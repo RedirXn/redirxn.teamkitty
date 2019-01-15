@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TeamKitty.Forms.TeamConfigPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Team Name:" />
+            <Entry x:Name="teamName" Text="enter team name" />
+            <StackLayout Orientation="Horizontal">
+                <Switch x:Name="isBeer" IsToggled="False" HorizontalOptions="Start" />
+                <Label Text="Beer" HorizontalOptions="Center" />
+                <Entry x:Name="beerPrice" x:DataType="x:Decimal (2)" Text="3.00" HorizontalOptions="EndAndExpand"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Switch x:Name="isSoftDrink" IsToggled="False" HorizontalOptions="Start" />
+                <Label Text="SoftDrink" HorizontalOptions="Center" />
+                <Entry x:Name="softDrinkPrice" x:DataType="x:Decimal (2)" Text="2.50" HorizontalOptions="EndAndExpand"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Switch x:Name="isPreMix" IsToggled="False" HorizontalOptions="Start" />
+                <Label Text="Pre-Mix" HorizontalOptions="Center" />
+                <Entry x:Name="preMixPrice" x:DataType="x:Decimal (2)" Text="5.00" HorizontalOptions="EndAndExpand"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Button x:Name="cancel" HorizontalOptions="Start" Clicked="Cancel_ClickedAsync" Text="Cancel"/>
+                <Button x:Name="save" HorizontalOptions="End" Clicked="Save_ClickedAsync" Text="Save"/>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="awssdk.cognitoidentity" Version="3.5.0.30" />
+    <PackageReference Include="awssdk.core" Version="3.5.1.28" />
+    <PackageReference Include="awssdk.dynamodbv2" Version="3.5.1.6" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
     <PackageReference Include="plugin.facebookclient" Version="2.2.1" />
     <PackageReference Include="splat" Version="9.6.1" />

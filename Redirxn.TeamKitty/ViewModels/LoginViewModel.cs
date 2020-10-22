@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Plugin.FacebookClient;
 using Redirxn.TeamKitty.Models;
+using Redirxn.TeamKitty.Services.Gateway;
 using Redirxn.TeamKitty.Services.Identity;
 using Redirxn.TeamKitty.Services.Routing;
 using Redirxn.TeamKitty.Views;
@@ -19,15 +20,17 @@ namespace Redirxn.TeamKitty.ViewModels
     {
         private IRoutingService _navigationService;
         private IIdentityService _identityService;
+        private IDataStore _dataStore;
         IFacebookClient _facebookService = CrossFacebookClient.Current;
 
         public ICommand OnLoginWithFacebookCommand { get; set; }
 
 
-        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null)
+        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null, IDataStore dataStore = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+            _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
 
             OnLoginWithFacebookCommand = new Command(async () => await LoginFacebookAsync());
         }

@@ -9,5 +9,6 @@ namespace Redirxn.TeamKitty.Services.Identity
     {
         bool IsUserLoggedIn { get; set; }
         NetworkAuthData LoginData { get; set; }
+        UserInfo UserDetail { get; set; }
     }
 }

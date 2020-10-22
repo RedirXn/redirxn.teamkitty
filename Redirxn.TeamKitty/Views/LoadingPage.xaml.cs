@@ -1,6 +1,7 @@
 ﻿using Redirxn.TeamKitty.Services.Identity;
 using Redirxn.TeamKitty.Services.Routing;
 using Redirxn.TeamKitty.ViewModels;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,9 @@ namespace Redirxn.TeamKitty.Views
             InitializeComponent();
 
         }
-        // TODO: Replace with Dependency Injection
-        internal LoadingViewModel ViewModel { get; set; } = new LoadingViewModel(new ShellRoutingService(), new IdentityService());
+
+        internal LoadingViewModel ViewModel { get; set; } = Locator.Current.GetService<LoadingViewModel>();
+
         protected override void OnAppearing()
         {
             base.OnAppearing();

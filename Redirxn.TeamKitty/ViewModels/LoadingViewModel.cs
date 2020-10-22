@@ -21,7 +21,7 @@ namespace Redirxn.TeamKitty.ViewModels
         // Called by the views OnAppearing method
         public async void Init()
         {
-            var isAuthenticated = identityService.IsUserLoggedIn();
+            var isAuthenticated = identityService.IsUserLoggedIn;
             if (isAuthenticated)
             {
                 await this.routingService.NavigateTo("///main");

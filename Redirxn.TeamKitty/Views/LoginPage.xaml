@@ -7,8 +7,17 @@
              x:Class="Redirxn.TeamKitty.Views.LoginPage"
              Shell.NavBarIsVisible="False">
     <ContentPage.Content>
-        <StackLayout Padding="10,0,10,0" VerticalOptions="Center">
-            <Button VerticalOptions="Center" Text="Login" Command="{Binding ExecuteLogin}"/>
+        <StackLayout Padding="20"
+                         VerticalOptions="CenterAndExpand">
+
+            <Button Text="Login with Facebook"
+                        ImageSource="ic_fb"
+                        Command="{Binding OnLoginWithFacebookCommand}"
+                        HeightRequest="45"
+                        TextColor="White"
+                        BackgroundColor="#4768AD"
+                        HorizontalOptions="CenterAndExpand"
+                        VerticalOptions="FillAndExpand"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

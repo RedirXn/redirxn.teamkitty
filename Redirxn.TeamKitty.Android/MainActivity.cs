@@ -6,6 +6,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Plugin.FacebookClient;
+using Java.Security;
+using Android.Content;
 
 namespace Redirxn.TeamKitty.Droid
 {
@@ -19,15 +22,52 @@ namespace Redirxn.TeamKitty.Droid
 
             base.OnCreate(savedInstanceState);
 
+            FacebookClientManager.Initialize(this);
+
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
+            
+            GetAppSignature(); // Remove once registered on Play store
+                        
+
             LoadApplication(new App());
         }
+
+        private static void GetAppSignature()
+        {
+            try
+            {
+                PackageInfo info = Android.App.Application.Context.PackageManager.GetPackageInfo(Android.App.Application.Context.PackageName, PackageInfoFlags.Signatures);
+                foreach (var signature in info.Signatures)
+                {
+                    MessageDigest md = MessageDigest.GetInstance("SHA");
+                    md.Update(signature.ToByteArray());
+
+                    System.Diagnostics.Debug.WriteLine("************ Signature ******************");
+                    System.Diagnostics.Debug.WriteLine(Convert.ToBase64String(md.Digest()));
+                }
+            }
+            catch (NoSuchAlgorithmException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+            }
+        }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent intent)
+        {
+            base.OnActivityResult(requestCode, resultCode, intent);
+            FacebookClientManager.OnActivityResult(requestCode, resultCode, intent);
         }
     }
 }

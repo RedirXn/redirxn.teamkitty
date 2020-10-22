@@ -1,9 +1,15 @@
-﻿using Redirxn.TeamKitty.Services.Routing;
+﻿using Newtonsoft.Json;
+using Plugin.FacebookClient;
+using Redirxn.TeamKitty.Models;
+using Redirxn.TeamKitty.Services.Identity;
+using Redirxn.TeamKitty.Services.Routing;
 using Redirxn.TeamKitty.Views;
 using Splat;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -12,28 +18,68 @@ namespace Redirxn.TeamKitty.ViewModels
     public class LoginViewModel : BaseViewModel
     {
         private IRoutingService _navigationService;
+        private IIdentityService _identityService;
+        IFacebookClient _facebookService = CrossFacebookClient.Current;
 
-        public LoginViewModel(IRoutingService navigationService = null)
+        public ICommand OnLoginWithFacebookCommand { get; set; }
+
+
+        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
-            ExecuteLogin = new Command(() => Login());
-            ExecuteRegistration = new Command(() => Register());
+            _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+
+            OnLoginWithFacebookCommand = new Command(async () => await LoginFacebookAsync());
         }
 
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public ICommand ExecuteLogin { get; set; }
-        public ICommand ExecuteRegistration { get; set; }
-
-        private void Login()
+        async Task LoginFacebookAsync()
         {
-            // This is where you would probably check the login and only if valid do the navigation...
-            _navigationService.NavigateTo("///main/home");
+            try
+            {
+                //if (_facebookService.IsLoggedIn)
+                //{
+                //    _facebookService.Logout();
+                //}
+
+                EventHandler<FBEventArgs<string>> userDataDelegate = null;
+
+                userDataDelegate = async (object sender, FBEventArgs<string> e) =>
+                {
+                    if (e == null) return;
+
+                    switch (e.Status)
+                    {
+                        case FacebookActionStatus.Completed:
+                            var facebookProfile = await Task.Run(() => JsonConvert.DeserializeObject<FacebookProfile>(e.Data));
+                            var socialLoginData = new NetworkAuthData
+                            {
+                                Email = facebookProfile.Email,
+                                Name = $"{facebookProfile.FirstName} {facebookProfile.LastName}",
+                                Id = facebookProfile.Id
+                            };
+                            _identityService.IsUserLoggedIn = true;
+                            _identityService.LoginData = socialLoginData;
+                            await _navigationService.NavigateTo("///main/home"); 
+                            break;
+                        case FacebookActionStatus.Canceled:
+                            break;
+                    }
+
+                    _facebookService.OnUserData -= userDataDelegate;
+                };
+
+                _facebookService.OnUserData += userDataDelegate;
+
+                string[] fbRequestFields = { "email", "first_name", "gender", "last_name" };
+                string[] fbPermisions = { "email" };
+                await _facebookService.RequestUserDataAsync(fbRequestFields, fbPermisions);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
 
-        private void Register()
-        {
-            Shell.Current.GoToAsync("//login/registration");
-        }
+
     }
 }

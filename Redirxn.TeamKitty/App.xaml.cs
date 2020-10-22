@@ -17,8 +17,7 @@ namespace Redirxn.TeamKitty
         {
             InitializeComponent();
             InitializeDi();
-
-            DependencyService.Register<MockDataStore>();
+                        
             MainPage = new AppShell();
         }
         private void InitializeDi()

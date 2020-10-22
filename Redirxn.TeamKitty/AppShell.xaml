@@ -43,7 +43,8 @@
                       IsTabStop="False"
                       ContentTemplate="{DataTemplate local:MainPage}"
                       Title="Home" />
-        
+        <ShellContent Title="About" Icon="tab_about.png" Route="AboutPage" ContentTemplate="{DataTemplate local:LoginPage}" />
+        <ShellContent Title="Browse" Icon="tab_feed.png" ContentTemplate="{DataTemplate local:LoginPage}" />
     </TabBar>
 
 </Shell>

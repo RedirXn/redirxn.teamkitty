@@ -3,6 +3,10 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Redirxn.TeamKitty.Services;
 using Redirxn.TeamKitty.Views;
+using Splat;
+using Redirxn.TeamKitty.Services.Routing;
+using Redirxn.TeamKitty.Services.Identity;
+using Redirxn.TeamKitty.ViewModels;
 
 namespace Redirxn.TeamKitty
 {
@@ -12,11 +16,21 @@ namespace Redirxn.TeamKitty
         public App()
         {
             InitializeComponent();
+            InitializeDi();
 
             DependencyService.Register<MockDataStore>();
             MainPage = new AppShell();
         }
+        private void InitializeDi()
+        {
+            // Services
+            Locator.CurrentMutable.RegisterLazySingleton<IRoutingService>(() => new ShellRoutingService());
+            Locator.CurrentMutable.RegisterLazySingleton<IIdentityService>(() => new IdentityService());
 
+            // ViewModels
+            Locator.CurrentMutable.Register(() => new LoadingViewModel());
+            Locator.CurrentMutable.Register(() => new LoginViewModel());            
+        }
         protected override void OnStart()
         {
         }

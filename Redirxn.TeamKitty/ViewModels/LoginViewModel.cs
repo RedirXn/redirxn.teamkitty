@@ -1,24 +1,39 @@
-﻿using Redirxn.TeamKitty.Views;
+﻿using Redirxn.TeamKitty.Services.Routing;
+using Redirxn.TeamKitty.Views;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace Redirxn.TeamKitty.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
-        public Command LoginCommand { get; }
+        private IRoutingService _navigationService;
 
-        public LoginViewModel()
+        public LoginViewModel(IRoutingService navigationService = null)
         {
-            LoginCommand = new Command(OnLoginClicked);
+            _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
+            ExecuteLogin = new Command(() => Login());
+            ExecuteRegistration = new Command(() => Register());
         }
 
-        private async void OnLoginClicked(object obj)
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public ICommand ExecuteLogin { get; set; }
+        public ICommand ExecuteRegistration { get; set; }
+
+        private void Login()
         {
-            // Prefixing with `//` switches to a different navigation stack instead of pushing to the active one
-            await Shell.Current.GoToAsync($"//{nameof(AboutPage)}");
+            // This is where you would probably check the login and only if valid do the navigation...
+            _navigationService.NavigateTo("///main/home");
+        }
+
+        private void Register()
+        {
+            Shell.Current.GoToAsync("//login/registration");
         }
     }
 }

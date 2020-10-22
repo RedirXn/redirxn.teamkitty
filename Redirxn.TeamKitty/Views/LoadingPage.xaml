@@ -4,11 +4,14 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="Redirxn.TeamKitty.Views.LoginPage"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             x:Class="Redirxn.TeamKitty.Views.LoadingPage">
     <ContentPage.Content>
-        <StackLayout Padding="10,0,10,0" VerticalOptions="Center">
-            <Button VerticalOptions="Center" Text="Login" Command="{Binding ExecuteLogin}"/>
+        <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+            <ActivityIndicator Color="Accent"
+                               IsRunning="True"
+                               IsVisible="True" />
+            <Label Text="Loading ..." />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

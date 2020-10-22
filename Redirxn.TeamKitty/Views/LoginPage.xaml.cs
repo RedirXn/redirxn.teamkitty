@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Redirxn.TeamKitty.ViewModels;
+using Splat;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,7 +16,14 @@ namespace Redirxn.TeamKitty.Views
         public LoginPage()
         {
             InitializeComponent();
-            this.BindingContext = new LoginViewModel();
+            this.BindingContext = ViewModel;
+        }
+
+        internal LoginViewModel ViewModel { get; set; } = Locator.Current.GetService<LoginViewModel>();
+
+        protected override bool OnBackButtonPressed()
+        {
+            return true;
         }
     }
 }

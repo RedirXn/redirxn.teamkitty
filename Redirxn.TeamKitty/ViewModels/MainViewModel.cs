@@ -16,7 +16,13 @@ namespace Redirxn.TeamKitty.ViewModels
         private IDataStore _dataStore;
         private IIdentityService _identityService;
 
-        public string CurrentKitty = "";
+        string _currentKitty = string.Empty;
+        public string CurrentKitty
+        {
+            get { return _currentKitty; }
+            set { SetProperty(ref _currentKitty, value); }
+        }
+
         public IEnumerable<string> Kitties;
 
         public MainViewModel(IDataStore dataStore = null, IIdentityService identityService = null)

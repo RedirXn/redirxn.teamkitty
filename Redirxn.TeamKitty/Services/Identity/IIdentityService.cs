@@ -7,7 +7,7 @@ namespace Redirxn.TeamKitty.Services.Identity
 {
     public interface IIdentityService
     {
-        bool IsUserLoggedIn { get; set; }
+        bool IsUserLoggedIn { get; set; } // TODO: CHange this to use App property
         NetworkAuthData LoginData { get; set; }
         UserInfo UserDetail { get; set; }
     }

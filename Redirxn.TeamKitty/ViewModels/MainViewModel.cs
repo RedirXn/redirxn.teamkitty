@@ -35,11 +35,19 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 _identityService.UserDetail = await _dataStore.GetUserDetail(_identityService.LoginData.Email);
             }            
-            if (_identityService.UserDetail.DefaultKitty != null)
+            if (_identityService.UserDetail != null && _identityService.UserDetail.DefaultKitty != null)
             {
                 CurrentKitty = _identityService.UserDetail.DefaultKitty;
             }
             return true;
+        }
+
+        internal void CreateNewKitty(string newKittyName)
+        {
+            if (Kitties == null || !Kitties.Contains(newKittyName))
+            {
+                _dataStore.CreateNewKitty(_identityService.LoginData, _identityService.UserDetail, newKittyName);
+            }
         }
     }
 }

@@ -29,8 +29,17 @@ namespace Redirxn.TeamKitty.Views
             await ViewModel.Init();
             if (ViewModel.CurrentKitty == "")
             {
-                string action = await DisplayActionSheet("You do not belong to a kitty", "Cancel", null, "Create a New Kitty", "Join an Existing Kitty");
+                string createKitty = "Create a New Kitty";
+                string action = await DisplayActionSheet("You do not belong to a kitty", "Cancel", null, createKitty, "Join an Existing Kitty");
                 Debug.WriteLine("Action: " + action);
+                if (action == createKitty)
+                {
+                    string newKittyName = await DisplayPromptAsync("Create New Kitty", "Enter a name for the new kitty:");
+                    if (newKittyName != null)
+                    {
+                        ViewModel.CreateNewKitty(newKittyName);
+                    }
+                }
             }
         }
 

@@ -9,5 +9,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
     {
         void Init(string activeToken);
         Task<UserInfo> GetUserDetail(string email);
+        void CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);
     }
 }

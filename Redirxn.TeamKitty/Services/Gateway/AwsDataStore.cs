@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Redirxn.TeamKitty.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,6 +49,29 @@ namespace Redirxn.TeamKitty.Services.Gateway
             if (u == null || u.Info == "{}") return null;
             var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
             return myInfo;
+        }
+
+        public async void CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
+        {
+            var kitty = new Kitty { Id = loginData.Email + '|' + newKittyName, Config = "{}", LedgerSummary = "{}" };
+            if (userDetail == null)
+            {
+                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new[] { newKittyName }, DefaultKitty = newKittyName };
+            }
+            else if (userDetail.KittyNames == null)
+            {
+                userDetail.KittyNames = new[] { newKittyName };
+                userDetail.DefaultKitty = newKittyName;
+            }
+            else
+            {
+                userDetail.KittyNames.Concat(new[] { newKittyName });
+                userDetail.DefaultKitty = newKittyName;
+            }
+            var u = new User { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
+
+            await _context.SaveAsync(kitty);
+            await _context.SaveAsync(u);
         }
 
         [DynamoDBTable("Kitties")]

@@ -51,7 +51,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
             return myInfo;
         }
 
-        public async void CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
+        public async Task<UserInfo> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
         {
             var kitty = new Kitty { Id = loginData.Email + '|' + newKittyName, Config = "{}", LedgerSummary = "{}" };
             if (userDetail == null)
@@ -72,6 +72,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
             await _context.SaveAsync(kitty);
             await _context.SaveAsync(u);
+            return userDetail;
         }
 
         [DynamoDBTable("Kitties")]

@@ -48,11 +48,12 @@ namespace Redirxn.TeamKitty.ViewModels
             return true;
         }
 
-        internal void CreateNewKitty(string newKittyName)
+        internal async void CreateNewKitty(string newKittyName)
         {
             if (Kitties == null || !Kitties.Contains(newKittyName))
             {
-                _dataStore.CreateNewKitty(_identityService.LoginData, _identityService.UserDetail, newKittyName);
+                _identityService.UserDetail = await _dataStore.CreateNewKitty(_identityService.LoginData, _identityService.UserDetail, newKittyName);
+                CurrentKitty = _identityService.UserDetail.DefaultKitty;
             }
         }
     }

@@ -42,7 +42,21 @@ namespace Redirxn.TeamKitty.Views
                 }
             }
         }
+        private void xamlSwitch_Toggled(object sender, ToggledEventArgs e)
+        {
+            if (e.Value)
+            {
+                switchStateLabel.Text = $"You are in the session.";
+                btnFridge.IsEnabled = true;
+            }
+            else
+            {
+                switchStateLabel.Text = $"Join the session.";
+                btnFridge.IsEnabled = false;
+            }
+            
+            
+        }
 
-        
     }
 }

@@ -5,13 +5,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              Title="{Binding CurrentKitty}"
-             Shell.TabBarIsVisible="True"
+             Shell.TabBarIsVisible="True"             
              x:Class="Redirxn.TeamKitty.Views.MainPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Example Item"
+                 IconImageSource="example_icon.png"
+                 Order="Primary"
+                 Priority="0" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="{Binding CurrentKitty}"
-                VerticalOptions="CenterAndExpand" 
+            <Label x:Name="switchStateLabel"
+                Text="Join the session"
+                VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
+            <Switch x:Name="xamlSwitch"
+                Toggled="xamlSwitch_Toggled"
+                IsToggled="False"
+                OnColor="LightBlue"
+                ThumbColor="DodgerBlue"
+                VerticalOptions="Center"
+                HorizontalOptions="CenterAndExpand" />
+            <Button x:Name="btnFridge"
+                Text="I'm going to the Fridge"
+                Command="{Binding OnFridgeCommand}"
+                VerticalOptions="CenterAndExpand"
+                IsEnabled="False"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

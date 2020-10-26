@@ -9,6 +9,6 @@ namespace Redirxn.TeamKitty.Services.Identity
     {
         bool IsUserLoggedIn { get; set; } // TODO: CHange this to use App property
         NetworkAuthData LoginData { get; set; }
-        UserInfo UserDetail { get; set; }
+        UserInfo UserDetail { get; set; }        
     }
 }

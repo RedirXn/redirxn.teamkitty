@@ -20,6 +20,11 @@ namespace Redirxn.TeamKitty.Views
             this.BindingContext = ViewModel;
         }
         internal StockViewModel ViewModel { get; set; } = Locator.Current.GetService<StockViewModel>();
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            ViewModel.OnAppearing();
+        }
 
     }
 }

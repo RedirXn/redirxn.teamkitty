@@ -2,11 +2,37 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Redirxn.TeamKitty.Views.StockPage"
-             Title="Stock">
-    <ContentPage.Content>
-        <StackLayout x:Name="stkStock">
-            <Button Text="Add a Stock Item"
-                    Command="{Binding OnAddStockCommand}"/>
-        </StackLayout>
-    </ContentPage.Content>
+             xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
+             xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
+             Title="Menu">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding OnAddStockCommand}" />
+    </ContentPage.ToolbarItems>
+    <RefreshView x:DataType="local:StockViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        <CollectionView x:Name="ItemsListView"
+                ItemsSource="{Binding Items}"
+                SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Padding="10" x:DataType="model:StockItem">
+                        <Label Text="{Binding MainName}" 
+                            LineBreakMode="NoWrap" 
+                            Style="{DynamicResource ListItemTextStyle}" 
+                            FontSize="16" />
+                        <Label Text="{Binding SalePrice}" 
+                            LineBreakMode="NoWrap"
+                            Style="{DynamicResource ListItemDetailTextStyle}"
+                            FontSize="13" />
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                NumberOfTapsRequired="1"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:StockViewModel}}, Path=ItemTapped}"		
+                                CommandParameter="{Binding .}">
+                            </TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
 </ContentPage>

@@ -27,6 +27,7 @@ namespace Redirxn.TeamKitty
             Locator.CurrentMutable.RegisterLazySingleton<IRoutingService>(() => new ShellRoutingService());
             Locator.CurrentMutable.RegisterLazySingleton<IIdentityService>(() => new IdentityService());
             Locator.CurrentMutable.RegisterLazySingleton<IDataStore>(() => new AwsDataStore());
+            Locator.CurrentMutable.RegisterLazySingleton<IKittyService>(() => new KittyService());
 
             // ViewModels
             Locator.CurrentMutable.Register(() => new LoadingViewModel());

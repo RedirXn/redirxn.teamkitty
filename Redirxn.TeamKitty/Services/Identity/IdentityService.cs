@@ -10,5 +10,6 @@ namespace Redirxn.TeamKitty.Services.Identity
         public bool IsUserLoggedIn { get; set; } = false;
         public NetworkAuthData LoginData { get; set; }
         public UserInfo UserDetail { get; set; }
+        public KittyConfig CurrentKittyConfig { get; set; }
     }
 }

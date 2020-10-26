@@ -20,7 +20,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
         AmazonDynamoDBClient _client;
         DynamoDBContext _context;
 
-
         public void Dispose()
         {
             if (_context != null) _context.Dispose();
@@ -45,43 +44,89 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
         public async Task<UserInfo> GetUserDetail(string email)
         {
-            var u = await _context.LoadAsync<User>(email);
+            var u = await _context.LoadAsync<DynamoUser>(email);
             if (u == null || u.Info == "{}") return null;
             var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
             return myInfo;
         }
+                
+        public async Task<Kitty> GetKitty(string kittyId)
+        {
+            DynamoKitty kittyFromDb = await GetDynamoKittyAsync(kittyId);
+            var kitty = new Kitty
+            {
+                Id = kittyId,
+                KittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kittyFromDb.Config),
+                Ledger = JsonConvert.DeserializeObject<Ledger>(kittyFromDb.LedgerSummary)
+            };
+            return kitty;
+        }
+
+        private async Task<DynamoKitty> GetDynamoKittyAsync(string kittyId)
+        {
+            return await _context.LoadAsync<DynamoKitty>(kittyId);
+        }
 
         public async Task<UserInfo> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
         {
-            var kitty = new Kitty { Id = loginData.Email + '|' + newKittyName, Config = "{}", LedgerSummary = "{}" };
+            var kittyId = loginData.Email + '|' + newKittyName;
+            var kitty = new DynamoKitty { Id = kittyId, Config = "{}", LedgerSummary = "{}" };
             if (userDetail == null)
             {
-                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new[] { newKittyName }, DefaultKitty = newKittyName };
+                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new[] { kittyId }, DefaultKitty = kittyId };
             }
             else if (userDetail.KittyNames == null)
             {
-                userDetail.KittyNames = new[] { newKittyName };
-                userDetail.DefaultKitty = newKittyName;
+                userDetail.KittyNames = new[] { kittyId };
+                userDetail.DefaultKitty = kittyId;
             }
             else
             {
-                userDetail.KittyNames.Concat(new[] { newKittyName });
-                userDetail.DefaultKitty = newKittyName;
+                userDetail.KittyNames.Concat(new[] { kittyId });
+                userDetail.DefaultKitty = kittyId;
             }
-            var u = new User { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
+            var u = new DynamoUser { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
 
             await _context.SaveAsync(kitty);
             await _context.SaveAsync(u);
             return userDetail;
         }
 
-        public void SaveStockItem(string mainName, string mainNamePlural, string stockName, decimal price, decimal stockPrice)
+        public async Task<KittyConfig> SaveStockItem(string kittyName, StockItem stockItem)
         {
+            var kitty = await GetDynamoKittyAsync(kittyName);
+
+            var kittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kitty.Config);
             
+            if (kittyConfig == null)
+            {
+                kittyConfig = new KittyConfig();
+            }
+            if (kittyConfig.StockItems == null)
+            {
+                kittyConfig.StockItems = new List<StockItem>();
+            }
+            if (kittyConfig.StockItems.Any(si => si.MainName == stockItem.MainName))
+            {
+                kittyConfig.StockItems = ReplaceStockItem(kittyConfig.StockItems, stockItem);
+            }
+            else
+            {
+                kittyConfig.StockItems = kittyConfig.StockItems.Concat(new[] { stockItem });
+            }
+            kitty.Config = JsonConvert.SerializeObject(kittyConfig);
+            
+            await _context.SaveAsync(kitty);
+            return kittyConfig;
+        }
+
+        public IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
+        {
+            return enumerable.Select(x => x.MainName == value.MainName ? value : x);
         }
 
         [DynamoDBTable("Kitties")]
-        class Kitty
+        class DynamoKitty
         {
             [DynamoDBHashKey]
             public string Id { get; set; }
@@ -90,7 +135,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
         }
 
         [DynamoDBTable("Users")]
-        class User
+        class DynamoUser
         {
             [DynamoDBHashKey]
             public string Id { get; set; }

@@ -1,20 +1,19 @@
 ﻿using Plugin.FacebookClient;
+using Redirxn.TeamKitty.Models;
 using Redirxn.TeamKitty.Services.Gateway;
 using Redirxn.TeamKitty.Services.Identity;
-using Redirxn.TeamKitty.Views;
 using Splat;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.ViewModels
-{    
+{
     class MainViewModel : BaseViewModel
     {
         private IDataStore _dataStore;
         private IIdentityService _identityService;
+        private IKittyService _kittyService;
 
         string _currentKitty = string.Empty;
         public string CurrentKitty
@@ -25,16 +24,17 @@ namespace Redirxn.TeamKitty.ViewModels
 
         public IEnumerable<string> Kitties;
 
-        public MainViewModel(IDataStore dataStore = null, IIdentityService identityService = null)
+        public MainViewModel(IDataStore dataStore = null, IIdentityService identityService = null, IKittyService kittyService = null)
         {
-            this._dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
-            this._identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+            _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
+            _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+            _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
         }
 
         // Called by the views OnAppearing method
         internal async Task<bool> Init()
         {
-            this._dataStore.Init(CrossFacebookClient.Current.ActiveToken);   
+            _dataStore.Init(CrossFacebookClient.Current.ActiveToken);   
 
             // Load data from AWS, set properties in the view model that are bound to the view.
             if (_identityService.UserDetail == null)
@@ -43,7 +43,8 @@ namespace Redirxn.TeamKitty.ViewModels
             }            
             if (_identityService.UserDetail != null && _identityService.UserDetail.DefaultKitty != null)
             {
-                CurrentKitty = _identityService.UserDetail.DefaultKitty;
+                CurrentKitty = _identityService.UserDetail.DefaultKitty.Split('|')[1];
+                _kittyService.Kitty = await _dataStore.GetKitty(_identityService.UserDetail.DefaultKitty);
             }
             return true;
         }
@@ -53,7 +54,8 @@ namespace Redirxn.TeamKitty.ViewModels
             if (Kitties == null || !Kitties.Contains(newKittyName))
             {
                 _identityService.UserDetail = await _dataStore.CreateNewKitty(_identityService.LoginData, _identityService.UserDetail, newKittyName);
-                CurrentKitty = _identityService.UserDetail.DefaultKitty;
+                CurrentKitty = _identityService.UserDetail.DefaultKitty.Split('|')[1];
+                _kittyService.Kitty = new Kitty { Id = _identityService.UserDetail.DefaultKitty };
             }
         }
     }

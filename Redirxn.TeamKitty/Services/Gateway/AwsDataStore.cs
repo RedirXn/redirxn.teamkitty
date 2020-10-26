@@ -75,6 +75,11 @@ namespace Redirxn.TeamKitty.Services.Gateway
             return userDetail;
         }
 
+        public void SaveStockItem(string mainName, string mainNamePlural, string stockName, decimal price, decimal stockPrice)
+        {
+            
+        }
+
         [DynamoDBTable("Kitties")]
         class Kitty
         {

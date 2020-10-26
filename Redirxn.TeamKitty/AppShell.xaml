@@ -42,9 +42,10 @@
         <ShellContent Route="home"
                       IsTabStop="False"
                       ContentTemplate="{DataTemplate local:MainPage}"
-                      Title="Home" />
-        <ShellContent Title="About" Icon="tab_about.png" Route="AboutPage" ContentTemplate="{DataTemplate local:LoginPage}" />
-        <ShellContent Title="Browse" Icon="tab_feed.png" ContentTemplate="{DataTemplate local:LoginPage}" />
+                      Title="Session" />
+        <ShellContent Title="Money" Icon="tab_money.png" Route="AboutPage" ContentTemplate="{DataTemplate local:LoginPage}" />
+        <ShellContent Title="Stock" Icon="tab_stock.png" ContentTemplate="{DataTemplate local:StockPage}" />
+        <ShellContent Title="Settings" Icon="tab_settings.png" ContentTemplate="{DataTemplate local:SettingsPage}" />
     </TabBar>
 
 </Shell>

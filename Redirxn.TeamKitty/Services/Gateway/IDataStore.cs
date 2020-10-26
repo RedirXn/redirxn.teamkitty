@@ -10,5 +10,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
         void Init(string activeToken);
         Task<UserInfo> GetUserDetail(string email);
         Task<UserInfo> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);
+        void SaveStockItem(string mainName, string mainNamePlural, string stockName, decimal price, decimal stockPrice);
     }
 }

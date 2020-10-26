@@ -53,8 +53,7 @@ namespace Redirxn.TeamKitty.Views
             {
                 switchStateLabel.Text = $"Join the session.";
                 btnFridge.IsEnabled = false;
-            }
-            
+            }          
             
         }
 

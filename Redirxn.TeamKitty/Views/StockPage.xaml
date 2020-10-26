@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Redirxn.TeamKitty.Views.StockPage"
+             Title="Stock">
+    <ContentPage.Content>
+        <StackLayout x:Name="stkStock">
+            <Button Text="Add a Stock Item"
+                    Command="{Binding OnAddStockCommand}"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Redirxn.TeamKitty.Views.SettingsPage"
+             Title="Settings">
+    <ContentPage.Content>
+        <ScrollView>
+        <StackLayout>
+            <Button Text="Change my Displayed Name" />
+            <Button Text="Change Kitty" />
+            <Button Text="Create a new Kitty" />
+            <Button Text="Join a new Kitty" />
+            <Button Text="Invite Someone to Join" />
+            <Button Text="Change the name of this Kitty"/>
+        </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

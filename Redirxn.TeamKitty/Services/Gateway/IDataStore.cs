@@ -12,5 +12,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
         Task<UserInfo> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);        
         Task<KittyConfig> SaveStockItem(string defaultKitty, StockItem stockItem);
         Task<Kitty> GetKitty(string defaultKitty);
+        Task DeleteStockItem(string id, string mainName);
     }
 }

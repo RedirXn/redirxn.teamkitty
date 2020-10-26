@@ -56,12 +56,17 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return string.Empty; }
             set { LoadFromState(value); }
         }
+        public ICommand OnDeleteStockCommand { get; set; }
         public StockItemViewModel(IRoutingService navigationService = null, IDataStore dataStore = null, IKittyService kittyService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
+
+            OnDeleteStockCommand = new Command(async () => await ExecuteDeleteItemCommand());
         }
+
+
         internal async void Save()
         {
             var stockItem = new StockItem
@@ -74,7 +79,7 @@ namespace Redirxn.TeamKitty.ViewModels
             };
 
             _kittyService.Kitty.KittyConfig = await _dataStore.SaveStockItem(_kittyService.Kitty.Id, stockItem);
-
+            await _navigationService.GoBack();
         }
         private void LoadFromState(string name)
         {
@@ -85,6 +90,13 @@ namespace Redirxn.TeamKitty.ViewModels
             StockName = item.StockGrouping;
             Price = item.SalePrice;
             StockPrice = item.StockPrice;
+        }
+
+        private async Task ExecuteDeleteItemCommand()
+        {
+            // ToDO: confirmation, or check not already in use.
+            await _dataStore.DeleteStockItem(_kittyService.Kitty.Id, MainName);
+            await _navigationService.GoBack();
         }
 
     }

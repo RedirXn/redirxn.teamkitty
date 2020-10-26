@@ -120,9 +120,31 @@ namespace Redirxn.TeamKitty.Services.Gateway
             return kittyConfig;
         }
 
-        public IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
+        private IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
         {
             return enumerable.Select(x => x.MainName == value.MainName ? value : x);
+        }
+        private IEnumerable<StockItem> RemoveStockItem(IEnumerable<StockItem> enumerable, string stockItemName)
+        {
+            return enumerable.Where((x) => x.MainName != stockItemName);
+        }
+
+        public async Task DeleteStockItem(string kittyName, string mainName)
+        {
+            var kitty = await GetDynamoKittyAsync(kittyName);
+
+            var kittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kitty.Config);
+
+            if (kittyConfig == null || kittyConfig.StockItems == null || !kittyConfig.StockItems.Any(si => si.MainName == mainName))
+            {
+                return;
+            }
+                
+            kittyConfig.StockItems = RemoveStockItem(kittyConfig.StockItems, mainName);
+            
+            kitty.Config = JsonConvert.SerializeObject(kittyConfig);
+
+            await _context.SaveAsync(kitty);            
         }
 
         [DynamoDBTable("Kitties")]

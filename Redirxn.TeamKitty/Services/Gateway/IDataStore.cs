@@ -9,9 +9,9 @@ namespace Redirxn.TeamKitty.Services.Gateway
     {
         void Init(string activeToken);
         Task<UserInfo> GetUserDetail(string email);
-        Task<UserInfo> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);        
-        Task<KittyConfig> SaveStockItem(string defaultKitty, StockItem stockItem);
-        Task<Kitty> GetKitty(string defaultKitty);
-        Task DeleteStockItem(string id, string mainName);
+        Task<Kitty> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);        
+        Task<Kitty> SaveStockItem(string kittyId, StockItem stockItem);
+        Task<Kitty> GetKitty(string kittyId);
+        Task<Kitty> DeleteStockItem(string kittyId, string mainName);
     }
 }

@@ -19,7 +19,6 @@ namespace Redirxn.TeamKitty.ViewModels
     {
         private IRoutingService _navigationService;
         private IKittyService _kittyService;
-        private IDataStore _dataStore;
         private IIdentityService _identityService;
 
         private StockItem _selectedItem;
@@ -29,21 +28,17 @@ namespace Redirxn.TeamKitty.ViewModels
         public Command<StockItem> ItemTapped { get; }
 
 
-        public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IDataStore dataStore = null, IIdentityService identityService = null)
+        public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
-            _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
-            _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
+            _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();            
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
 
             Items = new ObservableCollection<StockItem>();
 
-            OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));
-            
+            OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
-
             ItemTapped = new Command<StockItem>(OnItemSelected);
-
         }
         async Task ExecuteLoadItemsCommand()
         {
@@ -52,17 +47,11 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             {
                 Items.Clear();
-                var kitty = await _dataStore.GetKitty(_identityService.UserDetail.DefaultKitty);
-                if (kitty != null)
+                var kitty = await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
+
+                foreach (var item in kitty.KittyConfig.StockItems)
                 {
-                    _kittyService.Kitty = kitty;
-                    if (kitty.KittyConfig != null && kitty.KittyConfig.StockItems != null)
-                    {
-                        foreach (var item in kitty.KittyConfig.StockItems)
-                        {
-                            Items.Add(item);
-                        }
-                    }
+                    Items.Add(item);
                 }
             }
             catch (Exception ex)
@@ -95,10 +84,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             if (item == null)
                 return;
-            var goHere = $"{nameof(StockItemPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}";
-            await _navigationService.NavigateTo(goHere);
+            await _navigationService.NavigateTo($"{nameof(StockItemPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
         }
-
-
     }
 }

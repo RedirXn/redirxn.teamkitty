@@ -45,14 +45,22 @@ namespace Redirxn.TeamKitty.Services.Gateway
         public async Task<UserInfo> GetUserDetail(string email)
         {
             var u = await _context.LoadAsync<DynamoUser>(email);
-            if (u == null || u.Info == "{}") return null;
+            if (u == null || u.Info == "{}") return new UserInfo();
             var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
             return myInfo;
         }
                 
         public async Task<Kitty> GetKitty(string kittyId)
         {
+            if (string.IsNullOrWhiteSpace(kittyId))
+            {
+                return new Kitty();
+            }
             DynamoKitty kittyFromDb = await GetDynamoKittyAsync(kittyId);
+            if (kittyFromDb == null)
+            {
+                return new Kitty();
+            }
             var kitty = new Kitty
             {
                 Id = kittyId,
@@ -64,14 +72,14 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
         private async Task<DynamoKitty> GetDynamoKittyAsync(string kittyId)
         {
-            return await _context.LoadAsync<DynamoKitty>(kittyId);
+            return await _context.LoadAsync<DynamoKitty>(kittyId) ?? new DynamoKitty();
         }
 
-        public async Task<UserInfo> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
+        public async Task<Kitty> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
         {
             var kittyId = loginData.Email + '|' + newKittyName;
-            var kitty = new DynamoKitty { Id = kittyId, Config = "{}", LedgerSummary = "{}" };
-            if (userDetail == null)
+            var kittyDb = new DynamoKitty { Id = kittyId, Config = "{}", LedgerSummary = "{}" };
+            if (userDetail == null || userDetail.Id == string.Empty)
             {
                 userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new[] { kittyId }, DefaultKitty = kittyId };
             }
@@ -87,37 +95,66 @@ namespace Redirxn.TeamKitty.Services.Gateway
             }
             var u = new DynamoUser { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
 
-            await _context.SaveAsync(kitty);
+            await _context.SaveAsync(kittyDb);
             await _context.SaveAsync(u);
-            return userDetail;
+
+            return GetKittyFromDbKitty(kittyDb);
         }
 
-        public async Task<KittyConfig> SaveStockItem(string kittyName, StockItem stockItem)
+        public async Task<Kitty> SaveStockItem(string kittyId, StockItem stockItem)
         {
-            var kitty = await GetDynamoKittyAsync(kittyName);
-
-            var kittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kitty.Config);
+            var kittyDb = await GetDynamoKittyAsync(kittyId);            
+            var kitty = GetKittyFromDbKitty(kittyDb);
             
-            if (kittyConfig == null)
+            if (kitty.KittyConfig.StockItems.Any(si => si.MainName == stockItem.MainName))
             {
-                kittyConfig = new KittyConfig();
-            }
-            if (kittyConfig.StockItems == null)
-            {
-                kittyConfig.StockItems = new List<StockItem>();
-            }
-            if (kittyConfig.StockItems.Any(si => si.MainName == stockItem.MainName))
-            {
-                kittyConfig.StockItems = ReplaceStockItem(kittyConfig.StockItems, stockItem);
+                kitty.KittyConfig.StockItems = ReplaceStockItem(kitty.KittyConfig.StockItems, stockItem);
             }
             else
             {
-                kittyConfig.StockItems = kittyConfig.StockItems.Concat(new[] { stockItem });
+                kitty.KittyConfig.StockItems = kitty.KittyConfig.StockItems.Concat(new[] { stockItem });
             }
-            kitty.Config = JsonConvert.SerializeObject(kittyConfig);
+
+            kittyDb = GetDbKittyFromKitty(kitty);
             
-            await _context.SaveAsync(kitty);
-            return kittyConfig;
+            await _context.SaveAsync(kittyDb);
+            return kitty;
+        }
+        public async Task<Kitty> DeleteStockItem(string kittyId, string mainName)
+        {
+            var kittyDb = await GetDynamoKittyAsync(kittyId);
+            var kitty = GetKittyFromDbKitty(kittyDb);
+
+            if (!kitty.KittyConfig.StockItems.Any(si => si.MainName == mainName))
+            {
+                return kitty;
+            }
+
+            kitty.KittyConfig.StockItems = RemoveStockItem(kitty.KittyConfig.StockItems, mainName);
+
+            kittyDb = GetDbKittyFromKitty(kitty);
+            await _context.SaveAsync(kittyDb);
+            return kitty;
+        }
+
+        private DynamoKitty GetDbKittyFromKitty(Kitty kitty)
+        {
+            return new DynamoKitty
+            {
+                Id = kitty.Id,
+                Config = JsonConvert.SerializeObject(kitty.KittyConfig),
+                LedgerSummary = JsonConvert.SerializeObject(kitty.Ledger)
+            };
+        }
+
+        private Kitty GetKittyFromDbKitty(DynamoKitty kittyDb)
+        {
+            return new Kitty
+            {
+                Id = kittyDb.Id,
+                KittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kittyDb.Config),
+                Ledger = JsonConvert.DeserializeObject<Ledger>(kittyDb.LedgerSummary)
+            };
         }
 
         private IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
@@ -127,24 +164,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
         private IEnumerable<StockItem> RemoveStockItem(IEnumerable<StockItem> enumerable, string stockItemName)
         {
             return enumerable.Where((x) => x.MainName != stockItemName);
-        }
-
-        public async Task DeleteStockItem(string kittyName, string mainName)
-        {
-            var kitty = await GetDynamoKittyAsync(kittyName);
-
-            var kittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kitty.Config);
-
-            if (kittyConfig == null || kittyConfig.StockItems == null || !kittyConfig.StockItems.Any(si => si.MainName == mainName))
-            {
-                return;
-            }
-                
-            kittyConfig.StockItems = RemoveStockItem(kittyConfig.StockItems, mainName);
-            
-            kitty.Config = JsonConvert.SerializeObject(kittyConfig);
-
-            await _context.SaveAsync(kitty);            
         }
 
         [DynamoDBTable("Kitties")]

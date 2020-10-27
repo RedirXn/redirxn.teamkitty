@@ -26,8 +26,9 @@ namespace Redirxn.TeamKitty.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+
             await ViewModel.Init();
-            if (ViewModel.CurrentKitty == "")
+            if (string.IsNullOrEmpty(ViewModel.CurrentKitty))
             {
                 string createKitty = "Create a New Kitty";
                 string action = await DisplayActionSheet("You do not belong to a kitty", "Cancel", null, createKitty, "Join an Existing Kitty");

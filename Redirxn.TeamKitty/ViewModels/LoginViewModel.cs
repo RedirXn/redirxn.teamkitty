@@ -20,17 +20,15 @@ namespace Redirxn.TeamKitty.ViewModels
     {
         private IRoutingService _navigationService;
         private IIdentityService _identityService;
-        private IDataStore _dataStore;
         IFacebookClient _facebookService = CrossFacebookClient.Current;
 
         public ICommand OnLoginWithFacebookCommand { get; set; }
 
 
-        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null, IDataStore dataStore = null)
+        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
-            _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
 
             OnLoginWithFacebookCommand = new Command(async () => await LoginFacebookAsync());
         }
@@ -60,8 +58,7 @@ namespace Redirxn.TeamKitty.ViewModels
                                 Name = $"{facebookProfile.FirstName} {facebookProfile.LastName}",
                                 Id = facebookProfile.Id
                             };
-                            _identityService.IsUserLoggedIn = true;
-                            _identityService.LoginData = socialLoginData;
+                            await _identityService.Init(CrossFacebookClient.Current.ActiveToken, socialLoginData);
                             await _navigationService.NavigateTo("///main/home"); 
                             break;
                         case FacebookActionStatus.Canceled:

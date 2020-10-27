@@ -18,7 +18,6 @@ namespace Redirxn.TeamKitty.ViewModels
     public class StockItemViewModel : BaseViewModel
     {
         private IRoutingService _navigationService;
-        private IDataStore _dataStore;
         private IKittyService _kittyService;
 
         string _mainName;
@@ -57,15 +56,13 @@ namespace Redirxn.TeamKitty.ViewModels
             set { LoadFromState(value); }
         }
         public ICommand OnDeleteStockCommand { get; set; }
-        public StockItemViewModel(IRoutingService navigationService = null, IDataStore dataStore = null, IKittyService kittyService = null)
+        public StockItemViewModel(IRoutingService navigationService = null, IKittyService kittyService = null)
         {
-            _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
-            _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
+            _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();            
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
 
             OnDeleteStockCommand = new Command(async () => await ExecuteDeleteItemCommand());
         }
-
 
         internal async void Save()
         {
@@ -78,9 +75,15 @@ namespace Redirxn.TeamKitty.ViewModels
                 StockPrice = _stockPrice
             };
 
-            _kittyService.Kitty.KittyConfig = await _dataStore.SaveStockItem(_kittyService.Kitty.Id, stockItem);
+            await _kittyService.SaveStockItem(_kittyService.Kitty.Id, stockItem);
+            await ClosePage();
+        }
+
+        private async Task ClosePage()
+        {
             await _navigationService.GoBack();
         }
+
         private void LoadFromState(string name)
         {
             var item = _kittyService.Kitty.KittyConfig.StockItems.First(si => si.MainName == name);
@@ -95,8 +98,8 @@ namespace Redirxn.TeamKitty.ViewModels
         private async Task ExecuteDeleteItemCommand()
         {
             // ToDO: confirmation, or check not already in use.
-            await _dataStore.DeleteStockItem(_kittyService.Kitty.Id, MainName);
-            await _navigationService.GoBack();
+            await _kittyService.DeleteStockItem(_kittyService.Kitty.Id, MainName);
+            await ClosePage();
         }
 
     }

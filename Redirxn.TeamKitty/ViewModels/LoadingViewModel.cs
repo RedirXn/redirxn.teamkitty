@@ -9,26 +9,26 @@ namespace Redirxn.TeamKitty.ViewModels
 {
     class LoadingViewModel : BaseViewModel
     {
-        private readonly IRoutingService routingService;
-        private readonly IIdentityService identityService;
+        private readonly IRoutingService _routingService;
+        private readonly IIdentityService _identityService;
 
         public LoadingViewModel(IRoutingService routingService = null, IIdentityService identityService = null)
         {
-            this.routingService = routingService ?? Locator.Current.GetService<IRoutingService>();
-            this.identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+            _routingService = routingService ?? Locator.Current.GetService<IRoutingService>();
+            _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
         }
 
         // Called by the views OnAppearing method
         public async void Init()
         {
-            var isAuthenticated = identityService.IsUserLoggedIn;
+            var isAuthenticated = _identityService.IsUserLoggedIn;
             if (isAuthenticated)
             {
-                await this.routingService.NavigateTo("///main");
+                await _routingService.NavigateTo("///main");
             }
             else
             {
-                await this.routingService.NavigateTo("///login");
+                await _routingService.NavigateTo("///login");
             }
         }
     }

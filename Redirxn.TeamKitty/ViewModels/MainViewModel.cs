@@ -34,7 +34,7 @@ namespace Redirxn.TeamKitty.ViewModels
             CurrentKitty = _kittyService.Kitty?.DisplayName;
         }
 
-        internal async void CreateNewKitty(string newKittyName)
+        internal async Task CreateNewKitty(string newKittyName)
         {
             if (!_identityService.KittyNameExists(newKittyName))
             {                

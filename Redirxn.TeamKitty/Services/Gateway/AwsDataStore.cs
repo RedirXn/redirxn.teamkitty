@@ -62,12 +62,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
             {
                 return new Kitty();
             }
-            var kitty = new Kitty
-            {
-                Id = kittyId,
-                KittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kittyFromDb.Config),
-                Ledger = JsonConvert.DeserializeObject<Ledger>(kittyFromDb.LedgerSummary)
-            };
+            var kitty = GetKittyFromDbKitty(kittyFromDb);
             return kitty;
         }
 
@@ -79,19 +74,14 @@ namespace Redirxn.TeamKitty.Services.Gateway
         public async Task<Kitty> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
         {
             var kittyId = loginData.Email + '|' + newKittyName;
-            var kittyDb = new DynamoKitty { Id = kittyId, Config = "{}", LedgerSummary = "{}" };
+            var kittyDb = new DynamoKitty { Id = kittyId, Config = "{}", LedgerSummary = "{}", Administrators = new List<string> { loginData.Email } };
             if (userDetail == null || userDetail.Id == string.Empty)
             {
-                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new[] { kittyId }, DefaultKitty = kittyId };
-            }
-            else if (userDetail.KittyNames == null)
-            {
-                userDetail.KittyNames = new[] { kittyId };
-                userDetail.DefaultKitty = kittyId;
+                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new List<string> { kittyId }, DefaultKitty = kittyId };
             }
             else
             {
-                userDetail.KittyNames.Concat(new[] { kittyId });
+                userDetail.KittyNames.Add(kittyId);
                 userDetail.DefaultKitty = kittyId;
             }
             var u = new DynamoUser { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
@@ -144,7 +134,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
             {
                 Id = kitty.Id,
                 Config = JsonConvert.SerializeObject(kitty.KittyConfig),
-                LedgerSummary = JsonConvert.SerializeObject(kitty.Ledger)
+                LedgerSummary = JsonConvert.SerializeObject(kitty.Ledger),
+                Administrators = kitty.Administrators.ToList()
             };
         }
 
@@ -154,7 +145,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
             {
                 Id = kittyDb.Id,
                 KittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kittyDb.Config),
-                Ledger = JsonConvert.DeserializeObject<Ledger>(kittyDb.LedgerSummary)
+                Ledger = JsonConvert.DeserializeObject<Ledger>(kittyDb.LedgerSummary),
+                Administrators = kittyDb.Administrators
             };
         }
 
@@ -247,9 +239,29 @@ namespace Redirxn.TeamKitty.Services.Gateway
             return new string(stringChars);
         }
 
-        public Task<Kitty> JoinKittyWithCode(string joinCode)
+        public async Task<Kitty> JoinKittyWithCode(NetworkAuthData loginData, UserInfo userDetail, string joinCode)
         {
-            throw new NotImplementedException();
+            var code = await _context.LoadAsync<JoinCode>(joinCode);
+            if (code == null || DateTime.Parse(code.Expiry) < DateTime.Now)
+            {
+                return null;
+            }
+            var kitty = await GetKitty(code.KittyId);
+
+            if (userDetail == null || userDetail.Id == string.Empty)
+            {
+                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new List<string> { kitty.Id }, DefaultKitty = kitty.Id };
+            }
+            else
+            {
+                userDetail.KittyNames.Add(kitty.Id);
+                userDetail.DefaultKitty = kitty.Id;
+            }
+            var u = new DynamoUser { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
+
+            await _context.SaveAsync(u);
+
+            return kitty;
         }
 
         [DynamoDBTable("Kitties")]
@@ -259,6 +271,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
             public string Id { get; set; }
             public string Config { get; set; }
             public string LedgerSummary { get; set; }
+            public List<string> Administrators { get; set; }
         }
 
         [DynamoDBTable("Users")]

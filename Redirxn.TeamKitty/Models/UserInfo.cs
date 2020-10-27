@@ -8,7 +8,7 @@ namespace Redirxn.TeamKitty.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public IEnumerable<string> KittyNames { get; set; } = new string[0];
+        public IList<string> KittyNames { get; set; } = new List<string>();
         public string DefaultKitty { get; set; }
     }
 }

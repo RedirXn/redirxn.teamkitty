@@ -38,7 +38,7 @@ namespace Redirxn.TeamKitty.Views
                     string newKittyName = await DisplayPromptAsync("Create New Kitty", "Enter a name for the new kitty:");
                     if (newKittyName != null)
                     {
-                        ViewModel.CreateNewKitty(newKittyName);
+                        await ViewModel.CreateNewKitty(newKittyName);
                     }
                 }
             }

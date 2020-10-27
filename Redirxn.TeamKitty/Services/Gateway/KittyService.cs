@@ -2,6 +2,7 @@
 using Splat;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,9 +49,18 @@ namespace Redirxn.TeamKitty.Services.Gateway
             return await _dataStore.ResetJoinCode(Kitty.Id);
         }
 
-        public async Task JoinKittyWithCode(string joinCode)
+        public async Task JoinKittyWithCode(NetworkAuthData loginData, UserInfo userDetail, string joinCode)
         {
-            Kitty = await _dataStore.JoinKittyWithCode(joinCode);
+            var k = await _dataStore.JoinKittyWithCode(loginData, userDetail, joinCode);
+            if (k != null)
+            {
+                Kitty = k;
+            }
+        }
+
+        public bool AmIAdmin(string email)
+        {
+            return Kitty.Administrators.Any(s => s.Equals(email, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Redirxn.TeamKitty.Services.Identity
 
         public bool KittyNameExists(string newKittyName)
         {
-            if (UserDetail == null || UserDetail.KittyNames == null || !UserDetail.KittyNames.Any(k => k.Contains("|" + newKittyName)))
+            if (UserDetail == null || !UserDetail.KittyNames.Any(k => k.Contains("|" + newKittyName)))
             {
                 return false;
             }

@@ -13,5 +13,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
         Task<Kitty> SaveStockItem(string kittyId, StockItem stockItem);
         Task<Kitty> GetKitty(string kittyId);
         Task<Kitty> DeleteStockItem(string kittyId, string mainName);
+        Task<string> SetNewJoinCode(string kittyId);
+        Task<string> ResetJoinCode(string kittyId);
+        Task<Kitty> JoinKittyWithCode(string joinCode);
     }
 }

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redirxn.TeamKitty.Android",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redirxn.TeamKitty.iOS", "Redirxn.TeamKitty.iOS\Redirxn.TeamKitty.iOS.csproj", "{6A746ED0-852A-423F-9299-618FC43C3E3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redirxn.TeamKitty", "Redirxn.TeamKitty\Redirxn.TeamKitty.csproj", "{4C223F7E-02FA-45CA-9DA8-B65C65C66A93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redirxn.TeamKitty", "Redirxn.TeamKitty\Redirxn.TeamKitty.csproj", "{4C223F7E-02FA-45CA-9DA8-B65C65C66A93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

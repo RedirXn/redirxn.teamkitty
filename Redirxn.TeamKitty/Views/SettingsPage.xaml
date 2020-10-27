@@ -9,8 +9,10 @@
             <Button Text="Change my Displayed Name" />
             <Button Text="Change Kitty" />
             <Button Text="Create a new Kitty" />
-            <Button Text="Join a new Kitty" />
-            <Button Text="Invite Someone to Join" />
+                <Button Text="Join a new Kitty" 
+                        Clicked="BtnJoin_Clicked"/>
+                <Button Text="Invite Someone to Join" 
+                    Clicked="BtnInvite_Clicked"/>
             <Button Text="Change the name of this Kitty"/>
         </StackLayout>
         </ScrollView>

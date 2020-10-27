@@ -2,6 +2,7 @@
 using Amazon.CognitoIdentity;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
 using Newtonsoft.Json;
 using Redirxn.TeamKitty.Models;
 using System;
@@ -166,6 +167,91 @@ namespace Redirxn.TeamKitty.Services.Gateway
             return enumerable.Where((x) => x.MainName != stockItemName);
         }
 
+        public async Task<string> SetNewJoinCode(string kittyId)
+        {
+            var codeDb = new JoinCode
+            {
+                Id = CreateJoinCode(),
+                KittyId = kittyId,
+                Expiry = DateTime.Now.AddDays(1).ToString()
+            };
+            
+            await _context.SaveAsync(codeDb);
+            return codeDb.Id;
+        }
+
+        public async Task<string> ResetJoinCode(string kittyId)
+        {
+            List<JoinCode> codes = await GetCodesByKittyId(kittyId);
+            string keepCode = string.Empty;
+            foreach (var c in codes)
+            {
+                await _context.DeleteAsync<JoinCode>(c);
+                keepCode = c.Id;
+            }
+            if (string.IsNullOrEmpty(keepCode))
+            {
+                return await SetNewJoinCode(kittyId);
+            }
+            var codeDb = new JoinCode
+            {
+                Id = keepCode,
+                KittyId = kittyId,
+                Expiry = DateTime.Now.AddDays(1).ToString()
+            };
+
+            await _context.SaveAsync(codeDb);
+            return codeDb.Id;
+        }
+
+        private async Task<List<JoinCode>> GetCodesByKittyId(string kittyId)
+        {
+            QueryRequest queryRequest = new QueryRequest
+            {
+                TableName = "KittyCodes",
+                IndexName = "KittyId-index",
+                KeyConditionExpression = "KittyId = :id",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":id", new AttributeValue { S =  kittyId } }
+                },
+                ScanIndexForward = true
+            };
+
+            var result = await _client.QueryAsync(queryRequest);
+
+            List<JoinCode> codes = new List<JoinCode>();
+            foreach (var i in result.Items)
+            {
+                codes.Add(new JoinCode
+                {
+                    Id = i["Id"].S,
+                    KittyId = i["KittyId"].S,
+                    Expiry = i["Expiry"].S
+                });
+            }
+
+            return codes;
+        }
+
+        private string CreateJoinCode()
+        {
+            var chars = "ABCDEFGHIJKLMNPQRSTUVWXYZ23456789";
+            var stringChars = new char[6];
+            var random = new Random();
+
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            return new string(stringChars);
+        }
+
+        public Task<Kitty> JoinKittyWithCode(string joinCode)
+        {
+            throw new NotImplementedException();
+        }
+
         [DynamoDBTable("Kitties")]
         class DynamoKitty
         {
@@ -182,5 +268,16 @@ namespace Redirxn.TeamKitty.Services.Gateway
             public string Id { get; set; }
             public string Info { get; set; }
         }
+
+        [DynamoDBTable("KittyCodes")]
+        class JoinCode
+        {
+            [DynamoDBHashKey]
+            public string Id { get; set; }
+            [DynamoDBGlobalSecondaryIndexHashKey]
+            public string KittyId { get; set; }
+            public string Expiry { get; set; }
+        }
+
     }
 }

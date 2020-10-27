@@ -75,7 +75,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 StockPrice = _stockPrice
             };
 
-            await _kittyService.SaveStockItem(_kittyService.Kitty.Id, stockItem);
+            await _kittyService.SaveStockItem(stockItem);
             await ClosePage();
         }
 
@@ -98,7 +98,7 @@ namespace Redirxn.TeamKitty.ViewModels
         private async Task ExecuteDeleteItemCommand()
         {
             // ToDO: confirmation, or check not already in use.
-            await _kittyService.DeleteStockItem(_kittyService.Kitty.Id, MainName);
+            await _kittyService.DeleteStockItem(MainName);
             await ClosePage();
         }
 

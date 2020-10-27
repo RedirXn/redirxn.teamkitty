@@ -22,8 +22,6 @@ namespace Redirxn.TeamKitty.ViewModels
             set { SetProperty(ref _currentKitty, value); }
         }
 
-        public IEnumerable<string> Kitties;
-
         public MainViewModel(IIdentityService identityService = null, IKittyService kittyService = null)
         {            
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
@@ -38,7 +36,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
         internal async void CreateNewKitty(string newKittyName)
         {
-            if (Kitties == null || !Kitties.Contains(newKittyName))
+            if (!_identityService.KittyNameExists(newKittyName))
             {                
                 await _kittyService.CreateNewKitty(_identityService.LoginData, _identityService.UserDetail, newKittyName);
                 await _identityService.ReloadUserDetail();

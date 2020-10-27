@@ -13,5 +13,6 @@ namespace Redirxn.TeamKitty.Services.Identity
         UserInfo UserDetail { get; set; }
         Task Init(string activeToken, NetworkAuthData socialLoginData);
         Task ReloadUserDetail();
+        bool KittyNameExists(string newKittyName);
     }
 }

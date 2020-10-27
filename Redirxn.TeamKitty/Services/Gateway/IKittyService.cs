@@ -10,9 +10,11 @@ namespace Redirxn.TeamKitty.Services.Gateway
     {
         Kitty Kitty { get; set; }
 
-        Task<Kitty> LoadKitty(string defaultKitty);
-        Task SaveStockItem(string kittyId, StockItem stockItem);
-        Task DeleteStockItem(string kittyId, string stockName);
+        Task<Kitty> LoadKitty(string kittyId);
+        Task SaveStockItem(StockItem stockItem);
+        Task DeleteStockItem(string stockName);
         Task CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);
+        Task<string> GetJoinCode();
+        Task JoinKittyWithCode(string joinCode);
     }
 }

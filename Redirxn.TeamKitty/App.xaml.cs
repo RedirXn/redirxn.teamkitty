@@ -35,6 +35,7 @@ namespace Redirxn.TeamKitty
             Locator.CurrentMutable.Register(() => new MainViewModel());
             Locator.CurrentMutable.Register(() => new StockViewModel());
             Locator.CurrentMutable.Register(() => new StockItemViewModel());
+            Locator.CurrentMutable.Register(() => new SettingsViewModel());
         }
         protected override void OnStart()
         {

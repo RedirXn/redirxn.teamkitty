@@ -1,6 +1,7 @@
 ﻿using Redirxn.TeamKitty.Services.Gateway;
 using Redirxn.TeamKitty.Services.Identity;
 using Splat;
+using System;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.ViewModels
@@ -29,6 +30,11 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             await _kittyService.JoinKittyWithCode(_identityService.LoginData, _identityService.UserDetail, joinCode);
             await _identityService.ReloadUserDetail(); // TODO - notify that Kitty list has changed to do this.
+        }
+
+        internal async Task AddNewUser(string newUser)
+        {
+            await _kittyService.AddNewUser(newUser);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public ObservableCollection<StockItem> Items { get; }
         public Command LoadItemsCommand { get; }
         public Command<StockItem> ItemTapped { get; }
-
+        public bool IsAdmin { get; set; } = false;
 
         public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null)
         {
@@ -39,6 +39,8 @@ namespace Redirxn.TeamKitty.ViewModels
             OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<StockItem>(OnItemSelected);
+
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
         async Task ExecuteLoadItemsCommand()
         {
@@ -82,7 +84,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
         async void OnItemSelected(StockItem item)
         {
-            if (item == null)
+            if (item == null || !IsAdmin)
                 return;
             await _navigationService.NavigateTo($"{nameof(StockItemPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
         }

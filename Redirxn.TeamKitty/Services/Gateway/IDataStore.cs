@@ -16,5 +16,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
         Task<string> SetNewJoinCode(string kittyId);
         Task<string> ResetJoinCode(string kittyId);
         Task<Kitty> JoinKittyWithCode(NetworkAuthData loginData, UserInfo userDetail, string joinCode);
+        Task<Kitty> AddNewUser(string kittyId, string newUser);
     }
 }

@@ -62,5 +62,10 @@ namespace Redirxn.TeamKitty.Services.Gateway
         {
             return Kitty.Administrators.Any(s => s.Equals(email, StringComparison.OrdinalIgnoreCase));
         }
+
+        public async Task AddNewUser(string newUser)
+        {
+            Kitty = await _dataStore.AddNewUser(Kitty.Id, newUser);
+        }
     }
 }

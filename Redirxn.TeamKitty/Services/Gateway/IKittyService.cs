@@ -17,5 +17,6 @@ namespace Redirxn.TeamKitty.Services.Gateway
         Task<string> GetJoinCode();
         Task JoinKittyWithCode(NetworkAuthData loginData, UserInfo userDetail, string joinCode);
         bool AmIAdmin(string email);
+        Task AddNewUser(string newUser);
     }
 }

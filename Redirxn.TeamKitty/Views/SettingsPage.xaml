@@ -5,18 +5,21 @@
              Title="Settings">
     <ContentPage.Content>
         <ScrollView>
-        <StackLayout>
-            <Button Text="Change my Displayed Name"/>
-            <Button Text="Change Kitty" />
-            <Button Text="Create a new Kitty" />
-            <Button Text="Join a new Kitty" 
+            <StackLayout>
+                <Button Text="Change my Displayed Name"/>
+                <Button Text="Change Kitty" />
+                <Button Text="Create a new Kitty" />
+                <Button Text="Join a new Kitty" 
                     Clicked="BtnJoin_Clicked"/>
-            <Button Text="Invite Someone to Join This Kitty" 
+                <Button Text="Invite Someone to Join This Kitty" 
                     Clicked="BtnInvite_Clicked"
                     IsVisible="{Binding IsAdmin}" />
-            <Button Text="Change the name of this Kitty"
+                <Button Text="Add a Non-App User to This Kitty" 
+                    Clicked="BtnAddUser_Clicked"
                     IsVisible="{Binding IsAdmin}" />
-            <Button Text="Set someone as Admin"
+                <Button Text="Change the name of this Kitty"
+                    IsVisible="{Binding IsAdmin}" />
+                <Button Text="Set someone as Admin"
                     IsVisible="{Binding IsAdmin}" />
             </StackLayout>
         </ScrollView>

@@ -94,9 +94,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
         public async Task<Kitty> SaveStockItem(string kittyId, StockItem stockItem)
         {
-            var kittyDb = await GetDynamoKittyAsync(kittyId);            
-            var kitty = GetKittyFromDbKitty(kittyDb);
-            
+            var kitty = await GetKittyFromDb(kittyId);
+
             if (kitty.KittyConfig.StockItems.Any(si => si.MainName == stockItem.MainName))
             {
                 kitty.KittyConfig.StockItems = ReplaceStockItem(kitty.KittyConfig.StockItems, stockItem);
@@ -105,16 +104,13 @@ namespace Redirxn.TeamKitty.Services.Gateway
             {
                 kitty.KittyConfig.StockItems = kitty.KittyConfig.StockItems.Concat(new[] { stockItem });
             }
-
-            kittyDb = GetDbKittyFromKitty(kitty);
-            
-            await _context.SaveAsync(kittyDb);
+                        
+            await SaveKittyToDb(kitty);
             return kitty;
         }
         public async Task<Kitty> DeleteStockItem(string kittyId, string mainName)
         {
-            var kittyDb = await GetDynamoKittyAsync(kittyId);
-            var kitty = GetKittyFromDbKitty(kittyDb);
+            var kitty = await GetKittyFromDb(kittyId);
 
             if (!kitty.KittyConfig.StockItems.Any(si => si.MainName == mainName))
             {
@@ -123,8 +119,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
             kitty.KittyConfig.StockItems = RemoveStockItem(kitty.KittyConfig.StockItems, mainName);
 
-            kittyDb = GetDbKittyFromKitty(kitty);
-            await _context.SaveAsync(kittyDb);
+            await SaveKittyToDb(kitty);
             return kitty;
         }
 
@@ -261,6 +256,35 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
             await _context.SaveAsync(u);
 
+            return kitty;
+        }
+
+        private async Task<Kitty> GetKittyFromDb(string kittyId)
+        {
+            var kittyDb = await GetDynamoKittyAsync(kittyId);
+            return GetKittyFromDbKitty(kittyDb);
+        }
+        private async Task SaveKittyToDb(Kitty kitty)
+        {
+            var kittyDb = GetDbKittyFromKitty(kitty);
+            await _context.SaveAsync(kittyDb);
+        }
+        public async Task<Kitty> AddNewUser(string kittyId, string newUser)
+        {
+            var kitty = await GetKittyFromDb(kittyId);
+            if (kitty.Ledger.Summary.Any(m => m.Person.DisplayName == newUser))
+            {
+                return kitty;
+            }
+            kitty.Ledger.Summary.Add(new LedgerSummaryLine
+            {
+                Person = new Member { DisplayName = newUser, Email = "*" },
+                Balance = 0M,
+                TotalOwed = 0M,
+                TotalPaid = 0M
+            });
+
+            await SaveKittyToDb(kitty);
             return kitty;
         }
 

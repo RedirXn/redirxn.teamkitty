@@ -1,9 +1,6 @@
-﻿using Redirxn.TeamKitty.Services.Identity;
-using Redirxn.TeamKitty.Services.Routing;
+﻿using Redirxn.TeamKitty.Services.Application;
+using Redirxn.TeamKitty.Services.Logic;
 using Splat;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Redirxn.TeamKitty.ViewModels
 {

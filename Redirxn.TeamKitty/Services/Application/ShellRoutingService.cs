@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Xamarin.Forms;
 
-namespace Redirxn.TeamKitty.Services.Routing
+namespace Redirxn.TeamKitty.Services.Application
 {
     public class ShellRoutingService : IRoutingService
     {

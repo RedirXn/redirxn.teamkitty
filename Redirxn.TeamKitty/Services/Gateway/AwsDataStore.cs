@@ -8,12 +8,11 @@ using Redirxn.TeamKitty.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Services.Gateway
 {
-    public class AwsDataStore : IDataStore, IDisposable
+    public class AwsDataStore : IKittyDataStore, IJoinCodeDataStore, IUserDataStore, IDisposable
     {
         const string CognitoPoolId = "us-east-1:f779f47a-cfed-4016-a282-81f3313bd471";
 
@@ -50,17 +49,21 @@ namespace Redirxn.TeamKitty.Services.Gateway
             var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
             return myInfo;
         }
-                
+        public async Task SaveUserDetailToDb(UserInfo userDetail)
+        {
+            var u = new DynamoUser { Id = userDetail.Id, Info = JsonConvert.SerializeObject(userDetail) };
+            await _context.SaveAsync(u);
+        }
         public async Task<Kitty> GetKitty(string kittyId)
         {
             if (string.IsNullOrWhiteSpace(kittyId))
             {
-                return new Kitty();
+                return null;
             }
             DynamoKitty kittyFromDb = await GetDynamoKittyAsync(kittyId);
             if (kittyFromDb == null)
             {
-                return new Kitty();
+                return null;
             }
             var kitty = GetKittyFromDbKitty(kittyFromDb);
             return kitty;
@@ -70,57 +73,10 @@ namespace Redirxn.TeamKitty.Services.Gateway
         {
             return await _context.LoadAsync<DynamoKitty>(kittyId) ?? new DynamoKitty();
         }
-
-        public async Task<Kitty> CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName)
+        public async Task SaveKittyToDb(Kitty kitty)
         {
-            var kittyId = loginData.Email + '|' + newKittyName;
-            var kittyDb = new DynamoKitty { Id = kittyId, Config = "{}", LedgerSummary = "{}", Administrators = new List<string> { loginData.Email } };
-            if (userDetail == null || userDetail.Id == string.Empty)
-            {
-                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new List<string> { kittyId }, DefaultKitty = kittyId };
-            }
-            else
-            {
-                userDetail.KittyNames.Add(kittyId);
-                userDetail.DefaultKitty = kittyId;
-            }
-            var u = new DynamoUser { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
-
+            var kittyDb = GetDbKittyFromKitty(kitty);
             await _context.SaveAsync(kittyDb);
-            await _context.SaveAsync(u);
-
-            return GetKittyFromDbKitty(kittyDb);
-        }
-
-        public async Task<Kitty> SaveStockItem(string kittyId, StockItem stockItem)
-        {
-            var kitty = await GetKittyFromDb(kittyId);
-
-            if (kitty.KittyConfig.StockItems.Any(si => si.MainName == stockItem.MainName))
-            {
-                kitty.KittyConfig.StockItems = ReplaceStockItem(kitty.KittyConfig.StockItems, stockItem);
-            }
-            else
-            {
-                kitty.KittyConfig.StockItems = kitty.KittyConfig.StockItems.Concat(new[] { stockItem });
-            }
-                        
-            await SaveKittyToDb(kitty);
-            return kitty;
-        }
-        public async Task<Kitty> DeleteStockItem(string kittyId, string mainName)
-        {
-            var kitty = await GetKittyFromDb(kittyId);
-
-            if (!kitty.KittyConfig.StockItems.Any(si => si.MainName == mainName))
-            {
-                return kitty;
-            }
-
-            kitty.KittyConfig.StockItems = RemoveStockItem(kitty.KittyConfig.StockItems, mainName);
-
-            await SaveKittyToDb(kitty);
-            return kitty;
         }
 
         private DynamoKitty GetDbKittyFromKitty(Kitty kitty)
@@ -144,21 +100,11 @@ namespace Redirxn.TeamKitty.Services.Gateway
                 Administrators = kittyDb.Administrators
             };
         }
-
-        private IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
+        public async Task<string> SetNewJoinCode(string kittyId, string code)
         {
-            return enumerable.Select(x => x.MainName == value.MainName ? value : x);
-        }
-        private IEnumerable<StockItem> RemoveStockItem(IEnumerable<StockItem> enumerable, string stockItemName)
-        {
-            return enumerable.Where((x) => x.MainName != stockItemName);
-        }
-
-        public async Task<string> SetNewJoinCode(string kittyId)
-        {
-            var codeDb = new JoinCode
+            var codeDb = new DynamoJoinCode
             {
-                Id = CreateJoinCode(),
+                Id = code,
                 KittyId = kittyId,
                 Expiry = DateTime.Now.AddDays(1).ToString()
             };
@@ -166,32 +112,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
             await _context.SaveAsync(codeDb);
             return codeDb.Id;
         }
-
-        public async Task<string> ResetJoinCode(string kittyId)
-        {
-            List<JoinCode> codes = await GetCodesByKittyId(kittyId);
-            string keepCode = string.Empty;
-            foreach (var c in codes)
-            {
-                await _context.DeleteAsync<JoinCode>(c);
-                keepCode = c.Id;
-            }
-            if (string.IsNullOrEmpty(keepCode))
-            {
-                return await SetNewJoinCode(kittyId);
-            }
-            var codeDb = new JoinCode
-            {
-                Id = keepCode,
-                KittyId = kittyId,
-                Expiry = DateTime.Now.AddDays(1).ToString()
-            };
-
-            await _context.SaveAsync(codeDb);
-            return codeDb.Id;
-        }
-
-        private async Task<List<JoinCode>> GetCodesByKittyId(string kittyId)
+                
+        public async Task<List<JoinCode>> GetCodesByKittyId(string kittyId)
         {
             QueryRequest queryRequest = new QueryRequest
             {
@@ -211,81 +133,26 @@ namespace Redirxn.TeamKitty.Services.Gateway
             {
                 codes.Add(new JoinCode
                 {
-                    Id = i["Id"].S,
-                    KittyId = i["KittyId"].S,
-                    Expiry = i["Expiry"].S
+                    Code = i["Id"].S,
+                    Expiry = DateTime.Parse(i["Expiry"].S)
                 });
             }
 
             return codes;
         }
 
-        private string CreateJoinCode()
+        public async Task<string> GetKittyIdWithCode(string joinCode)
         {
-            var chars = "ABCDEFGHIJKLMNPQRSTUVWXYZ23456789";
-            var stringChars = new char[6];
-            var random = new Random();
-
-            for (int i = 0; i < stringChars.Length; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
-
-            return new string(stringChars);
+            var code = await _context.LoadAsync<DynamoJoinCode>(joinCode);
+            return (DateTime.Parse(code?.Expiry) > DateTime.Now) ? code.KittyId : null;
         }
-
-        public async Task<Kitty> JoinKittyWithCode(NetworkAuthData loginData, UserInfo userDetail, string joinCode)
+        public async Task DeleteCode(JoinCode code)
         {
-            var code = await _context.LoadAsync<JoinCode>(joinCode);
-            if (code == null || DateTime.Parse(code.Expiry) < DateTime.Now)
+            var c = new DynamoJoinCode
             {
-                return null;
-            }
-            var kitty = await GetKitty(code.KittyId);
-
-            if (userDetail == null || userDetail.Id == string.Empty)
-            {
-                userDetail = new UserInfo { Id = loginData.Email, Name = loginData.Name, KittyNames = new List<string> { kitty.Id }, DefaultKitty = kitty.Id };
-            }
-            else
-            {
-                userDetail.KittyNames.Add(kitty.Id);
-                userDetail.DefaultKitty = kitty.Id;
-            }
-            var u = new DynamoUser { Id = loginData.Email, Info = JsonConvert.SerializeObject(userDetail) };
-
-            await _context.SaveAsync(u);
-
-            return kitty;
-        }
-
-        private async Task<Kitty> GetKittyFromDb(string kittyId)
-        {
-            var kittyDb = await GetDynamoKittyAsync(kittyId);
-            return GetKittyFromDbKitty(kittyDb);
-        }
-        private async Task SaveKittyToDb(Kitty kitty)
-        {
-            var kittyDb = GetDbKittyFromKitty(kitty);
-            await _context.SaveAsync(kittyDb);
-        }
-        public async Task<Kitty> AddNewUser(string kittyId, string newUser)
-        {
-            var kitty = await GetKittyFromDb(kittyId);
-            if (kitty.Ledger.Summary.Any(m => m.Person.DisplayName == newUser))
-            {
-                return kitty;
-            }
-            kitty.Ledger.Summary.Add(new LedgerSummaryLine
-            {
-                Person = new Member { DisplayName = newUser, Email = "*" },
-                Balance = 0M,
-                TotalOwed = 0M,
-                TotalPaid = 0M
-            });
-
-            await SaveKittyToDb(kitty);
-            return kitty;
+                Id = code.Code,
+            };
+            await _context.DeleteAsync(c);
         }
 
         [DynamoDBTable("Kitties")]
@@ -307,7 +174,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
         }
 
         [DynamoDBTable("KittyCodes")]
-        class JoinCode
+        class DynamoJoinCode
         {
             [DynamoDBHashKey]
             public string Id { get; set; }

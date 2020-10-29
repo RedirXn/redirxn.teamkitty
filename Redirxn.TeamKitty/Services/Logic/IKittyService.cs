@@ -4,19 +4,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Redirxn.TeamKitty.Services.Gateway
+namespace Redirxn.TeamKitty.Services.Logic
 {
     public interface IKittyService
     {
-        Kitty Kitty { get; set; }
-
-        Task<Kitty> LoadKitty(string kittyId);
+        Kitty Kitty { get; }
+        Task LoadKitty(string kittyId);
         Task SaveStockItem(StockItem stockItem);
         Task DeleteStockItem(string stockName);
-        Task CreateNewKitty(NetworkAuthData loginData, UserInfo userDetail, string newKittyName);
-        Task<string> GetJoinCode();
-        Task JoinKittyWithCode(NetworkAuthData loginData, UserInfo userDetail, string joinCode);
+        Task<string> CreateNewKitty(string email, string newKittyName);
         bool AmIAdmin(string email);
         Task AddNewUser(string newUser);
+        Task TickMeASingle(string email, string personDisplayName, StockItem item);
+        Task AddRegisteredUser(string email, string name);
     }
 }

@@ -1,13 +1,9 @@
-﻿using System;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-using Redirxn.TeamKitty.Services;
-using Redirxn.TeamKitty.Views;
+﻿using Xamarin.Forms;
 using Splat;
-using Redirxn.TeamKitty.Services.Routing;
-using Redirxn.TeamKitty.Services.Identity;
 using Redirxn.TeamKitty.ViewModels;
 using Redirxn.TeamKitty.Services.Gateway;
+using Redirxn.TeamKitty.Services.Application;
+using Redirxn.TeamKitty.Services.Logic;
 
 namespace Redirxn.TeamKitty
 {
@@ -25,9 +21,16 @@ namespace Redirxn.TeamKitty
         {
             // Services
             Locator.CurrentMutable.RegisterLazySingleton<IRoutingService>(() => new ShellRoutingService());
-            Locator.CurrentMutable.RegisterLazySingleton<IIdentityService>(() => new IdentityService());
-            Locator.CurrentMutable.RegisterLazySingleton<IDataStore>(() => new AwsDataStore());
+            Locator.CurrentMutable.RegisterLazySingleton<IIdentityService>(() => new IdentityService());            
             Locator.CurrentMutable.RegisterLazySingleton<IKittyService>(() => new KittyService());
+            Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService());
+            Locator.CurrentMutable.RegisterLazySingleton<IInviteService>(() => new InviteService());
+
+            // DataStores
+            var awsDataStore = new AwsDataStore();
+            Locator.CurrentMutable.RegisterLazySingleton<IKittyDataStore>(() => awsDataStore);
+            Locator.CurrentMutable.RegisterLazySingleton<IJoinCodeDataStore>(() => awsDataStore);
+            Locator.CurrentMutable.RegisterLazySingleton<IUserDataStore>(() => awsDataStore);
 
             // ViewModels
             Locator.CurrentMutable.Register(() => new LoadingViewModel());

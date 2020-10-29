@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Redirxn.TeamKitty.Services.Routing
+namespace Redirxn.TeamKitty.Services.Application
 {
     public interface IRoutingService
     {

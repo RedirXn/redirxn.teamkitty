@@ -1,24 +1,22 @@
 ﻿using Redirxn.TeamKitty.Models;
 using Redirxn.TeamKitty.Services.Gateway;
 using Splat;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Redirxn.TeamKitty.Services.Identity
-{   
+namespace Redirxn.TeamKitty.Services.Logic
+{
     public class IdentityService : IIdentityService
     {
-        IDataStore _dataStore;
+        IUserDataStore _dataStore;
         public bool IsUserLoggedIn { get { return LoginData != null && LoginData.Email != string.Empty; } }
         public NetworkAuthData LoginData { get; set; }
         public UserInfo UserDetail { get; set; }        
 
-        public IdentityService(IDataStore dataStore = null)
+        public IdentityService(IUserDataStore dataStore = null)
         {
-            _dataStore = dataStore ?? Locator.Current.GetService<IDataStore>();
+            _dataStore = dataStore ?? Locator.Current.GetService<IUserDataStore>();
         }
         
         public async Task Init(string activeToken, NetworkAuthData socialLoginData)
@@ -43,5 +41,22 @@ namespace Redirxn.TeamKitty.Services.Identity
             }
             return true;
         }
+        public async Task AddMeToKitty(string kittyId)
+        {
+
+            if (UserDetail == null || string.IsNullOrEmpty(UserDetail.Id))
+            {
+                UserDetail = new UserInfo { Id = LoginData.Email, Name = LoginData.Name, KittyNames = new List<string> { kittyId }, DefaultKitty = kittyId };
+            }
+            else
+            {
+                UserDetail.KittyNames.Add(kittyId);
+                UserDetail.DefaultKitty = kittyId;
+            }
+
+            await _dataStore.SaveUserDetailToDb(UserDetail);
+        }
+
     }
+
 }

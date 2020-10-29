@@ -1,15 +1,11 @@
 ﻿using Redirxn.TeamKitty.Models;
-using Redirxn.TeamKitty.Services.Gateway;
-using Redirxn.TeamKitty.Services.Identity;
-using Redirxn.TeamKitty.Services.Routing;
+using Redirxn.TeamKitty.Services.Application;
+using Redirxn.TeamKitty.Services.Logic;
 using Redirxn.TeamKitty.Views;
 using Splat;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -22,10 +18,11 @@ namespace Redirxn.TeamKitty.ViewModels
         private IIdentityService _identityService;
 
         private StockItem _selectedItem;
-        public ICommand OnAddStockCommand { get; set; }
-        public ObservableCollection<StockItem> Items { get; }
-        public Command LoadItemsCommand { get; }
+
+        public ICommand OnAddStockCommand { get; set; }        
+        public ICommand LoadItemsCommand { get; }
         public Command<StockItem> ItemTapped { get; }
+        public ObservableCollection<StockItem> Items { get; }
         public bool IsAdmin { get; set; } = false;
 
         public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null)
@@ -37,21 +34,19 @@ namespace Redirxn.TeamKitty.ViewModels
             Items = new ObservableCollection<StockItem>();
 
             OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
-            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+            LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
             ItemTapped = new Command<StockItem>(OnItemSelected);
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
-        async Task ExecuteLoadItemsCommand()
+        void ExecuteLoadItemsCommand()
         {
             IsBusy = true;
 
             try
             {
                 Items.Clear();
-                var kitty = await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
-
-                foreach (var item in kitty.KittyConfig.StockItems)
+                foreach (var item in _kittyService.Kitty.KittyConfig.StockItems)
                 {
                     Items.Add(item);
                 }

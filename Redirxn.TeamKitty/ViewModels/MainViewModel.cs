@@ -10,7 +10,7 @@ using Xamarin.Forms;
 
 namespace Redirxn.TeamKitty.ViewModels
 {
-    class MainViewModel : BaseViewModel
+    public class MainViewModel : BaseViewModel
     {        
         private IIdentityService _identityService;
         private IKittyService _kittyService;
@@ -40,7 +40,7 @@ namespace Redirxn.TeamKitty.ViewModels
             ItemTapped = new Command<StockItem>(OnItemSelected);
         }
 
-        internal async Task Init()
+        public async Task Init()
         {
             IsBusy = true;
             await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);

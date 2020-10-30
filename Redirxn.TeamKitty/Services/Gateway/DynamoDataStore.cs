@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Services.Gateway
 {
-    public class AwsDataStore : IKittyDataStore, IJoinCodeDataStore, IUserDataStore, IDisposable
+    public class DynamoDataStore : IKittyDataStore, IJoinCodeDataStore, IUserDataStore, IDisposable
     {
         const string CognitoPoolId = "us-east-1:f779f47a-cfed-4016-a282-81f3313bd471";
 

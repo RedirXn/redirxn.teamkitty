@@ -65,8 +65,16 @@ namespace Redirxn.TeamKitty.Services.Logic
             var kitty = new Kitty
             {
                 Id = email + '|' + newKittyName,
-                Administrators = new [] { email }
+                Administrators = new [] { email },
             };
+
+            kitty.Ledger.Summary.Add(new LedgerSummaryLine
+            {
+                Person = new Member { DisplayName = email, Email = email },
+                Balance = 0M,
+                TotalOwed = 0M,
+                TotalPaid = 0M
+            });
 
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;

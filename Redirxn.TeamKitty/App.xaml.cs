@@ -27,10 +27,10 @@ namespace Redirxn.TeamKitty
             Locator.CurrentMutable.RegisterLazySingleton<IInviteService>(() => new InviteService());
 
             // DataStores
-            var awsDataStore = new AwsDataStore();
-            Locator.CurrentMutable.RegisterLazySingleton<IKittyDataStore>(() => awsDataStore);
-            Locator.CurrentMutable.RegisterLazySingleton<IJoinCodeDataStore>(() => awsDataStore);
-            Locator.CurrentMutable.RegisterLazySingleton<IUserDataStore>(() => awsDataStore);
+            var dynamoDataStore = new DynamoDataStore();
+            Locator.CurrentMutable.RegisterLazySingleton<IKittyDataStore>(() => dynamoDataStore);
+            Locator.CurrentMutable.RegisterLazySingleton<IJoinCodeDataStore>(() => dynamoDataStore);
+            Locator.CurrentMutable.RegisterLazySingleton<IUserDataStore>(() => dynamoDataStore);
 
             // ViewModels
             Locator.CurrentMutable.Register(() => new LoadingViewModel());

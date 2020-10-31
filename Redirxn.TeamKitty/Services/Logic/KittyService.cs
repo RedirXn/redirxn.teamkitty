@@ -84,13 +84,13 @@ namespace Redirxn.TeamKitty.Services.Logic
         {
             await AddUser(name);
         }
-        public async Task AddRegisteredUser(string email, string name)
+        public async Task AddRegisteredUser(string email, string name, string kittyId)
         {
-            await AddUser(name, email);
+            await AddUser(name, email, kittyId);
         }
-        public async Task AddUser(string name, string email = null)
+        public async Task AddUser(string name, string email = null, string kittyId = null)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            var kitty = await _dataStore.GetKitty(kittyId ?? Kitty.Id);
 
             if ((email == null && kitty.Ledger.Summary.Any(m => m.Person.DisplayName == name))
                 || (kitty.Ledger.Summary.Any(m => m.Person.Email == email)))

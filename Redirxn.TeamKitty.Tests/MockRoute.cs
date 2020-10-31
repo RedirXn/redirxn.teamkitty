@@ -1,10 +1,12 @@
 ﻿using Redirxn.TeamKitty.Services.Application;
+using System;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Tests
 {
-    internal class MockRoute : IRoutingService
+    public class MockRoute : IRoutingService
     {
+        private string _navigatedTo;
         public Task GoBack()
         {
             throw new System.NotImplementedException();
@@ -15,9 +17,14 @@ namespace Redirxn.TeamKitty.Tests
             throw new System.NotImplementedException();
         }
 
-        public Task NavigateTo(string route)
+        public async Task NavigateTo(string route)
         {
-            throw new System.NotImplementedException();
+            _navigatedTo = route;
+        }
+
+        internal bool WasNavigatedTo(string route)
+        {
+            return _navigatedTo == route;
         }
     }
 }

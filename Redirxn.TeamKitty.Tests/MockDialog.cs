@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Tests
 {
-    internal class MockDialog : IDialogService
+    public class MockDialog : IDialogService
     {
         string _optionToReturn;
         string _inputToReturn;

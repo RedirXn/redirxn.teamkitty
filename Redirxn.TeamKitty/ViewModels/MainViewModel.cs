@@ -1,6 +1,7 @@
 ﻿using Redirxn.TeamKitty.Models;
 using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
+using Redirxn.TeamKitty.Views;
 using Splat;
 using System;
 using System.Collections.ObjectModel;
@@ -14,7 +15,9 @@ namespace Redirxn.TeamKitty.ViewModels
     {        
         private IIdentityService _identityService;
         private IKittyService _kittyService;
+        private IInviteService _inviteService;
         private IDialogService _dialogService;
+        private IRoutingService _routingService;
         
         private StockItem _selectedItem;
         private string _currentKitty = string.Empty;
@@ -28,11 +31,13 @@ namespace Redirxn.TeamKitty.ViewModels
             set { SetProperty(ref _currentKitty, value); }
         }
 
-        public MainViewModel(IIdentityService identityService = null, IKittyService kittyService = null, IDialogService dialogService = null)
+        public MainViewModel(IIdentityService identityService = null, IKittyService kittyService = null, IDialogService dialogService = null, IInviteService inviteService = null, IRoutingService routingService = null)
         {            
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
+            _inviteService = inviteService ?? Locator.Current.GetService<IInviteService>();
+            _routingService = routingService ?? Locator.Current.GetService<IRoutingService>();
 
             Items = new ObservableCollection<StockItem>();
 
@@ -43,29 +48,16 @@ namespace Redirxn.TeamKitty.ViewModels
         public async Task Init()
         {
             IsBusy = true;
-            await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
             CurrentKitty = _kittyService.Kitty?.DisplayName;
             SelectedItem = null;
 
-            await EnsureUserBelongsToAKitty();
-
-            ExecuteLoadItemsCommand();
-        }
-        private async Task EnsureUserBelongsToAKitty()
-        {
             if (string.IsNullOrEmpty(CurrentKitty))
             {
-                string createKitty = "Create a New Kitty";
-                string action = await _dialogService.SelectOption("You do not belong to a kitty", "Cancel", createKitty, "Join an Existing Kitty");                
-                
-                if (action == createKitty)
-                {                    
-                    string newKittyName = await _dialogService.GetSingleTextInput("Create New Kitty", "Enter a name for the new kitty:");
-                    if (newKittyName != null)
-                    {
-                        await CreateNewKitty(newKittyName);
-                    }
-                }
+                await _routingService.NavigateTo($"{nameof(SettingsPage)}");
+            }
+            else
+            {
+                ExecuteLoadItemsCommand();
             }
         }
 
@@ -77,7 +69,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 Items.Clear();
 
-                foreach (var item in _kittyService.Kitty.KittyConfig.StockItems)
+                foreach (var item in _kittyService.Kitty?.KittyConfig?.StockItems)
                 {
                     Items.Add(item);
                 }
@@ -89,16 +81,6 @@ namespace Redirxn.TeamKitty.ViewModels
             finally
             {
                 IsBusy = false;
-            }
-        }
-
-        internal async Task CreateNewKitty(string newKittyName)
-        {
-            if (!_identityService.KittyNameExists(newKittyName))
-            {                
-                var kittyId = await _kittyService.CreateNewKitty(_identityService.LoginData.Email, newKittyName);
-                await _identityService.AddMeToKitty(kittyId);
-                CurrentKitty = _kittyService.Kitty.DisplayName;                
             }
         }
 

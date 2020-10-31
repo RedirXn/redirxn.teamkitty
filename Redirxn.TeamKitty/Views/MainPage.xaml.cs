@@ -16,11 +16,11 @@ namespace Redirxn.TeamKitty.Views
 
         internal MainViewModel ViewModel { get; set; } = Locator.Current.GetService<MainViewModel>();
 
-        protected override async void OnAppearing()
+        protected override void OnAppearing()
         {
             base.OnAppearing();
 
-            await ViewModel.Init();            
+            ViewModel.Init();            
         }
 
     }

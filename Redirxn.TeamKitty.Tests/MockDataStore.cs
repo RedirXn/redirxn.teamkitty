@@ -1,13 +1,20 @@
 ﻿using Redirxn.TeamKitty.Models;
 using Redirxn.TeamKitty.Services.Gateway;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Tests
 {
-    internal class MockDataStore : IKittyDataStore, IUserDataStore, IJoinCodeDataStore
+    public class MockDataStore : IKittyDataStore, IUserDataStore, IJoinCodeDataStore
     {
-        public bool SaveKittyToDbCalled { get; private set; } 
+        public Kitty SaveKittyToDbKitty { get; private set; }
+        public UserInfo SaveUserDetailToDbUser { get; private set; }
+
+        private Kitty _kittyToReturn;
+        private Kitty _kittyToConditionallyReturn;
+        private string _kittyReturnCondition;
+        private string _kittyReturnId;
         public MockDataStore()
         {
         }
@@ -24,12 +31,19 @@ namespace Redirxn.TeamKitty.Tests
 
         public async Task<Kitty> GetKitty(string kittyId)
         {
-            return null;
+            if (kittyId == _kittyReturnCondition)
+            {
+                return _kittyToConditionallyReturn;
+            }
+            else
+            {
+                return _kittyToReturn;
+            }
         }
 
-        public Task<string> GetKittyIdWithCode(string joinCode)
+        public async Task<string> GetKittyIdWithCode(string joinCode)
         {
-            throw new System.NotImplementedException();
+            return _kittyReturnId;
         }
 
         public async Task<UserInfo> GetUserDetail(string email)
@@ -44,18 +58,32 @@ namespace Redirxn.TeamKitty.Tests
 
         public async Task SaveKittyToDb(Kitty kitty)
         {
-            SaveKittyToDbCalled = true;
-            return;
+            SaveKittyToDbKitty = kitty;            
         }
 
-        public Task SaveUserDetailToDb(UserInfo userDetail)
+        public async Task SaveUserDetailToDb(UserInfo userDetail)
         {
-            throw new System.NotImplementedException();
+            SaveUserDetailToDbUser = userDetail;            
         }
 
         public Task<string> SetNewJoinCode(string kittyId, string code)
         {
             throw new System.NotImplementedException();
+        }
+
+        internal void MakeGetKittyReturn(Kitty kitty, string withThisId = null)
+        {
+            if (withThisId == null)
+            {
+                _kittyToReturn = kitty;
+                return;
+            }
+            _kittyReturnCondition = withThisId;
+            _kittyToConditionallyReturn = kitty;
+        }
+        internal void MakeGetKittyIdReturnThisId(string id)
+        {
+            _kittyReturnId = id;
         }
     }
 }

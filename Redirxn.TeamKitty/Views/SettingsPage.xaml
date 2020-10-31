@@ -6,16 +6,19 @@
     <ContentPage.Content>
         <ScrollView>
             <StackLayout>
-                <Button Text="Change my Displayed Name"/>
-                <Button Text="Change Kitty" />
-                <Button Text="Create a new Kitty" />
+                <Button Text="Change my Displayed Name"
+                        IsVisible="{Binding KittyExists}"/>
+                <Button Text="Change Kitty" 
+                        IsVisible="{Binding KittyExists}"/>
+                <Button Text="Create a new Kitty" 
+                        Command="{Binding CreateKittyCommand}"/>
                 <Button Text="Join a new Kitty" 
-                    Clicked="BtnJoin_Clicked"/>
+                    Command="{Binding JoinKittyCommand}" />
                 <Button Text="Invite Someone to Join This Kitty" 
-                    Clicked="BtnInvite_Clicked"
+                    Command="{Binding InviteCommand}"
                     IsVisible="{Binding IsAdmin}" />
                 <Button Text="Add a Non-App User to This Kitty" 
-                    Clicked="BtnAddUser_Clicked"
+                    Command="{Binding AddUserCommand}"
                     IsVisible="{Binding IsAdmin}" />
                 <Button Text="Change the name of this Kitty"
                     IsVisible="{Binding IsAdmin}" />

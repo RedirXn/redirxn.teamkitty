@@ -16,19 +16,13 @@ namespace Redirxn.TeamKitty.Views
             this.BindingContext = ViewModel;
         }
         internal SettingsViewModel ViewModel { get; set; } = Locator.Current.GetService<SettingsViewModel>();
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
 
-        private async void BtnInvite_Clicked(object sender, EventArgs e)
-        {
-            await ViewModel.InviteClicked(); // TODO: Replace with command
+            await ViewModel.Init();
         }
-        private async void BtnAddUser_Clicked(object sender, EventArgs e)
-        {
-            await ViewModel.AddUserClicked(); // TODO: Replace with command
-        }
-        private async void BtnJoin_Clicked(object sender, EventArgs e)
-        {
-            await ViewModel.JoinClicked(); // TODO: Replace with command
-        }
+
 
     }
 }

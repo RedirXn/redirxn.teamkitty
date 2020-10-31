@@ -10,23 +10,34 @@ namespace Redirxn.TeamKitty.Tests
     {
         public Kitty SaveKittyToDbKitty { get; private set; }
         public UserInfo SaveUserDetailToDbUser { get; private set; }
-
+        public List<JoinCode> DeletedCodes { get; private set; }
+        public string JoinCodeThatWasSet { get; private set; }
         private Kitty _kittyToReturn;
         private Kitty _kittyToConditionallyReturn;
         private string _kittyReturnCondition;
         private string _kittyReturnId;
+        private List<JoinCode> _codes;
+        
         public MockDataStore()
         {
         }
 
-        public Task DeleteCode(JoinCode c)
+        public async Task DeleteCode(JoinCode c)
         {
-            throw new System.NotImplementedException();
+            if (DeletedCodes == null)
+            {
+                DeletedCodes = new List<JoinCode>();
+            }
+            DeletedCodes.Add(c);
         }
 
-        public Task<List<JoinCode>> GetCodesByKittyId(string kittyId)
+        public void MakeGetCodesForKittyIdReturn(List<JoinCode> codes)
         {
-            throw new System.NotImplementedException();
+            _codes = codes;
+        }
+        public async Task<List<JoinCode>> GetCodesByKittyId(string kittyId)
+        {
+            return _codes;
         }
 
         public async Task<Kitty> GetKitty(string kittyId)
@@ -66,9 +77,10 @@ namespace Redirxn.TeamKitty.Tests
             SaveUserDetailToDbUser = userDetail;            
         }
 
-        public Task<string> SetNewJoinCode(string kittyId, string code)
+        public async Task<string> SetNewJoinCode(string kittyId, string code)
         {
-            throw new System.NotImplementedException();
+            JoinCodeThatWasSet = code;
+            return code;
         }
 
         internal void MakeGetKittyReturn(Kitty kitty, string withThisId = null)

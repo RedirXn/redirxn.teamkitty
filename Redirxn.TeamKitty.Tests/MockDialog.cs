@@ -7,11 +7,12 @@ namespace Redirxn.TeamKitty.Tests
     {
         string _optionToReturn;
         string _inputToReturn;
-        
+
         public bool SelectOptionCalled { get; private set; }
-        public Task Alert(string title, string message, string okButton)
+        public string AlertText { get; private set; }
+        public async Task Alert(string title, string message, string okButton)
         {
-            throw new System.NotImplementedException();
+            AlertText = message;
         }
 
         public async Task<string> GetSingleTextInput(string title, string message)

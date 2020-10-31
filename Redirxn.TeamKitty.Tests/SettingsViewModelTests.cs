@@ -6,6 +6,8 @@ using Redirxn.TeamKitty.Models;
 using FluentAssertions;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 
 namespace Redirxn.TeamKitty.Tests
 {
@@ -81,6 +83,22 @@ namespace Redirxn.TeamKitty.Tests
             await vmSettings.JoinKitty();
 
             AssertKittyIsCreatedCorrectly("Id");
+        }
+        [Test]
+        public async Task CanInviteToKitty()
+        {
+            await SetupAsync();
+            const string NewKittyName = "TestKittyName";
+            const string jCode = "MYCODE"; 
+            Dialogs.Make_TextInputReturn(NewKittyName);            
+            Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = jCode, Expiry = DateTime.Now.AddHours(1) } });
+            await vmSettings.CreateNewKitty();
+
+            await vmSettings.Invite();
+
+            Dialogs.AlertText.Should().NotBeNullOrEmpty();
+            Db.DeletedCodes.First(jc => jc.Code == jCode).Should().NotBeNull();
+            Db.JoinCodeThatWasSet.Should().Be(jCode);
         }
     }
 }

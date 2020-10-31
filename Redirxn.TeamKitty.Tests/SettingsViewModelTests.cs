@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using Redirxn.TeamKitty.Views;
 
 namespace Redirxn.TeamKitty.Tests
 {
@@ -15,6 +16,8 @@ namespace Redirxn.TeamKitty.Tests
     public class SettingsViewModelTests : BaseTest
     {
         private const string myEmail = "me@myplace";
+        private const string TestCode = "MYCODE";
+
         SettingsViewModel vmSettings;
 
         [SetUp]
@@ -80,9 +83,8 @@ namespace Redirxn.TeamKitty.Tests
         {
             await SetupAsync();
 
-            const string testCode = "MYCODE";
             const string testId = "IhaveAn|Id";
-            Dialogs.Make_TextInputReturn(testCode);
+            Dialogs.Make_TextInputReturn(TestCode);
             Db.MakeGetKittyIdReturnThisId(testId);
             Db.MakeGetKittyReturn(new Kitty { Id = testId }, testId);
 
@@ -95,14 +97,13 @@ namespace Redirxn.TeamKitty.Tests
         {
             await SetupAsync();
             string NewKittyName = await CreateTestKitty();
-            const string jCode = "MYCODE";          
-            Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = jCode, Expiry = DateTime.Now.AddHours(1) } });
+            Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = TestCode, Expiry = DateTime.Now.AddHours(1) } });
 
             await vmSettings.Invite();
 
             Dialogs.AlertText.Should().NotBeNullOrEmpty();
-            Db.DeletedCodes.First(jc => jc.Code == jCode).Should().NotBeNull();
-            Db.JoinCodeThatWasSet.Should().Be(jCode);
+            Db.DeletedCodes.First(jc => jc.Code == TestCode).Should().NotBeNull();
+            Db.JoinCodeThatWasSet.Should().Be(TestCode);
         }
         [Test]
         public async Task CanAddUser()
@@ -146,4 +147,5 @@ namespace Redirxn.TeamKitty.Tests
             Db.SaveUserDetailToDbUser.Name.Should().NotBe(userName);
         }
     }
+
 }

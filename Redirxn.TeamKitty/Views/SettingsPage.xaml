@@ -10,7 +10,8 @@
                         Command="{Binding ChangeMyNameCommand}"
                         IsVisible="{Binding KittyExists}"/>
                 <Button Text="Change Kitty" 
-                        IsVisible="{Binding KittyExists}"/>
+                        Command="{Binding ChangeKittyCommand}"
+                        IsVisible="{Binding MultipleKitties}"/>
                 <Button Text="Create a new Kitty" 
                         Command="{Binding CreateKittyCommand}"/>
                 <Button Text="Join a new Kitty" 

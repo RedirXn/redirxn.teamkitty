@@ -1,6 +1,7 @@
 ﻿using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
 using Splat;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -21,6 +22,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public ICommand InviteCommand { get; set; }
         public ICommand AddUserCommand { get; set; }
         public ICommand ChangeMyNameCommand { get; set; }
+        public ICommand ChangeKittyCommand { get; set; }
 
         private bool _isAdmin = false;
         public bool IsAdmin
@@ -34,7 +36,12 @@ namespace Redirxn.TeamKitty.ViewModels
             get => _kittyExists;
             set { SetProperty(ref _kittyExists, value); }
         }
-
+        private bool _multipleKitties = true;
+        public bool MultipleKitties
+        {
+            get => _multipleKitties;
+            set { SetProperty(ref _multipleKitties, value); }
+        }
         public SettingsViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IInviteService inviteService = null, IDialogService dialogService = null, IRoutingService routingService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
@@ -48,15 +55,16 @@ namespace Redirxn.TeamKitty.ViewModels
             InviteCommand = new Command(async () => await Invite());
             AddUserCommand = new Command(async () => await AddUser());
             ChangeMyNameCommand = new Command(async () => await ChangeMyName());
+            ChangeKittyCommand = new Command(async () => await ChangeKitty());
         }
-
 
         public async Task Init()
         {
             await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
-            KittyExists = !string.IsNullOrEmpty(_kittyService.Kitty.DisplayName);            
+            KittyExists = !string.IsNullOrEmpty(_kittyService.Kitty.DisplayName);
+            MultipleKitties = _identityService.UserDetail.KittyNames.Count > 1;
         }
         internal async Task CreateNewKitty()
         {
@@ -93,6 +101,7 @@ namespace Redirxn.TeamKitty.ViewModels
             if (!string.IsNullOrWhiteSpace(joinCode))
             {
                 await JoinKittyWithCode(joinCode);
+                await _routingService.NavigateTo($"///main");
             }
         }
         internal async Task AddUser()
@@ -136,5 +145,10 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             await _kittyService.AddNewUser(newUser);
         }
+        private async Task ChangeKitty()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

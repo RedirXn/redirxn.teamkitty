@@ -1,6 +1,7 @@
 ﻿using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
 using Splat;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -19,6 +20,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public ICommand JoinKittyCommand { get; set; }
         public ICommand InviteCommand { get; set; }
         public ICommand AddUserCommand { get; set; }
+        public ICommand ChangeMyNameCommand { get; set; }
 
         private bool _isAdmin = false;
         public bool IsAdmin
@@ -45,7 +47,9 @@ namespace Redirxn.TeamKitty.ViewModels
             JoinKittyCommand = new Command(async () => await JoinKitty());
             InviteCommand = new Command(async () => await Invite());
             AddUserCommand = new Command(async () => await AddUser());
+            ChangeMyNameCommand = new Command(async () => await ChangeMyName());
         }
+
 
         public async Task Init()
         {
@@ -100,6 +104,25 @@ namespace Redirxn.TeamKitty.ViewModels
                 await AddNewUser(newUser);
             }
         }
+        internal async Task ChangeMyName()
+        {
+            string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");
+
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                await ChangeMyNameTo(newName);
+            }
+        }
+
+        private async Task ChangeMyNameTo(string newName)
+        {
+            if(_kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.DisplayName == newName) == null)
+            {
+                await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
+                await _identityService.Rename(newName);
+            }
+        }
+
         internal async Task Invite()
         {
             string joinCode = await GetKittyJoinCode();

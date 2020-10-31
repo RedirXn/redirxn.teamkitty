@@ -17,5 +17,6 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task AddNewUser(string newUser);
         Task TickMeASingle(string email, string personDisplayName, StockItem item);
         Task AddRegisteredUser(string email, string name, string kittyId = null);
+        Task RenameMember(string email, string newName);
     }
 }

@@ -7,6 +7,7 @@
         <ScrollView>
             <StackLayout>
                 <Button Text="Change my Displayed Name"
+                        Command="{Binding ChangeMyNameCommand}"
                         IsVisible="{Binding KittyExists}"/>
                 <Button Text="Change Kitty" 
                         IsVisible="{Binding KittyExists}"/>

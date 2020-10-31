@@ -135,6 +135,9 @@ namespace Redirxn.TeamKitty.Services.Logic
             });
 
             kitty = await RecalculateLedgerSummary(kitty);
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+
         }
 
         private Task<Kitty> RecalculateLedgerSummary(Kitty kitty)
@@ -150,6 +153,33 @@ namespace Redirxn.TeamKitty.Services.Logic
             return enumerable.Where((x) => x.MainName != stockItemName);
         }
 
+        public async Task RenameMember(string email, string newName)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
 
+            var me = new Member
+            {
+                Email = email,
+                DisplayName = newName
+            };
+
+            foreach (var t in kitty.Ledger.Transactions)
+            {
+                if (t.Person.Email == me.Email)
+                {
+                    t.Person = me;
+                }
+            }
+            foreach (var s in kitty.Ledger.Summary)
+            {
+                if (s.Person.Email == me.Email)
+                {
+                    s.Person = me;
+                }
+            }
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
     }
 }

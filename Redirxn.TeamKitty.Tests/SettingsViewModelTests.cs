@@ -69,7 +69,7 @@ namespace Redirxn.TeamKitty.Tests
         private void AssertKittyIsCreatedCorrectly(string NewKittyName)
         {
             Db.SaveKittyToDbKitty.DisplayName.Should().Be(NewKittyName);
-            Db.SaveKittyToDbKitty.Ledger.Summary.First(ls => ls.Person.Email == myEmail).Should().NotBeNull();
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.Email == myEmail).Should().NotBeNull();
             Db.SaveUserDetailToDbUser.DefaultKitty.Should().Be(Db.SaveKittyToDbKitty.Id);
             Db.SaveUserDetailToDbUser.Id.Should().Be(myEmail);
             Db.SaveUserDetailToDbUser.KittyNames.Should().Contain(Db.SaveKittyToDbKitty.Id);
@@ -115,8 +115,35 @@ namespace Redirxn.TeamKitty.Tests
 
             await vmSettings.AddUser();
 
-            Db.SaveKittyToDbKitty.Ledger.Summary.First(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
         }
+        [Test]
+        public async Task CanRenameMyself()
+        {
+            await SetupAsync();
+            string NewKittyName = await CreateTestKitty();
+            const string userName = "HeyItsaMeMario";
+            Dialogs.Make_TextInputReturn(userName);
+            Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
 
+            await vmSettings.ChangeMyName();
+
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
+            Db.SaveUserDetailToDbUser.Name.Should().Be(userName);
+        }
+        [Test]
+        public async Task CantRenameMyselfIfNameIsInUse()
+        {
+            await SetupAsync();
+            string NewKittyName = await CreateTestKitty();
+            const string userName = "HeyItsaMeMario";
+            Dialogs.Make_TextInputReturn(userName);
+            Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
+            await vmSettings.AddUser();
+
+            await vmSettings.ChangeMyName();
+
+            Db.SaveUserDetailToDbUser.Name.Should().NotBe(userName);
+        }
     }
 }

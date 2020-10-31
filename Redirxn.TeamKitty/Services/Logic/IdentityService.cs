@@ -57,6 +57,11 @@ namespace Redirxn.TeamKitty.Services.Logic
             await _dataStore.SaveUserDetailToDb(UserDetail);
         }
 
+        public async Task Rename(string newName)
+        {
+            UserDetail.Name = newName;
+            await _dataStore.SaveUserDetailToDb(UserDetail);
+        }
     }
 
 }

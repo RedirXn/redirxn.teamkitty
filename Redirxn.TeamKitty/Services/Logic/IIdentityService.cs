@@ -14,5 +14,6 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task Init(string activeToken, NetworkAuthData socialLoginData);        
         bool KittyNameExists(string newKittyName);
         Task AddMeToKitty(string kittyId);
+        Task Rename(string newName);
     }
 }

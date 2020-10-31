@@ -46,13 +46,19 @@ namespace Redirxn.TeamKitty.Tests
         {
             await SetupAsync();
 
+            string NewKittyName = await CreateTestKitty();
+
+            AssertKittyIsCreatedCorrectly(NewKittyName);
+            AssertIWasMadeAdmin();
+        }
+
+        private async Task<string> CreateTestKitty()
+        {
             const string NewKittyName = "TestKittyName";
             Dialogs.Make_TextInputReturn(NewKittyName);
 
             await vmSettings.CreateNewKitty();
-
-            AssertKittyIsCreatedCorrectly(NewKittyName);
-            AssertIWasMadeAdmin();
+            return NewKittyName;
         }
 
         private void AssertIWasMadeAdmin()
@@ -88,11 +94,9 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanInviteToKitty()
         {
             await SetupAsync();
-            const string NewKittyName = "TestKittyName";
-            const string jCode = "MYCODE"; 
-            Dialogs.Make_TextInputReturn(NewKittyName);            
+            string NewKittyName = await CreateTestKitty();
+            const string jCode = "MYCODE";          
             Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = jCode, Expiry = DateTime.Now.AddHours(1) } });
-            await vmSettings.CreateNewKitty();
 
             await vmSettings.Invite();
 
@@ -100,5 +104,19 @@ namespace Redirxn.TeamKitty.Tests
             Db.DeletedCodes.First(jc => jc.Code == jCode).Should().NotBeNull();
             Db.JoinCodeThatWasSet.Should().Be(jCode);
         }
+        [Test]
+        public async Task CanAddUser()
+        {
+            await SetupAsync();
+            string NewKittyName = await CreateTestKitty();
+            const string userName = "NewGuy";
+            Dialogs.Make_TextInputReturn(userName);
+            Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
+
+            await vmSettings.AddUser();
+
+            Db.SaveKittyToDbKitty.Ledger.Summary.First(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
+        }
+
     }
 }

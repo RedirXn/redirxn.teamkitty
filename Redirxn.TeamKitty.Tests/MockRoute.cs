@@ -7,9 +7,10 @@ namespace Redirxn.TeamKitty.Tests
     public class MockRoute : IRoutingService
     {
         private string _navigatedTo;
-        public Task GoBack()
+        private bool _goBack;
+        public async Task GoBack()
         {
-            throw new System.NotImplementedException();
+            _goBack = true;
         }
 
         public Task GoBackModal()
@@ -25,6 +26,11 @@ namespace Redirxn.TeamKitty.Tests
         internal bool WasNavigatedTo(string route)
         {
             return _navigatedTo == route;
+        }
+
+        internal bool WasGoBackCalled()
+        {
+            return _goBack;
         }
     }
 }

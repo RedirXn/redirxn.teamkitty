@@ -51,15 +51,17 @@ namespace Redirxn.TeamKitty.ViewModels
             set { LoadFromState(value); }
         }
         public ICommand OnDeleteStockCommand { get; set; }
+        public ICommand SaveItemCommand { get; set; }
         public StockItemViewModel(IRoutingService navigationService = null, IKittyService kittyService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();            
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
 
             OnDeleteStockCommand = new Command(async () => await ExecuteDeleteItemCommand());
+            SaveItemCommand = new Command(async () => await Save());
         }
 
-        internal async void Save()
+        internal async Task Save()
         {
             var stockItem = new StockItem
             {

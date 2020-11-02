@@ -49,7 +49,7 @@
                     </StackLayout>
                 </Frame>
                 <Button Text="Save"
-                        Clicked="Button_Clicked"/>
+                        Command="{Binding SaveItemCommand}"/>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

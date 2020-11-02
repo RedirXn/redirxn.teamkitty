@@ -14,7 +14,7 @@ namespace Redirxn.TeamKitty.Tests
         public string JoinCodeThatWasSet { get; private set; }
         private Kitty _kittyToReturn;
         private Kitty _kittyToConditionallyReturn;
-        private string _kittyReturnCondition;
+        private string _kittyReturnCondition = "";
         private string _kittyReturnId;
         private List<JoinCode> _codes;
         

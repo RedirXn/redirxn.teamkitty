@@ -27,12 +27,6 @@ namespace Redirxn.TeamKitty.Views
             return true;
         }
 
-        private void Button_Clicked(object sender, EventArgs e)
-        {
-            // TODO: COnvert to Command
-            ViewModel.Save();
-        }
-
         private void Generic_TextChanged(object sender, TextChangedEventArgs e)
         {
             // TODO: Should be bindings

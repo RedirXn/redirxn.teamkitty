@@ -49,18 +49,18 @@ namespace Redirxn.TeamKitty.Tests
         {
             await SetupAsync();
 
-            string NewKittyName = await CreateTestKitty();
+            string NewKittyName = CreateTestKitty();
 
             AssertKittyIsCreatedCorrectly(NewKittyName);
             AssertIWasMadeAdmin();
         }
 
-        private async Task<string> CreateTestKitty()
+        private string CreateTestKitty()
         {
             const string NewKittyName = "TestKittyName";
             Dialogs.Make_TextInputReturn(NewKittyName);
 
-            await vmSettings.CreateNewKitty();
+            vmSettings.CreateKittyCommand.Execute(null);
             return NewKittyName;
         }
 
@@ -88,7 +88,7 @@ namespace Redirxn.TeamKitty.Tests
             Db.MakeGetKittyIdReturnThisId(testId);
             Db.MakeGetKittyReturn(new Kitty { Id = testId }, testId);
 
-            await vmSettings.JoinKitty();
+            vmSettings.JoinKittyCommand.Execute(null);
 
             AssertKittyIsCreatedCorrectly("Id");
         }
@@ -96,10 +96,10 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanInviteToKitty()
         {
             await SetupAsync();
-            string NewKittyName = await CreateTestKitty();
+            string NewKittyName = CreateTestKitty();
             Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = TestCode, Expiry = DateTime.Now.AddHours(1) } });
 
-            await vmSettings.Invite();
+            vmSettings.InviteCommand.Execute(null);
 
             Dialogs.AlertText.Should().NotBeNullOrEmpty();
             Db.DeletedCodes.First(jc => jc.Code == TestCode).Should().NotBeNull();
@@ -109,12 +109,12 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanAddUser()
         {
             await SetupAsync();
-            string NewKittyName = await CreateTestKitty();
+            string NewKittyName = CreateTestKitty();
             const string userName = "NewGuy";
             Dialogs.Make_TextInputReturn(userName);
             Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
 
-            await vmSettings.AddUser();
+            vmSettings.AddUserCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
         }
@@ -122,12 +122,12 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanRenameMyself()
         {
             await SetupAsync();
-            string NewKittyName = await CreateTestKitty();
+            string NewKittyName = CreateTestKitty();
             const string userName = "HeyItsaMeMario";
             Dialogs.Make_TextInputReturn(userName);
             Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
 
-            await vmSettings.ChangeMyName();
+            vmSettings.ChangeMyNameCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
             Db.SaveUserDetailToDbUser.Name.Should().Be(userName);
@@ -136,13 +136,13 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CantRenameMyselfIfNameIsInUse()
         {
             await SetupAsync();
-            string NewKittyName = await CreateTestKitty();
+            string NewKittyName = CreateTestKitty();
             const string userName = "HeyItsaMeMario";
             Dialogs.Make_TextInputReturn(userName);
             Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
             await vmSettings.AddUser();
 
-            await vmSettings.ChangeMyName();
+            vmSettings.ChangeMyNameCommand.Execute(null);
 
             Db.SaveUserDetailToDbUser.Name.Should().NotBe(userName);
         }

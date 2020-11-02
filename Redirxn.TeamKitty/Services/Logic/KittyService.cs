@@ -97,7 +97,7 @@ namespace Redirxn.TeamKitty.Services.Logic
             {
                 return;
             }
-
+            // TODO - non-app user needs to have somehting unique in email for ledger recalculation
             kitty.Ledger.Summary.Add(new LedgerSummaryLine
             {
                 Person = new Member { DisplayName = name, Email = email ?? "*" },
@@ -140,9 +140,28 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         }
 
-        private Task<Kitty> RecalculateLedgerSummary(Kitty kitty)
+        private async Task<Kitty> RecalculateLedgerSummary(Kitty kitty)
         {
-            throw new NotImplementedException(); // TODO
+            foreach(var lsl in kitty.Ledger.Summary)
+            {
+                lsl.Purchases = new List<Purchase>();
+                foreach(var si in kitty.KittyConfig.StockItems)
+                {
+                    var filtered = kitty.Ledger.Transactions.Where(t =>
+                            t.Person.Email == lsl.Person.Email &&
+                            t.TransactionType == TransactionType.Purchase &&
+                            t.TransactionName == si.MainName
+                            );
+                    lsl.Purchases.Add(new Purchase
+                    {
+                        ProductName = si.MainName,
+                        ProductCount = filtered.Sum(t => t.TransactionCount),
+                        ProductTotal = filtered.Sum(t => t.TransactionAmount)
+                    });
+                }
+                lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);
+            }
+            return kitty;
         }
         private IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
         {

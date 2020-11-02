@@ -57,7 +57,13 @@ namespace Redirxn.TeamKitty.Tests
 
             Routes.WasNavigatedTo("StockItemPage?FromMainName=Item1").Should().BeTrue();
         }
+        [Test]
+        public void CanNavigateAddItem()
+        {
+            _vmStock.OnAddStockCommand.Execute(null);
 
+            Routes.WasNavigatedTo("StockItemPage").Should().BeTrue();
+        }
         private Kitty GetFakeAdminKitty()
         {
             return new Kitty

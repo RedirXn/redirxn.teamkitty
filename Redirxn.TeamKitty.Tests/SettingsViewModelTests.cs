@@ -117,6 +117,7 @@ namespace Redirxn.TeamKitty.Tests
             vmSettings.AddUserCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.Email == userName).Should().NotBeNull();
         }
         [Test]
         public async Task CanRenameMyself()

@@ -55,6 +55,15 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 await _routingService.NavigateTo($"{nameof(SettingsPage)}");
             }
+            else if (string.IsNullOrWhiteSpace(_identityService.UserDetail.Name) || _identityService.UserDetail.Name == _identityService.UserDetail.Id)
+            {
+                var newName = await _dialogService.GetSingleTextInput("Name Input", "What name would you like to appear in the kitty as?");
+                if (newName != null)
+                {
+                    await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
+                    await _identityService.Rename(newName);
+                }
+            }
             else
             {
                 ExecuteLoadItemsCommand();

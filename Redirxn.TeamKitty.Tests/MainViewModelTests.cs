@@ -7,6 +7,7 @@ using FluentAssertions;
 using Redirxn.TeamKitty.Views;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Tests
 {
@@ -32,6 +33,19 @@ namespace Redirxn.TeamKitty.Tests
             _vmMain.Init();
 
             Routes.WasNavigatedTo(nameof(SettingsPage)).Should().BeTrue();
+        }
+
+        [Test]
+        public async Task NamelessDemandsNameChange()
+        {
+            PrepareKitty();            
+            const string newName = "New Display Name";
+            Dialogs.Make_TextInputReturn(newName);
+            _vmMain = new MainViewModel();
+
+            await _vmMain.Init();
+
+            Db.SaveUserDetailToDbUser.Name.Should().Be(newName);            
         }
         [Test]
         public void CanLoadStockItems()
@@ -131,7 +145,8 @@ namespace Redirxn.TeamKitty.Tests
                             }
                         }
                     }
-                }
+                },
+                Id="me|FakeKitty"
             };
         }
 

@@ -15,5 +15,10 @@ namespace Redirxn.TeamKitty.Views
             this.BindingContext = ViewModel;
         }
         internal MultiTickViewModel ViewModel { get; set; } = Locator.Current.GetService<MultiTickViewModel>();
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            ViewModel.OnAppearing();
+        }
     }
 }

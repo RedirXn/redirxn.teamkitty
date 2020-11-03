@@ -48,6 +48,10 @@ namespace Redirxn.TeamKitty.ViewModels
         public async Task Init()
         {
             IsBusy = true;
+            if(_kittyService.Kitty == null && !string.IsNullOrWhiteSpace(_identityService.UserDetail.DefaultKitty))
+            {
+                await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
+            }
             CurrentKitty = _kittyService.Kitty?.DisplayName;
             SelectedItem = null;
 

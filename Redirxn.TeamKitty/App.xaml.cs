@@ -19,11 +19,13 @@ namespace Redirxn.TeamKitty
         }
         private void InitializeDi()
         {
-            // Services
+            // Xamarin Services
             Locator.CurrentMutable.RegisterLazySingleton<IRoutingService>(() => new ShellRoutingService());
+            Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService());
+
+            // Business Services
             Locator.CurrentMutable.RegisterLazySingleton<IIdentityService>(() => new IdentityService());            
             Locator.CurrentMutable.RegisterLazySingleton<IKittyService>(() => new KittyService());
-            Locator.CurrentMutable.RegisterLazySingleton<IDialogService>(() => new DialogService());
             Locator.CurrentMutable.RegisterLazySingleton<IInviteService>(() => new InviteService());
 
             // DataStores
@@ -37,6 +39,7 @@ namespace Redirxn.TeamKitty
             Locator.CurrentMutable.Register(() => new LoginViewModel());
             Locator.CurrentMutable.Register(() => new MainViewModel());
             Locator.CurrentMutable.Register(() => new MultiTickViewModel());
+            Locator.CurrentMutable.Register(() => new StatusViewModel());
             Locator.CurrentMutable.Register(() => new StockViewModel());
             Locator.CurrentMutable.Register(() => new StockItemViewModel());
             Locator.CurrentMutable.Register(() => new SettingsViewModel());

@@ -50,6 +50,11 @@ namespace Redirxn.TeamKitty.ViewModels
             ItemTapped = new Command<TickDisplay>(OnItemSelected);
             ConfirmCommand = new Command(async () => await Confirmed());
         }
+        public void OnAppearing()
+        {
+            // This "IsBusy" assignment is what triggers the refresh which in turn calls to load the items.
+            IsBusy = true;
+        }
 
         private async Task Confirmed()
         {

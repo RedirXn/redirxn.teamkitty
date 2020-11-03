@@ -97,7 +97,7 @@ namespace Redirxn.TeamKitty.Services.Logic
             {
                 return;
             }
-            // TODO - non-app user needs to have somehting unique in email for ledger recalculation
+            
             kitty.Ledger.Summary.Add(new LedgerSummaryLine
             {
                 Person = new Member { DisplayName = name, Email = email ?? name },

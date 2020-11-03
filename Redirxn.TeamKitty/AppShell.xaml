@@ -43,7 +43,7 @@
                       IsTabStop="False"
                       ContentTemplate="{DataTemplate local:MainPage}"
                       Title="Session" />
-        <ShellContent Title="Money" Icon="tab_money.png" Route="AboutPage" ContentTemplate="{DataTemplate local:LoginPage}" />
+        <ShellContent Title="Status" Icon="tab_money.png" Route="AboutPage" ContentTemplate="{DataTemplate local:StatusPage}" />
         <ShellContent Title="Stock" Icon="tab_stock.png" ContentTemplate="{DataTemplate local:StockPage}" />
         <ShellContent Title="Settings" Icon="tab_settings.png" ContentTemplate="{DataTemplate local:SettingsPage}" />
     </TabBar>

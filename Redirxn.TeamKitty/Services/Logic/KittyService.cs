@@ -134,14 +134,15 @@ namespace Redirxn.TeamKitty.Services.Logic
                 TransactionName = item.MainName
             });
 
-            kitty = await RecalculateLedgerSummary(kitty);
+            kitty = RecalculateLedgerSummary(kitty);
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
 
         }
 
-        private async Task<Kitty> RecalculateLedgerSummary(Kitty kitty)
+        private Kitty RecalculateLedgerSummary(Kitty kitty)
         {
+
             foreach(var lsl in kitty.Ledger.Summary)
             {
                 lsl.Purchases = new List<Purchase>();
@@ -158,7 +159,7 @@ namespace Redirxn.TeamKitty.Services.Logic
                         ProductCount = filtered.Sum(t => t.TransactionCount),
                         ProductTotal = filtered.Sum(t => t.TransactionAmount)
                     });
-                }
+                }                
                 lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);
             }
             return kitty;
@@ -197,6 +198,30 @@ namespace Redirxn.TeamKitty.Services.Logic
                 }
             }
 
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+
+        public async Task TickMultiplePeople(List<string> people, StockItem item)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            foreach (var p in people)
+            {
+                var summ = kitty.Ledger.Summary.FirstOrDefault(s => s.Person.DisplayName == p);
+
+                kitty.Ledger.Transactions.Add(new Transaction
+                {
+                    Date = DateTime.Now,
+                    Person = summ.Person,
+                    TransactionType = TransactionType.Purchase,
+                    TransactionAmount = item.SalePrice,
+                    TransactionCount = 1,
+                    TransactionName = item.MainName
+                });
+            }
+
+            kitty = RecalculateLedgerSummary(kitty);
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
         }

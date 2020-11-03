@@ -42,7 +42,7 @@ namespace Redirxn.TeamKitty.ViewModels
             Items = new ObservableCollection<StockItem>();
 
             LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
-            ItemTapped = new Command<StockItem>(OnItemSelected);
+            ItemTapped = new Command<StockItem>(async (item) => await OnItemSelected(item));
         }
 
         public async Task Init()
@@ -94,7 +94,7 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
 
-        async void OnItemSelected(StockItem item)
+        async Task OnItemSelected(StockItem item)
         {
             if (item == null)
                 return;
@@ -109,7 +109,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _kittyService.TickMeASingle(_identityService.LoginData.Email, _identityService.UserDetail.Name, item);
                     break;
                 case myRound:
-                    // people select page
+                    await _routingService.NavigateTo($"{nameof(MultiTickPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
                     break;
                 default:
                     break;

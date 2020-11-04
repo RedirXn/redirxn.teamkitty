@@ -81,7 +81,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             if (!_identityService.KittyNameExists(newKittyName))
             {
-                var kittyId = await _kittyService.CreateNewKitty(_identityService.LoginData.Email, newKittyName);
+                var kittyId = await _kittyService.CreateNewKitty(_identityService.LoginData.Email, _identityService.LoginData.Name, newKittyName);
                 await _identityService.AddMeToKitty(kittyId);
             }
         }

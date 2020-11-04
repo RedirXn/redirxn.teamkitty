@@ -100,7 +100,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
             }
-            UpdateScreenText();
+            ExecuteLoadProvisionsCommand();            
         }
 
         private async Task PaymentRequest()

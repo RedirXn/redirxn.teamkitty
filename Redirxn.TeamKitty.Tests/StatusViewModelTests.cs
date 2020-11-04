@@ -21,8 +21,9 @@ namespace Redirxn.TeamKitty.Tests
         public void CanShowBalancetext(decimal balance, string expected)
         {
             Prepare(balance);
-
             _vmStatus = new StatusViewModel();
+
+            _vmStatus.OnAppearing();
 
             _vmStatus.MyBalanceText.Should().Be(expected);
         }

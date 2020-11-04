@@ -12,7 +12,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task LoadKitty(string kittyId);
         Task SaveStockItem(StockItem stockItem);
         Task DeleteStockItem(string stockName);
-        Task<string> CreateNewKitty(string email, string newKittyName);
+        Task<string> CreateNewKitty(string email, string userName, string newKittyName);
         bool AmIAdmin(string email);
         Task AddNewUser(string newUser);
         Task TickMeASingle(string email, string personDisplayName, StockItem item);

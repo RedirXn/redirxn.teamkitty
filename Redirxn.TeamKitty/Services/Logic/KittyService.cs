@@ -60,7 +60,7 @@ namespace Redirxn.TeamKitty.Services.Logic
             Kitty = kitty;
         }
 
-        public async Task<string> CreateNewKitty(string email, string newKittyName)
+        public async Task<string> CreateNewKitty(string email, string userName, string newKittyName)
         {
             var kitty = new Kitty
             {
@@ -70,7 +70,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
             kitty.Ledger.Summary.Add(new LedgerSummaryLine
             {
-                Person = new Member { DisplayName = email, Email = email },
+                Person = new Member { DisplayName = userName, Email = email },
                 Balance = 0M,
                 TotalOwed = 0M,
                 TotalPaid = 0M

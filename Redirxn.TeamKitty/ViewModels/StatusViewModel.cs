@@ -43,7 +43,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             PayCommand = new Command(async () => await PaymentRequest());
             ProvideCommand = new Command(async () => await ProvisionRequest());
-            LoadProvisionsCommand = new Command(() => ExecuteLoadProvisionsCommand());
+            LoadProvisionsCommand = new Command(async () => await ExecuteLoadProvisionsCommand());
 
             Provisions = new ObservableCollection<Provision>();
             MyDisplayName = _identityService.UserDetail.Name;
@@ -57,7 +57,7 @@ namespace Redirxn.TeamKitty.ViewModels
         }
 
 
-        void ExecuteLoadProvisionsCommand()
+        async Task ExecuteLoadProvisionsCommand()
         {
             IsBusy = true;
 
@@ -76,7 +76,8 @@ namespace Redirxn.TeamKitty.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
             finally
             {
@@ -91,27 +92,44 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private async Task ProvisionRequest()
         {
-            string[] options = _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.StockGrouping + " of " + si.MainName).ToArray();
-            string option = await _dialogService.SelectOption("Provide Stock", "Cancel", options);
-
-            var sItem = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(si => si.StockGrouping + " of " + si.MainName == option);
-
-            if (sItem != null)
+            try
             {
-                await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
+                string[] options = _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.StockGrouping + " of " + si.MainName).ToArray();
+                string option = await _dialogService.SelectOption("Provide Stock", "Cancel", options);
+
+                var sItem = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(si => si.StockGrouping + " of " + si.MainName == option);
+
+                if (sItem != null)
+                {
+                    await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
+                }
+                ExecuteLoadProvisionsCommand();
             }
-            ExecuteLoadProvisionsCommand();            
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
 
         private async Task PaymentRequest()
         {
-            string strAmount = await _dialogService.GetSingleMoneyInput("Payment", "How much are you paying?");
-            if (!string.IsNullOrWhiteSpace(strAmount))
-            {
-                var amount = decimal.Parse(strAmount);
-                await _kittyService.MakePayment(_identityService.LoginData.Email, amount);
+            try
+            { 
+                string strAmount = await _dialogService.GetSingleMoneyInput("Payment", "How much are you paying?");
+                if (!string.IsNullOrWhiteSpace(strAmount))
+                {
+                    var amount = decimal.Parse(strAmount);
+                    await _kittyService.MakePayment(_identityService.LoginData.Email, amount);
+                }
+                UpdateScreenText();
             }
-            UpdateScreenText();
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+
         }
 
         private string GetBalanceText(decimal balance)

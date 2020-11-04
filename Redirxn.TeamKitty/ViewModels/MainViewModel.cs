@@ -41,40 +41,48 @@ namespace Redirxn.TeamKitty.ViewModels
 
             Items = new ObservableCollection<StockItem>();
 
-            LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
+            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<StockItem>(async (item) => await OnItemSelected(item));
         }
 
         public async Task Init()
         {
-            IsBusy = true;
-            if(_kittyService.Kitty == null && !string.IsNullOrWhiteSpace(_identityService.UserDetail.DefaultKitty))
-            {
-                await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
-            }
-            CurrentKitty = _kittyService.Kitty?.DisplayName;
-            SelectedItem = null;
-
-            if (string.IsNullOrEmpty(CurrentKitty))
-            {
-                await _routingService.NavigateTo($"{nameof(SettingsPage)}");
-            }
-            else if (string.IsNullOrWhiteSpace(_identityService.UserDetail.Name) || _identityService.UserDetail.Name == _identityService.UserDetail.Id)
-            {
-                var newName = await _dialogService.GetSingleTextInput("Name Input", "What name would you like to appear in the kitty as?");
-                if (newName != null)
+            try 
+            { 
+                IsBusy = true;
+                if(_kittyService.Kitty == null && !string.IsNullOrWhiteSpace(_identityService.UserDetail.DefaultKitty))
                 {
-                    await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
-                    await _identityService.Rename(newName);
+                    await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
+                }
+                CurrentKitty = _kittyService.Kitty?.DisplayName;
+                SelectedItem = null;
+
+                if (string.IsNullOrEmpty(CurrentKitty))
+                {
+                    await _routingService.NavigateTo($"{nameof(SettingsPage)}");
+                }
+                else if (string.IsNullOrWhiteSpace(_identityService.UserDetail.Name) || _identityService.UserDetail.Name == _identityService.UserDetail.Id)
+                {
+                    var newName = await _dialogService.GetSingleTextInput("Name Input", "What name would you like to appear in the kitty as?");
+                    if (newName != null)
+                    {
+                        await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
+                        await _identityService.Rename(newName);
+                    }
+                }
+                else
+                {
+                    await ExecuteLoadItemsCommand();
                 }
             }
-            else
+            catch (Exception ex)
             {
-                ExecuteLoadItemsCommand();
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
 
-        void ExecuteLoadItemsCommand()
+        async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;
 
@@ -89,7 +97,8 @@ namespace Redirxn.TeamKitty.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
             finally
             {
@@ -114,18 +123,26 @@ namespace Redirxn.TeamKitty.ViewModels
 
             const string justMe = "Just Me";
             const string myRound = "It's My Round";
-            var option = await _dialogService.SelectOption($"Tick up a {item.MainName} for:", "Cancel", justMe, myRound);
+            try
+            { 
+                var option = await _dialogService.SelectOption($"Tick up a {item.MainName} for:", "Cancel", justMe, myRound);
 
-            switch (option)
+                switch (option)
+                {
+                    case justMe:
+                        await _kittyService.TickMeASingle(_identityService.LoginData.Email, _identityService.UserDetail.Name, item);
+                        break;
+                    case myRound:
+                        await _routingService.NavigateTo($"{nameof(MultiTickPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
             {
-                case justMe:
-                    await _kittyService.TickMeASingle(_identityService.LoginData.Email, _identityService.UserDetail.Name, item);
-                    break;
-                case myRound:
-                    await _routingService.NavigateTo($"{nameof(MultiTickPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
-                    break;
-                default:
-                    break;
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
     }

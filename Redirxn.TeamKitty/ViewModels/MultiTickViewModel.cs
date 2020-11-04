@@ -20,6 +20,7 @@ namespace Redirxn.TeamKitty.ViewModels
     {
         IKittyService _kittyService;
         IRoutingService _routingService;
+        IDialogService _dialogService;
 
         string _itemName;
         public string FromMainName
@@ -39,15 +40,16 @@ namespace Redirxn.TeamKitty.ViewModels
         public Command<TickDisplay> ItemTapped { get; }
         public ObservableCollection<TickDisplay> Items { get; }
 
-        public MultiTickViewModel(IKittyService kittyService = null, IRoutingService routingService = null)
+        public MultiTickViewModel(IKittyService kittyService = null, IRoutingService routingService = null, IDialogService dialogService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
             _routingService = routingService ?? Locator.Current.GetService<IRoutingService>();
+            _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
             Items = new ObservableCollection<TickDisplay>();
 
-            LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
-            ItemTapped = new Command<TickDisplay>(OnItemSelected);
+            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+            ItemTapped = new Command<TickDisplay>(async (i) => await OnItemSelected(i));
             ConfirmCommand = new Command(async () => await Confirmed());
         }
         public void OnAppearing()
@@ -59,40 +61,55 @@ namespace Redirxn.TeamKitty.ViewModels
         private async Task Confirmed()
         {
             var people = new List<string>();
-
-            foreach (var i in Items.Where(t => t.Ticked))
+            try 
+            { 
+                foreach (var i in Items.Where(t => t.Ticked))
+                {
+                    people.Add(i.DisplayName);
+                };
+                if (people.Count() > 0)
+                {
+                    await _kittyService.TickMultiplePeople(people, _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName));
+                    await _routingService.GoBack();
+                }
+            }
+            catch (Exception ex)
             {
-                people.Add(i.DisplayName);
-            };
-            if (people.Count() > 0)
-            {
-                await _kittyService.TickMultiplePeople(people, _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName));
-                await _routingService.GoBack();
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
 
-        private void OnItemSelected(TickDisplay item)
+        private async Task OnItemSelected(TickDisplay item)
         {
-            item.Ticked = !item.Ticked;
+            try
+            { 
+                item.Ticked = !item.Ticked;
 
-            var count = Items.Where(t => t.Ticked).Count();
-            var si = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName);
+                var count = Items.Where(t => t.Ticked).Count();
+                var si = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName);
 
-            if (count == 0)
-            {
-                ConfirmText = "None";
+                if (count == 0)
+                {
+                    ConfirmText = "None";
+                }
+                else if (count == 1)
+                {
+                    ConfirmText = $"1 {si.MainName}";
+                }
+                else
+                {
+                    ConfirmText = $"{count} {si.PluralName}";
+                }
             }
-            else if (count == 1)
+            catch (Exception ex)
             {
-                ConfirmText = $"1 {si.MainName}";
-            }
-            else
-            {
-                ConfirmText = $"{count} {si.PluralName}";
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
 
-        void ExecuteLoadItemsCommand()
+        async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;
 
@@ -112,6 +129,7 @@ namespace Redirxn.TeamKitty.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
             finally
             {

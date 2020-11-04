@@ -16,15 +16,17 @@ namespace Redirxn.TeamKitty.ViewModels
     {
         private IRoutingService _navigationService;
         private IIdentityService _identityService;
+        private IDialogService _dialogService;
         IFacebookClient _facebookService = CrossFacebookClient.Current;
 
         public ICommand OnLoginWithFacebookCommand { get; set; }
 
 
-        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null)
+        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+            _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
             OnLoginWithFacebookCommand = new Command(async () => await LoginFacebookAsync());
         }
@@ -73,6 +75,7 @@ namespace Redirxn.TeamKitty.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
 

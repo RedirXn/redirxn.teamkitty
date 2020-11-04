@@ -2,6 +2,7 @@
 using Redirxn.TeamKitty.Services.Logic;
 using Splat;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -60,20 +61,36 @@ namespace Redirxn.TeamKitty.ViewModels
 
         public async Task Init()
         {
-            await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
+            try
+            { 
+                await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
 
-            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
-            KittyExists = !string.IsNullOrEmpty(_kittyService.Kitty.DisplayName);
-            MultipleKitties = _identityService.UserDetail.KittyNames.Count > 1;
+                IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+                KittyExists = !string.IsNullOrEmpty(_kittyService.Kitty.DisplayName);
+                MultipleKitties = _identityService.UserDetail.KittyNames.Count > 1;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         internal async Task CreateNewKitty()
         {
-            string newKittyName = await _dialogService.GetSingleTextInput("Create a Kitty", "Enter the name for your new Kitty:");
+            try
+            { 
+                string newKittyName = await _dialogService.GetSingleTextInput("Create a Kitty", "Enter the name for your new Kitty:");
 
-            if (!string.IsNullOrWhiteSpace(newKittyName))
+                if (!string.IsNullOrWhiteSpace(newKittyName))
+                {
+                    await CreateNewKittyWithName(newKittyName);
+                    await _routingService.NavigateTo($"///main");
+                }
+            }
+            catch (Exception ex)
             {
-                await CreateNewKittyWithName(newKittyName);
-                await _routingService.NavigateTo($"///main");
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
 
@@ -96,30 +113,54 @@ namespace Redirxn.TeamKitty.ViewModels
         }
         internal async Task JoinKitty()
         {
-            string joinCode = await _dialogService.GetSingleTextInput("Join a Kitty", "Enter the code given to you by the Kitty Administrator:");
+            try 
+            { 
+                string joinCode = await _dialogService.GetSingleTextInput("Join a Kitty", "Enter the code given to you by the Kitty Administrator:");
 
-            if (!string.IsNullOrWhiteSpace(joinCode))
+                if (!string.IsNullOrWhiteSpace(joinCode))
+                {
+                    await JoinKittyWithCode(joinCode);
+                    await _routingService.NavigateTo($"///main");
+                }
+            }
+            catch (Exception ex)
             {
-                await JoinKittyWithCode(joinCode);
-                await _routingService.NavigateTo($"///main");
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
         internal async Task AddUser()
         {
-            string newUser = await _dialogService.GetSingleTextInput("Add a Non-App User", "Enter the name for the person:");
+            try
+            { 
+                string newUser = await _dialogService.GetSingleTextInput("Add a Non-App User", "Enter the name for the person:");
             
-            if (!string.IsNullOrWhiteSpace(newUser))
+                if (!string.IsNullOrWhiteSpace(newUser))
+                {
+                    await AddNewUser(newUser);
+                }
+            }
+            catch (Exception ex)
             {
-                await AddNewUser(newUser);
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
         internal async Task ChangeMyName()
         {
-            string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");
+            try
+            { 
+                string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");
 
-            if (!string.IsNullOrWhiteSpace(newName))
+                if (!string.IsNullOrWhiteSpace(newName))
+                {
+                    await ChangeMyNameTo(newName);
+                }
+            }
+            catch (Exception ex)
             {
-                await ChangeMyNameTo(newName);
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
 
@@ -134,8 +175,16 @@ namespace Redirxn.TeamKitty.ViewModels
 
         internal async Task Invite()
         {
-            string joinCode = await GetKittyJoinCode();
-            await _dialogService.Alert("Join Code", "Advise people to use this code: " + joinCode + " to join your kitty. (expires in 24 hours)", "OK");
+            try
+            { 
+                string joinCode = await GetKittyJoinCode();
+                await _dialogService.Alert("Join Code", "Advise people to use this code: " + joinCode + " to join your kitty. (expires in 24 hours)", "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         internal Task<string> GetKittyJoinCode()
         {
@@ -147,6 +196,7 @@ namespace Redirxn.TeamKitty.ViewModels
         }
         private async Task ChangeKitty()
         {
+            // TODO
             throw new NotImplementedException();
         }
 

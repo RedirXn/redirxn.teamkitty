@@ -2,6 +2,8 @@
 using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
 using Splat;
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,6 +16,7 @@ namespace Redirxn.TeamKitty.ViewModels
     {
         private IRoutingService _navigationService;
         private IKittyService _kittyService;
+        private IDialogService _dialogService;
 
         string _mainName;
         public string MainName
@@ -52,10 +55,11 @@ namespace Redirxn.TeamKitty.ViewModels
         }
         public ICommand OnDeleteStockCommand { get; set; }
         public ICommand SaveItemCommand { get; set; }
-        public StockItemViewModel(IRoutingService navigationService = null, IKittyService kittyService = null)
+        public StockItemViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IDialogService dialogService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();            
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
+            _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
             OnDeleteStockCommand = new Command(async () => await ExecuteDeleteItemCommand());
             SaveItemCommand = new Command(async () => await Save());
@@ -72,8 +76,17 @@ namespace Redirxn.TeamKitty.ViewModels
                 StockPrice = _stockPrice
             };
 
-            await _kittyService.SaveStockItem(stockItem);
-            await ClosePage();
+            try
+            { 
+                await _kittyService.SaveStockItem(stockItem);
+                await ClosePage();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+
         }
 
         private async Task ClosePage()
@@ -81,22 +94,39 @@ namespace Redirxn.TeamKitty.ViewModels
             await _navigationService.GoBack();
         }
 
-        private void LoadFromState(string name)
+        private async void LoadFromState(string name)
         {
-            var item = _kittyService.Kitty.KittyConfig.StockItems.First(si => si.MainName == name);
+            try
+            { 
+                var item = _kittyService.Kitty.KittyConfig.StockItems.First(si => si.MainName == name);
 
-            MainName = item.MainName;
-            MainNamePlural = item.PluralName;
-            StockName = item.StockGrouping;
-            Price = item.SalePrice;
-            StockPrice = item.StockPrice;
+                MainName = item.MainName;
+                MainNamePlural = item.PluralName;
+                StockName = item.StockGrouping;
+                Price = item.SalePrice;
+                StockPrice = item.StockPrice;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+
         }
 
         private async Task ExecuteDeleteItemCommand()
         {
-            // ToDO: confirmation, or check not already in use.
-            await _kittyService.DeleteStockItem(MainName);
-            await ClosePage();
+            try
+            { 
+                // ToDO: confirmation, or check not already in use.
+                await _kittyService.DeleteStockItem(MainName);
+                await ClosePage();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
 
     }

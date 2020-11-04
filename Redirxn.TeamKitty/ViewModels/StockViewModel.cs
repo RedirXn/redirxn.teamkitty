@@ -6,6 +6,7 @@ using Splat;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -16,6 +17,7 @@ namespace Redirxn.TeamKitty.ViewModels
         private IRoutingService _navigationService;
         private IKittyService _kittyService;
         private IIdentityService _identityService;
+        private IDialogService _dialogService;
 
         private StockItem _selectedItem;
 
@@ -25,21 +27,22 @@ namespace Redirxn.TeamKitty.ViewModels
         public ObservableCollection<StockItem> Items { get; }
         public bool IsAdmin { get; set; } = false;
 
-        public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null)
+        public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();            
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
+            _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
             Items = new ObservableCollection<StockItem>();
 
             OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
-            LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
+            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<StockItem>(OnItemSelected);
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
-        void ExecuteLoadItemsCommand()
+        async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;
 
@@ -53,7 +56,8 @@ namespace Redirxn.TeamKitty.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
             finally
             {
@@ -79,9 +83,17 @@ namespace Redirxn.TeamKitty.ViewModels
 
         async void OnItemSelected(StockItem item)
         {
-            if (item == null || !IsAdmin)
-                return;
-            await _navigationService.NavigateTo($"{nameof(StockItemPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
+            try
+            { 
+                if (item == null || !IsAdmin)
+                    return;
+                await _navigationService.NavigateTo($"{nameof(StockItemPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
     }
 }

@@ -20,32 +20,47 @@ namespace Redirxn.TeamKitty.Tests
         [TestCase(5, "You are ahead $5.00")]
         public void CanShowBalancetext(decimal balance, string expected)
         {
+            Prepare(balance);
+
+            _vmStatus = new StatusViewModel();
+
+            _vmStatus.MyBalanceText.Should().Be(expected);
+        }
+
+        private void Prepare(decimal balance)
+        {
             var fakeLoginData = new NetworkAuthData { Email = myEmail, Id = myEmail };
             Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
             var kitty = GetFakeAdminKitty();
             kitty.Ledger.Summary.First().Balance = balance;
             Db.MakeGetKittyReturn(kitty);
             Locator.Current.GetService<IKittyService>().LoadKitty("anything");
-
-            _vmStatus = new StatusViewModel();
-
-            _vmStatus.MyBalanceText.Should().Be(expected);
         }
+
         [Test]
         public void CanPayMoney()
         {
-            var fakeLoginData = new NetworkAuthData { Email = myEmail, Id = myEmail };
-            Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
-            var kitty = GetFakeAdminKitty();            
-            Db.MakeGetKittyReturn(kitty);
-            Locator.Current.GetService<IKittyService>().LoadKitty("anything");
-            _vmStatus = new StatusViewModel();
+            Prepare(0);
             Dialogs.Make_MoneyInputReturn("100");
+            _vmStatus = new StatusViewModel();            
 
             _vmStatus.PayCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Payment).First().TransactionAmount.Should().Be(100M);
             Db.SaveKittyToDbKitty.Ledger.Summary.First(lsl => lsl.Person.Email == myEmail).Balance.Should().Be(100M);
+        }
+        [Test]
+        public void CanSupplyStock()
+        {
+            Prepare(0);
+            Dialogs.Make_SelectOptionReturn("Case of Item1");
+            _vmStatus = new StatusViewModel();
+            
+            _vmStatus.ProvideCommand.Execute(null);
+
+            Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Provision).First().TransactionName.Should().Be("Case of Item1");
+            Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Provision).First().TransactionCount.Should().Be(1);
+            Db.SaveKittyToDbKitty.Ledger.Summary.First(lsl => lsl.Person.Email == myEmail).Provisions["Case of Item1"].Should().Be(1);
         }
         private Kitty GetFakeAdminKitty()
         {
@@ -59,12 +74,14 @@ namespace Redirxn.TeamKitty.Tests
                         new StockItem
                         {
                             MainName="Item1",
-                            SalePrice=2.5M
+                            SalePrice=2.5M,
+                            StockGrouping="Case"
                         },
                         new StockItem
                         {
                             MainName="Item2",
-                            SalePrice=5M
+                            SalePrice=5M,
+                            StockGrouping="Vat"
                         }
                     }
                 },

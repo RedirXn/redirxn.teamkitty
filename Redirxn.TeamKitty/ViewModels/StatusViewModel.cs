@@ -40,9 +40,23 @@ namespace Redirxn.TeamKitty.ViewModels
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
             PayCommand = new Command(async () => await PaymentRequest());
+            ProvideCommand = new Command(async () => await ProvisionRequest());
 
             _myDisplayName = _identityService.UserDetail.Name;
             _myBalanceText = GetBalanceText(_kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email).Balance);
+        }
+
+        private async Task ProvisionRequest()
+        {
+            string[] options = _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.StockGrouping + " of " + si.MainName).ToArray();
+            string option = await _dialogService.SelectOption("Provide Stock", "Cancel");
+
+            var sItem = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(si => si.StockGrouping + " of " + si.MainName == option);
+
+            if (sItem != null)
+            {
+                await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
+            }
         }
 
         private async Task PaymentRequest()

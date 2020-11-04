@@ -250,5 +250,30 @@ namespace Redirxn.TeamKitty.Services.Logic
             Kitty = kitty;
 
         }
+
+        public async Task ProvideStock(string email, StockItem sItem)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            var sl = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
+            var me = sl.Person;
+            var iName = sItem.StockGrouping + " of " + sItem.MainName;
+            kitty.Ledger.Transactions.Add(new Transaction
+            {
+                Date = DateTime.Now,
+                Person = me,
+                TransactionType = TransactionType.Provision,
+                TransactionCount = 1,
+                TransactionName = iName
+            });
+
+            sl.Provisions.TryGetValue(iName, out var prv);
+            sl.Provisions[iName] = prv + 1;
+            
+            kitty = RecalculateLedgerSummary(kitty, email);
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+
+        }
     }
 }

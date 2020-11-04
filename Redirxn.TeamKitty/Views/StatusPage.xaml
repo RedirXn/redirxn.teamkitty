@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
+             xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
              x:Class="Redirxn.TeamKitty.Views.StatusPage">
     <ContentPage.Content>
         <ScrollView>
@@ -8,14 +10,34 @@
                 <Label Text="{Binding MyDisplayName}"
                     VerticalOptions="Start" 
                     HorizontalOptions="CenterAndExpand" />
-                <Label Text="Balance:"
-                    HorizontalOptions="Start" />
                 <Label Text="{Binding MyBalanceText}"
                     HorizontalOptions="CenterAndExpand" />
                 <StackLayout Orientation="Horizontal">
                     <Button Text="Pay" Command="{Binding PayCommand}" />
                     <Button Text="Provide Stock" Command="{Binding ProvideCommand}"/>
-                </StackLayout>                
+                </StackLayout>
+                <Label Text="{Binding MyPaidText}"
+                    HorizontalOptions="CenterAndExpand" />
+                <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadProvisionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+                    <CollectionView x:Name="ProvisionsListView"
+                        ItemsSource="{Binding Provisions}"
+                        SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Padding="10" x:DataType="local:Provision">
+                                    <Label Text="{Binding Key}" 
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="16" />
+                                    <Label Text="{Binding Value}" 
+                                        LineBreakMode="NoWrap"
+                                        Style="{DynamicResource ListItemDetailTextStyle}"
+                                        FontSize="13" />
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

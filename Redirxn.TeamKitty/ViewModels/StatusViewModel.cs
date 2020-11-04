@@ -1,11 +1,11 @@
-﻿using Redirxn.TeamKitty.Models;
-using Redirxn.TeamKitty.Services.Application;
+﻿using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
 using Splat;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -31,8 +31,10 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _myBalanceText; }
             set { SetProperty(ref _myBalanceText, value); }
         }
+        public ObservableCollection<Provision> Provisions { get; }
         public ICommand PayCommand { get; set; }
         public ICommand ProvideCommand { get; set; }
+        public ICommand LoadProvisionsCommand { get; set; }
         public StatusViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
@@ -41,15 +43,56 @@ namespace Redirxn.TeamKitty.ViewModels
 
             PayCommand = new Command(async () => await PaymentRequest());
             ProvideCommand = new Command(async () => await ProvisionRequest());
+            LoadProvisionsCommand = new Command(() => ExecuteLoadProvisionsCommand());
 
-            _myDisplayName = _identityService.UserDetail.Name;
-            _myBalanceText = GetBalanceText(_kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email).Balance);
+            Provisions = new ObservableCollection<Provision>();
+            MyDisplayName = _identityService.UserDetail.Name;
+        }
+        public void OnAppearing()
+        {
+            // This "IsBusy" assignment is what triggers the refresh which in turn calls to load the items.
+            IsBusy = true;
+
+            UpdateScreenText();
+        }
+
+
+        void ExecuteLoadProvisionsCommand()
+        {
+            IsBusy = true;
+
+            try
+            {
+                Provisions.Clear();
+
+                foreach (var item in _kittyService.Kitty?.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email).Provisions)
+                {
+                    Provisions.Add(new Provision
+                    {
+                        Key = item.Key,
+                        Value = item.Value
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void UpdateScreenText()
+        {            
+            MyBalanceText = GetBalanceText(_kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email).Balance);
         }
 
         private async Task ProvisionRequest()
         {
             string[] options = _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.StockGrouping + " of " + si.MainName).ToArray();
-            string option = await _dialogService.SelectOption("Provide Stock", "Cancel");
+            string option = await _dialogService.SelectOption("Provide Stock", "Cancel", options);
 
             var sItem = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(si => si.StockGrouping + " of " + si.MainName == option);
 
@@ -57,6 +100,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
             }
+            UpdateScreenText();
         }
 
         private async Task PaymentRequest()
@@ -67,6 +111,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 var amount = decimal.Parse(strAmount);
                 await _kittyService.MakePayment(_identityService.LoginData.Email, amount);
             }
+            UpdateScreenText();
         }
 
         private string GetBalanceText(decimal balance)
@@ -85,4 +130,10 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
     }
+    public class Provision
+    {
+        public string Key { get; set; }
+        public int Value { get; set; }
+    }
+
 }

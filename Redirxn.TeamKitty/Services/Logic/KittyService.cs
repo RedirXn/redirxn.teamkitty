@@ -134,34 +134,34 @@ namespace Redirxn.TeamKitty.Services.Logic
                 TransactionName = item.MainName
             });
 
-            kitty = RecalculateLedgerSummary(kitty);
+            kitty = RecalculateLedgerSummary(kitty, email);
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
 
         }
 
-        private Kitty RecalculateLedgerSummary(Kitty kitty)
+        private Kitty RecalculateLedgerSummary(Kitty kitty, string email)
         {
-
-            foreach(var lsl in kitty.Ledger.Summary)
+            var lsl = kitty.Ledger.Summary.FirstOrDefault(s => s.Person.Email == email);
+            lsl.Purchases = new List<Purchase>();
+            foreach(var si in kitty.KittyConfig.StockItems)
             {
-                lsl.Purchases = new List<Purchase>();
-                foreach(var si in kitty.KittyConfig.StockItems)
+                var filtered = kitty.Ledger.Transactions.Where(t =>
+                        t.Person.Email == lsl.Person.Email &&
+                        t.TransactionType == TransactionType.Purchase &&
+                        t.TransactionName == si.MainName
+                        );
+                lsl.Purchases.Add(new Purchase
                 {
-                    var filtered = kitty.Ledger.Transactions.Where(t =>
-                            t.Person.Email == lsl.Person.Email &&
-                            t.TransactionType == TransactionType.Purchase &&
-                            t.TransactionName == si.MainName
-                            );
-                    lsl.Purchases.Add(new Purchase
-                    {
-                        ProductName = si.MainName,
-                        ProductCount = filtered.Sum(t => t.TransactionCount),
-                        ProductTotal = filtered.Sum(t => t.TransactionAmount)
-                    });
-                }                
-                lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);
+                    ProductName = si.MainName,
+                    ProductCount = filtered.Sum(t => t.TransactionCount),
+                    ProductTotal = filtered.Sum(t => t.TransactionAmount)
+                });
             }
+            lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Payment).Sum(t => t.TransactionAmount);
+            lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);
+            lsl.Balance = lsl.TotalPaid - lsl.TotalOwed;
+
             return kitty;
         }
         private IEnumerable<StockItem> ReplaceStockItem(IEnumerable<StockItem> enumerable, StockItem value)
@@ -205,11 +205,11 @@ namespace Redirxn.TeamKitty.Services.Logic
         public async Task TickMultiplePeople(List<string> people, StockItem item)
         {
             var kitty = await _dataStore.GetKitty(Kitty.Id);
-
+            List<string> emails = new List<string>(people.Count());
             foreach (var p in people)
             {
                 var summ = kitty.Ledger.Summary.FirstOrDefault(s => s.Person.DisplayName == p);
-
+                emails.Add(summ.Person.Email);
                 kitty.Ledger.Transactions.Add(new Transaction
                 {
                     Date = DateTime.Now,
@@ -221,9 +221,34 @@ namespace Redirxn.TeamKitty.Services.Logic
                 });
             }
 
-            kitty = RecalculateLedgerSummary(kitty);
+            foreach (var e in emails)
+            {
+                kitty = RecalculateLedgerSummary(kitty, e);
+            }
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
+        }
+
+        public async Task MakePayment(string email, decimal amount)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+                        
+            var me = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email).Person;
+
+            kitty.Ledger.Transactions.Add(new Transaction
+            {
+                Date = DateTime.Now,
+                Person = me,
+                TransactionType = TransactionType.Payment,
+                TransactionAmount = amount,
+                TransactionCount = 1,
+                TransactionName = "Cash"
+            });
+
+            kitty = RecalculateLedgerSummary(kitty, email);
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+
         }
     }
 }

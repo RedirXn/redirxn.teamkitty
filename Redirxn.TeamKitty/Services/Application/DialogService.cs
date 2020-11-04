@@ -9,6 +9,11 @@ namespace Redirxn.TeamKitty.Services.Application
             await Xamarin.Forms.Application.Current.MainPage.DisplayAlert(title, message, okButton);
         }
 
+        public async Task<string> GetSingleMoneyInput(string title, string message)
+        {
+            return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message, keyboard: Xamarin.Forms.Keyboard.Numeric);
+        }
+
         public async Task<string> GetSingleTextInput(string title, string message)
         {
             return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message);

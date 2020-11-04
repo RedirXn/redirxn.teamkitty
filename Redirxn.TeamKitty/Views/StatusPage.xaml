@@ -12,6 +12,10 @@
                     HorizontalOptions="Start" />
                 <Label Text="{Binding MyBalanceText}"
                     HorizontalOptions="CenterAndExpand" />
+                <StackLayout Orientation="Horizontal">
+                    <Button Text="Pay" Command="{Binding PayCommand}" />
+                    <Button Text="Provide Stock" Command="{Binding ProvideCommand}"/>
+                </StackLayout>                
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

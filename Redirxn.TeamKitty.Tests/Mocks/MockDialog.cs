@@ -1,4 +1,5 @@
 ﻿using Redirxn.TeamKitty.Services.Application;
+using System;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Tests
@@ -7,6 +8,7 @@ namespace Redirxn.TeamKitty.Tests
     {
         string _optionToReturn;
         string _inputToReturn;
+        string _moneyToReturn;
 
         public bool SelectOptionCalled { get; private set; }
         public string AlertText { get; private set; }
@@ -33,6 +35,16 @@ namespace Redirxn.TeamKitty.Tests
         public void Make_TextInputReturn(string thisText)
         {
             _inputToReturn = thisText;
+        }
+
+        internal void Make_MoneyInputReturn(string amount)
+        {
+            _moneyToReturn = amount;
+        }
+
+        public async Task<string> GetSingleMoneyInput(string title, string message)
+        {
+            return _moneyToReturn;
         }
     }
 }

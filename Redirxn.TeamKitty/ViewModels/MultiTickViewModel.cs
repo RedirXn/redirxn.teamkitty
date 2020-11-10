@@ -54,7 +54,6 @@ namespace Redirxn.TeamKitty.ViewModels
         }
         public void OnAppearing()
         {
-            // This "IsBusy" assignment is what triggers the refresh which in turn calls to load the items.
             IsBusy = true;
         }
 

@@ -43,6 +43,13 @@ namespace Redirxn.TeamKitty.ViewModels
             get => _multipleKitties;
             set { SetProperty(ref _multipleKitties, value); }
         }
+        private string _currentKitty = string.Empty;
+        public string CurrentKitty
+        {
+            get { return _currentKitty; }
+            set { SetProperty(ref _currentKitty, value); }
+        }
+
         public SettingsViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IInviteService inviteService = null, IDialogService dialogService = null, IRoutingService routingService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
@@ -68,6 +75,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
                 KittyExists = !string.IsNullOrEmpty(_kittyService.Kitty.DisplayName);
                 MultipleKitties = _identityService.UserDetail.KittyNames.Count > 1;
+                CurrentKitty = _kittyService.Kitty?.DisplayName;
             }
             catch (Exception ex)
             {

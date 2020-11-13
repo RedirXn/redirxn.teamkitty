@@ -34,6 +34,12 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _confirmText; }
             set { SetProperty(ref _confirmText, value); }
         }
+        private string _currentKitty = string.Empty;
+        public string CurrentKitty
+        {
+            get { return _currentKitty; }
+            set { SetProperty(ref _currentKitty, value); }
+        }
 
         public ICommand ConfirmCommand { get; }
         public ICommand LoadItemsCommand { get; }
@@ -55,6 +61,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public void OnAppearing()
         {
             IsBusy = true;
+            CurrentKitty = _kittyService.Kitty?.DisplayName;
         }
 
         private async Task Confirmed()

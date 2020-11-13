@@ -53,6 +53,13 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return string.Empty; }
             set { LoadFromState(value); }
         }
+        private string _currentKitty = string.Empty;
+        public string CurrentKitty
+        {
+            get { return _currentKitty; }
+            set { SetProperty(ref _currentKitty, value); }
+        }
+
         public ICommand OnDeleteStockCommand { get; set; }
         public ICommand SaveItemCommand { get; set; }
         public StockItemViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IDialogService dialogService = null)
@@ -63,6 +70,8 @@ namespace Redirxn.TeamKitty.ViewModels
 
             OnDeleteStockCommand = new Command(async () => await ExecuteDeleteItemCommand());
             SaveItemCommand = new Command(async () => await Save());
+
+            CurrentKitty = _kittyService.Kitty?.DisplayName;
         }
 
         internal async Task Save()

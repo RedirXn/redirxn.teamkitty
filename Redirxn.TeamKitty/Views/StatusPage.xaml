@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
              xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
+             Title="{Binding CurrentKitty}"
              x:Class="Redirxn.TeamKitty.Views.StatusPage">
     <ContentPage.Content>
         <ScrollView>

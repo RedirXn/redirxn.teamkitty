@@ -26,6 +26,12 @@ namespace Redirxn.TeamKitty.ViewModels
         public Command<StockItem> ItemTapped { get; }
         public ObservableCollection<StockItem> Items { get; }
         public bool IsAdmin { get; set; } = false;
+        private string _currentKitty = string.Empty;
+        public string CurrentKitty
+        {
+            get { return _currentKitty; }
+            set { SetProperty(ref _currentKitty, value); }
+        }
 
         public StockViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
@@ -69,6 +75,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             IsBusy = true;
             SelectedItem = null;
+            CurrentKitty = _kittyService.Kitty?.DisplayName;
         }
 
         public StockItem SelectedItem

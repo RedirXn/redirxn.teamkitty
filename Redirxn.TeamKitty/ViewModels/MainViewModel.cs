@@ -90,9 +90,12 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 Items.Clear();
 
-                foreach (var item in _kittyService.Kitty?.KittyConfig?.StockItems)
+                if (_kittyService.Kitty != null)
                 {
-                    Items.Add(item);
+                    foreach (var item in _kittyService.Kitty?.KittyConfig?.StockItems)
+                    {
+                        Items.Add(item);
+                    }
                 }
             }
             catch (Exception ex)

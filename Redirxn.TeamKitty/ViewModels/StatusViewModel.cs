@@ -31,6 +31,13 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _myBalanceText; }
             set { SetProperty(ref _myBalanceText, value); }
         }
+        private string _currentKitty = string.Empty;
+        public string CurrentKitty
+        {
+            get { return _currentKitty; }
+            set { SetProperty(ref _currentKitty, value); }
+        }
+
         public ObservableCollection<Provision> Provisions { get; }
         public ICommand PayCommand { get; set; }
         public ICommand ProvideCommand { get; set; }
@@ -52,7 +59,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             // This "IsBusy" assignment is what triggers the refresh which in turn calls to load the items.
             IsBusy = true;
-
+            CurrentKitty = _kittyService.Kitty?.DisplayName;
             UpdateScreenText();
         }
 

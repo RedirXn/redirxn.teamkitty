@@ -4,7 +4,7 @@
              x:Class="Redirxn.TeamKitty.Views.StockPage"
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
              xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
-             Title="Menu">
+             Title="{Binding CurrentKitty}">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Add" Command="{Binding OnAddStockCommand}" IsEnabled="{Binding IsAdmin}"/>
     </ContentPage.ToolbarItems>

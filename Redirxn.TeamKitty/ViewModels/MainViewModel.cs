@@ -55,7 +55,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
                 }
                 CurrentKitty = _kittyService.Kitty?.DisplayName;
-                SelectedItem = null;
+                SetSelectedItem(null);
 
                 if (string.IsNullOrEmpty(CurrentKitty))
                 {
@@ -112,11 +112,11 @@ namespace Redirxn.TeamKitty.ViewModels
         public StockItem SelectedItem
         {
             get => _selectedItem;
-            set
-            {
-                SetProperty(ref _selectedItem, value);
-                OnItemSelected(value);
-            }
+        }
+        public async void SetSelectedItem(StockItem value)
+        {
+            SetProperty(ref _selectedItem, value);
+            await OnItemSelected(value);
         }
 
         async Task OnItemSelected(StockItem item)

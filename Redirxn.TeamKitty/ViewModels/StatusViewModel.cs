@@ -52,14 +52,14 @@ namespace Redirxn.TeamKitty.ViewModels
             ProvideCommand = new Command(async () => await ProvisionRequest());
             LoadProvisionsCommand = new Command(async () => await ExecuteLoadProvisionsCommand());
 
-            Provisions = new ObservableCollection<Provision>();
-            MyDisplayName = _identityService.UserDetail.Name;
+            Provisions = new ObservableCollection<Provision>();            
         }
         public void OnAppearing()
         {
             // This "IsBusy" assignment is what triggers the refresh which in turn calls to load the items.
             IsBusy = true;
             CurrentKitty = _kittyService.Kitty?.DisplayName;
+            MyDisplayName = _identityService.UserDetail.Name;
             UpdateScreenText();
         }
 
@@ -110,7 +110,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 {
                     await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
                 }
-                ExecuteLoadProvisionsCommand();
+                await ExecuteLoadProvisionsCommand();
             }
             catch (Exception ex)
             {

@@ -26,11 +26,11 @@ namespace Redirxn.TeamKitty.Tests
         }
 
         [Test]
-        public void KittylessRedirectsToSettingsPage()
+        public async Task KittylessRedirectsToSettingsPage()
         {
             _vmMain = new MainViewModel();
 
-            _vmMain.Init();
+            await _vmMain.Init();
 
             Routes.WasNavigatedTo(nameof(SettingsPage)).Should().BeTrue();
         }

@@ -1,4 +1,5 @@
-﻿using Redirxn.TeamKitty.Services.Application;
+﻿using Redirxn.TeamKitty.Models;
+using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
 using Splat;
 using System;
@@ -12,11 +13,15 @@ using Xamarin.Forms;
 
 namespace Redirxn.TeamKitty.ViewModels
 {
+    [QueryProperty(nameof(FromMember), nameof(FromMember))]
     public class StatusViewModel : BaseViewModel
     {
         private IKittyService _kittyService;
         private IIdentityService _identityService;
         private IDialogService _dialogService;
+
+        private LedgerSummaryLine _summary;
+        private bool _loadingFromState;
 
         string _myDisplayName;
         public string MyDisplayName
@@ -31,17 +36,36 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _myBalanceText; }
             set { SetProperty(ref _myBalanceText, value); }
         }
+        string _myPaidText;
+        public string MyPaidText
+        {
+            get { return _myPaidText; }
+            set { SetProperty(ref _myPaidText, value); }
+        }
         private string _currentKitty = string.Empty;
         public string CurrentKitty
         {
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
+        private bool _isChangeable;
+        public bool IsChangeable
+        {
+            get { return _isChangeable; }
+            set { SetProperty(ref _isChangeable, value); }
+        }
 
         public ObservableCollection<Provision> Provisions { get; }
         public ICommand PayCommand { get; set; }
         public ICommand ProvideCommand { get; set; }
         public ICommand LoadProvisionsCommand { get; set; }
+
+        public string FromMember
+        {
+            get { return string.Empty; }
+            set { LoadFromState(value); }
+        }
+
         public StatusViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
@@ -56,11 +80,18 @@ namespace Redirxn.TeamKitty.ViewModels
         }
         public void OnAppearing()
         {
-            // This "IsBusy" assignment is what triggers the refresh which in turn calls to load the items.
             IsBusy = true;
             CurrentKitty = _kittyService.Kitty?.DisplayName;
-            MyDisplayName = _identityService.UserDetail.Name;
+
+            if (!_loadingFromState)
+            {
+                _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email);
+            }
+
+            IsChangeable = _kittyService.AmIAdmin(_identityService.LoginData.Email) || _summary.Person.Email == _identityService.LoginData.Email;
+            MyDisplayName = _summary.Person.DisplayName;
             UpdateScreenText();
+            _loadingFromState = false;
         }
 
 
@@ -72,13 +103,16 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 Provisions.Clear();
 
-                foreach (var item in _kittyService.Kitty?.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email).Provisions)
+                if (_summary != null)
                 {
-                    Provisions.Add(new Provision
+                    foreach (var item in _summary.Provisions)
                     {
-                        Key = item.Key,
-                        Value = item.Value
-                    });
+                        Provisions.Add(new Provision
+                        {
+                            Key = item.Key,
+                            Value = item.Value
+                        });
+                    }
                 }
             }
             catch (Exception ex)
@@ -93,8 +127,9 @@ namespace Redirxn.TeamKitty.ViewModels
         }
 
         private void UpdateScreenText()
-        {            
-            MyBalanceText = GetBalanceText(_kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email).Balance);
+        {
+            MyBalanceText = GetBalanceText(_summary.Balance);
+            MyPaidText = string.Format("Paid so far: {0:C}", Math.Abs(_summary.TotalPaid));
         }
 
         private async Task ProvisionRequest()
@@ -108,7 +143,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 if (sItem != null)
                 {
-                    await _kittyService.ProvideStock(_identityService.LoginData.Email, sItem);
+                    await _kittyService.ProvideStock(_summary.Person.Email, sItem);
                 }
                 await ExecuteLoadProvisionsCommand();
             }
@@ -127,7 +162,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 if (!string.IsNullOrWhiteSpace(strAmount))
                 {
                     var amount = decimal.Parse(strAmount);
-                    await _kittyService.MakePayment(_identityService.LoginData.Email, amount);
+                    await _kittyService.MakePayment(_summary.Person.Email, amount);
                 }
                 UpdateScreenText();
             }
@@ -139,20 +174,40 @@ namespace Redirxn.TeamKitty.ViewModels
 
         }
 
-        private string GetBalanceText(decimal balance)
+        private string GetBalanceText(decimal balance) 
         {
             if (balance == 0M)
             {
-                return "You Owe Nothing";
+                return "All paid up";
             }
             else if (balance < 0M)
             {
-                return string.Format("You owe {0:C}", Math.Abs(balance));
+                return string.Format("You still owe {0:C}", Math.Abs(balance));
             }
             else
             {
                 return string.Format("You are ahead {0:C}", balance);
             }
+        }
+
+        private async void LoadFromState(string email)
+        {
+            try
+            {
+                _loadingFromState = true;
+                var decodedEmail = System.Web.HttpUtility.UrlDecode(email);
+                var item = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == decodedEmail);
+
+                MyDisplayName = item.Person.DisplayName;
+                _summary = item;
+                UpdateScreenText();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+
         }
     }
     public class Provision

@@ -8,10 +8,10 @@ using FluentAssertions;
 namespace Redirxn.TeamKitty.Tests
 {
     [TestFixture]
-    public class StockViewModelTests : BaseTest
+    public class KittyViewModelTests : BaseTest
     {
         private const string myEmail = "me@myplace";
-        private StockViewModel _vmStock;
+        private KittyViewModel _vmKitty;
 
         [SetUp]
         public override void Setup()
@@ -29,41 +29,23 @@ namespace Redirxn.TeamKitty.Tests
             Db.MakeGetKittyReturn(fakeKitty);
             Locator.Current.GetService<IKittyService>().LoadKitty("anything");
 
-            _vmStock = new StockViewModel();
-            _vmStock.LoadItemsCommand.Execute(null);
-        }
-        [Test]
-        public void CanDetermineAdmin()
-        {
-            _vmStock.IsAdmin.Should().BeTrue();
-        }
-
-        [Test]
-        public void CanLoadAllStockItems()
-        {
-            _vmStock.Items.Count.Should().Be(2);
+            _vmKitty = new KittyViewModel();
+            _vmKitty.LoadItemsCommand.Execute(null);
         }
 
         [Test]
         public void CanNavigateOnSelectItem()
         {
-            var si = new StockItem
+            var lsl = new LedgerSummaryLine
             {
-                MainName = "Item1",
-                SalePrice = 2.5M
+                Person = new Member { DisplayName="Test", Email=myEmail},                
             };
 
-            _vmStock.ItemTapped.Execute(si);
+            _vmKitty.ItemTapped.Execute(lsl);
 
-            Routes.WasNavigatedTo("StockItemPage?FromMainName=Item1").Should().BeTrue();
+            Routes.WasNavigatedTo(@"///StatusPage?FromMember=me@myplace").Should().BeTrue();
         }
-        [Test]
-        public void CanNavigateAddItem()
-        {
-            _vmStock.OnAddStockCommand.Execute(null);
 
-            Routes.WasNavigatedTo("StockItemPage").Should().BeTrue();
-        }
         private Kitty GetFakeAdminKitty()
         {
             return new Kitty

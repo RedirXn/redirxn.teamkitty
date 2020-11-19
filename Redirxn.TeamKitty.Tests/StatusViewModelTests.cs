@@ -15,8 +15,8 @@ namespace Redirxn.TeamKitty.Tests
         private const string myEmail = "me@myplace";
         StatusViewModel _vmStatus;
 
-        [TestCase(-5.0, "You owe $5.00")]
-        [TestCase(0, "You Owe Nothing")]
+        [TestCase(-5.0, "You still owe $5.00")]
+        [TestCase(0, "All paid up")]
         [TestCase(5, "You are ahead $5.00")]
         public void CanShowBalancetext(decimal balance, string expected)
         {
@@ -43,7 +43,8 @@ namespace Redirxn.TeamKitty.Tests
         {
             Prepare(0);
             Dialogs.Make_MoneyInputReturn("100");
-            _vmStatus = new StatusViewModel();            
+            _vmStatus = new StatusViewModel();
+            _vmStatus.OnAppearing();
 
             _vmStatus.PayCommand.Execute(null);
 
@@ -56,7 +57,8 @@ namespace Redirxn.TeamKitty.Tests
             Prepare(0);
             Dialogs.Make_SelectOptionReturn("Case of Item1");
             _vmStatus = new StatusViewModel();
-            
+            _vmStatus.OnAppearing();
+
             _vmStatus.ProvideCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Provision).First().TransactionName.Should().Be("Case of Item1");

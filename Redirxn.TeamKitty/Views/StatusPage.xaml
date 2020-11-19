@@ -13,7 +13,7 @@
                     HorizontalOptions="CenterAndExpand" />
                 <Label Text="{Binding MyBalanceText}"
                     HorizontalOptions="CenterAndExpand" />
-                <StackLayout Orientation="Horizontal">
+                <StackLayout Orientation="Horizontal" IsVisible="{Binding IsChangeable}">
                     <Button Text="Pay" Command="{Binding PayCommand}" />
                     <Button Text="Provide Stock" Command="{Binding ProvideCommand}"/>
                 </StackLayout>

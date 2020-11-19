@@ -7,23 +7,19 @@ using Xamarin.Forms.Xaml;
 namespace Redirxn.TeamKitty.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class StatusPage : ContentPage
+    public partial class KittyPage : ContentPage
     {
-        public StatusPage()
+        public KittyPage()
         {
             InitializeComponent();
             this.BindingContext = ViewModel;
         }
-        internal StatusViewModel ViewModel { get; set; } = Locator.Current.GetService<StatusViewModel>();
+        internal KittyViewModel ViewModel { get; set; } = Locator.Current.GetService<KittyViewModel>();
         protected override void OnAppearing()
         {
             base.OnAppearing();
             ViewModel.OnAppearing();
         }
 
-        protected override bool OnBackButtonPressed()
-        {
-            return true;
-        }
     }
 }

@@ -43,7 +43,7 @@ namespace Redirxn.TeamKitty.Tests
 
             _vmKitty.ItemTapped.Execute(lsl);
 
-            Routes.WasNavigatedTo(@"///StatusPage?FromMember=me@myplace").Should().BeTrue();
+            Routes.WasNavigatedTo(@"StatusPage?FromMember=me@myplace").Should().BeTrue();
         }
 
         private Kitty GetFakeAdminKitty()

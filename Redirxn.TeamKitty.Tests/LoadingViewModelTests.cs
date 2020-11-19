@@ -50,6 +50,11 @@ namespace Redirxn.TeamKitty.Tests
             {
                 throw new NotImplementedException();
             }
+
+            public Task SetDefaultKitty(string nextKitty)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 

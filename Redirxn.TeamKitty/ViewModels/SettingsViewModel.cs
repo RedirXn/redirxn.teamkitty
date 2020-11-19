@@ -204,8 +204,23 @@ namespace Redirxn.TeamKitty.ViewModels
         }
         private async Task ChangeKitty()
         {
-            // TODO
-            throw new NotImplementedException();
+            try
+            {
+                var kitties = _identityService.UserDetail.KittyNames;
+                var displayKitties = kitties.Select(k => k.Split('|')[1]).ToArray();
+                string nextKittyDisplay = await _dialogService.SelectOption("Choose Kitty", "Cancel", displayKitties);
+
+                if (!string.IsNullOrWhiteSpace(nextKittyDisplay))
+                {
+                    var nextKitty = kitties.First(k => k.EndsWith("|" + nextKittyDisplay));
+                    await _kittyService.LoadKitty(nextKitty);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
 
     }

@@ -88,7 +88,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 if (item == null)
                     return;
-                await _routingService.NavigateTo($"///{nameof(StatusPage)}?{nameof(StatusViewModel.FromMember)}={item.Person.Email}");
+                await _routingService.NavigateTo($"{nameof(StatusPage)}?{nameof(StatusViewModel.FromMember)}={item.Person.Email}");
             }
             catch (Exception ex)
             {

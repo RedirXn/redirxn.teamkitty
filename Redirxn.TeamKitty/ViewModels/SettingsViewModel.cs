@@ -214,6 +214,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 {
                     var nextKitty = kitties.First(k => k.EndsWith("|" + nextKittyDisplay));
                     await _kittyService.LoadKitty(nextKitty);
+                    await _identityService.SetDefaultKitty(nextKitty);
                 }
             }
             catch (Exception ex)

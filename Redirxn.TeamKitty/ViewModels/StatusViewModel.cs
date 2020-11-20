@@ -79,8 +79,7 @@ namespace Redirxn.TeamKitty.ViewModels
             Provisions = new ObservableCollection<Provision>();            
         }
         public void OnAppearing()
-        {
-            IsBusy = true;
+        {            
             CurrentKitty = _kittyService.Kitty?.DisplayName;
 
             if (!_loadingFromState)
@@ -92,6 +91,7 @@ namespace Redirxn.TeamKitty.ViewModels
             MyDisplayName = _summary.Person.DisplayName;
             UpdateScreenText();
             _loadingFromState = false;
+            IsBusy = true;
         }
 
 

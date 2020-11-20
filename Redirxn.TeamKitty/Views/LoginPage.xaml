@@ -9,7 +9,11 @@
     <ContentPage.Content>
         <StackLayout Padding="20"
                          VerticalOptions="CenterAndExpand">
-
+            <Label Text="Team Kitty" 
+                   FontSize="Large"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,40"/>
             <Button Text="Login with Facebook"
                         ImageSource="ic_fb"
                         Command="{Binding OnLoginWithFacebookCommand}"
@@ -17,7 +21,7 @@
                         TextColor="White"
                         BackgroundColor="#4768AD"
                         HorizontalOptions="CenterAndExpand"
-                        VerticalOptions="FillAndExpand"/>
+                        VerticalOptions="FillAndExpand"                        />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

@@ -31,6 +31,18 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
+        private string _kittyBalanceText = string.Empty;
+        public string KittyBalanceText
+        {
+            get { return _kittyBalanceText; }
+            set { SetProperty(ref _kittyBalanceText, value); }
+        }
+        private string _kittyOnHandText = string.Empty;
+        public string KittyOnHandText
+        {
+            get { return _kittyOnHandText; }
+            set { SetProperty(ref _kittyOnHandText, value); }
+        }
         private LedgerSummaryLine _selectedItem; 
         public LedgerSummaryLine SelectedItem
         {
@@ -81,6 +93,8 @@ namespace Redirxn.TeamKitty.ViewModels
             IsBusy = true;
             SelectedItem = null;
             CurrentKitty = _kittyService.Kitty?.DisplayName;
+            KittyBalanceText = "When all money collected: $" + _kittyService.GetKittyBalance();
+            KittyOnHandText = " Collected so far: $" + _kittyService.GetKittyOnHand();
         }
         async void OnItemSelected(LedgerSummaryLine item)
         {

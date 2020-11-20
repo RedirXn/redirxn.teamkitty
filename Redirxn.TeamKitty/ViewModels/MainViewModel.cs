@@ -6,6 +6,7 @@ using Splat;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -19,11 +20,11 @@ namespace Redirxn.TeamKitty.ViewModels
         private IDialogService _dialogService;
         private IRoutingService _routingService;
         
-        private StockItem _selectedItem;
+        private StockItemCount _selectedItem;
         private string _currentKitty = string.Empty;
-        public ObservableCollection<StockItem> Items { get; }
+        public ObservableCollection<StockItemCount> Items { get; }
         public Command LoadItemsCommand { get; }
-        public Command<StockItem> ItemTapped { get; }
+        public Command<StockItemCount> ItemTapped { get; }
 
         public string CurrentKitty
         {
@@ -39,10 +40,10 @@ namespace Redirxn.TeamKitty.ViewModels
             _inviteService = inviteService ?? Locator.Current.GetService<IInviteService>();
             _routingService = routingService ?? Locator.Current.GetService<IRoutingService>();
 
-            Items = new ObservableCollection<StockItem>();
+            Items = new ObservableCollection<StockItemCount>();
 
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
-            ItemTapped = new Command<StockItem>(async (item) => await OnItemSelected(item));
+            ItemTapped = new Command<StockItemCount>(async (item) => await OnItemSelected(item));
         }
 
         public async Task Init()
@@ -94,7 +95,16 @@ namespace Redirxn.TeamKitty.ViewModels
                 {
                     foreach (var item in _kittyService.Kitty?.KittyConfig?.StockItems)
                     {
-                        Items.Add(item);
+                        var lsl = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(sl => sl.Person.Email == _identityService.LoginData.Email);
+                        var purchased = lsl?.Purchases?.FirstOrDefault(p => p.ProductName == item.MainName)?.ProductCount;
+
+                        Items.Add(new StockItemCount
+                        {
+                            Base = item,
+                            MainName = item.MainName,
+                            SalePrice = item.SalePrice,
+                            Count = purchased ?? 0
+                        });
                     }
                 }
             }
@@ -109,17 +119,17 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
 
-        public StockItem SelectedItem
+        public StockItemCount SelectedItem
         {
             get => _selectedItem;
         }
-        public async void SetSelectedItem(StockItem value)
+        public async void SetSelectedItem(StockItemCount value)
         {
             SetProperty(ref _selectedItem, value);
             await OnItemSelected(value);
         }
 
-        async Task OnItemSelected(StockItem item)
+        async Task OnItemSelected(StockItemCount item)
         {
             if (item == null)
                 return;
@@ -133,10 +143,12 @@ namespace Redirxn.TeamKitty.ViewModels
                 switch (option)
                 {
                     case justMe:
-                        await _kittyService.TickMeASingle(_identityService.LoginData.Email, _identityService.UserDetail.Name, item);
+                        await _kittyService.TickMeASingle(_identityService.LoginData.Email, _identityService.UserDetail.Name, item.Base);
+                        IsBusy = true;
                         break;
                     case myRound:
                         await _routingService.NavigateTo($"{nameof(MultiTickPage)}?{nameof(StockItemViewModel.FromMainName)}={item.MainName}");
+                        IsBusy = true;
                         break;
                     default:
                         break;
@@ -148,5 +160,13 @@ namespace Redirxn.TeamKitty.ViewModels
                 await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
+    }
+
+    public class StockItemCount
+    {
+        public StockItem Base { get; set; }
+        public string MainName { get; set; }
+        public decimal SalePrice { get; set; }
+        public int Count { get; set; }
     }
 }

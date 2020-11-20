@@ -14,11 +14,14 @@
                 <Label Text="{Binding MyBalanceText}"
                     HorizontalOptions="CenterAndExpand" />
                 <StackLayout Orientation="Horizontal" IsVisible="{Binding IsChangeable}">
-                    <Button Text="Pay" Command="{Binding PayCommand}" />
-                    <Button Text="Provide Stock" Command="{Binding ProvideCommand}"/>
+                    <Button Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="CenterAndExpand" />
+                    <Button Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="CenterAndExpand"/>
                 </StackLayout>
                 <Label Text="{Binding MyPaidText}"
                     HorizontalOptions="CenterAndExpand" />
+                <Label Text="Provided:"
+                    HorizontalOptions="StartAndExpand"
+                    Margin="10,10,0,0"/>
                 <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadProvisionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                     <CollectionView x:Name="ProvisionsListView"
                         ItemsSource="{Binding Provisions}"
@@ -26,14 +29,18 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <StackLayout Padding="10" x:DataType="local:Provision">
+                                    <StackLayout Orientation="Horizontal">
                                     <Label Text="{Binding Key}" 
                                         LineBreakMode="NoWrap" 
                                         Style="{DynamicResource ListItemTextStyle}" 
-                                        FontSize="16" />
+                                        FontSize="Small" 
+                                        HorizontalOptions="StartAndExpand"/>
                                     <Label Text="{Binding Value}" 
                                         LineBreakMode="NoWrap"
                                         Style="{DynamicResource ListItemDetailTextStyle}"
-                                        FontSize="13" />
+                                        FontSize="Small"
+                                        HorizontalOptions="CenterAndExpand"/>
+                                    </StackLayout>
                                 </StackLayout>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>

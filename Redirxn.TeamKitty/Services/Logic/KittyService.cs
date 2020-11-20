@@ -275,5 +275,15 @@ namespace Redirxn.TeamKitty.Services.Logic
             Kitty = kitty;
 
         }
+
+        public string GetKittyBalance()
+        {
+            return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalOwed));
+        }
+
+        public string GetKittyOnHand()
+        {
+            return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalPaid));
+        }
     }
 }

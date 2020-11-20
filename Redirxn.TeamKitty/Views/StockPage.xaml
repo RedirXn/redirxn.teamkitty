@@ -15,14 +15,18 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <StackLayout Padding="10" x:DataType="model:StockItem">
-                        <Label Text="{Binding MainName}" 
-                            LineBreakMode="NoWrap" 
-                            Style="{DynamicResource ListItemTextStyle}" 
-                            FontSize="16" />
-                        <Label Text="{Binding SalePrice}" 
-                            LineBreakMode="NoWrap"
-                            Style="{DynamicResource ListItemDetailTextStyle}"
-                            FontSize="13" />
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="{Binding MainName}" 
+                                LineBreakMode="NoWrap" 
+                                Style="{DynamicResource ListItemTextStyle}" 
+                                FontSize="Small"
+                                HorizontalOptions="StartAndExpand"/>
+                            <Label Text="{Binding SalePrice, StringFormat='${0:#.00}'}" 
+                                LineBreakMode="NoWrap"
+                                Style="{DynamicResource ListItemDetailTextStyle}"
+                                FontSize="Small"
+                                HorizontalOptions="CenterAndExpand"/>
+                        </StackLayout>
                         <StackLayout.GestureRecognizers>
                             <TapGestureRecognizer 
                                 NumberOfTapsRequired="1"

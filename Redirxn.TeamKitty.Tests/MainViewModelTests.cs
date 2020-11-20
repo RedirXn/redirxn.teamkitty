@@ -63,10 +63,11 @@ namespace Redirxn.TeamKitty.Tests
             PrepareKitty();
 
             var si = GetFakeAdminKitty().KittyConfig.StockItems.First(si => si.MainName == "Item1");
+            var siItem = new StockItemCount { Base = si, MainName = si.MainName, SalePrice = si.SalePrice, Count = 1 };
             Dialogs.Make_SelectOptionReturn("Just Me");
             _vmMain = new MainViewModel();
 
-            _vmMain.ItemTapped.Execute(si);
+            _vmMain.ItemTapped.Execute(siItem);
 
             Db.SaveKittyToDbKitty.Ledger.Transactions[0].TransactionAmount.Should().Be(2.5M);
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == myEmail).TotalOwed.Should().Be(2.5M);
@@ -77,18 +78,20 @@ namespace Redirxn.TeamKitty.Tests
             PrepareKitty();
 
             var si1 = GetFakeAdminKitty().KittyConfig.StockItems.First(si => si.MainName == "Item1");
+            var siItem1 = new StockItemCount { Base = si1, MainName = si1.MainName, SalePrice = si1.SalePrice, Count = 1 };
             var si2 = GetFakeAdminKitty().KittyConfig.StockItems.First(si => si.MainName == "Item2");
+            var siItem2 = new StockItemCount { Base = si2, MainName = si2.MainName, SalePrice = si2.SalePrice, Count = 1 };
             Dialogs.Make_SelectOptionReturn("Just Me");
             _vmMain = new MainViewModel();
 
-            _vmMain.ItemTapped.Execute(si1);
-            _vmMain.ItemTapped.Execute(si1);
-            _vmMain.ItemTapped.Execute(si1);
-            _vmMain.ItemTapped.Execute(si1);
-            _vmMain.ItemTapped.Execute(si2);
-            _vmMain.ItemTapped.Execute(si2);
-            _vmMain.ItemTapped.Execute(si2);
-            _vmMain.ItemTapped.Execute(si2);
+            _vmMain.ItemTapped.Execute(siItem1);
+            _vmMain.ItemTapped.Execute(siItem1);
+            _vmMain.ItemTapped.Execute(siItem1);
+            _vmMain.ItemTapped.Execute(siItem1);
+            _vmMain.ItemTapped.Execute(siItem2);
+            _vmMain.ItemTapped.Execute(siItem2);
+            _vmMain.ItemTapped.Execute(siItem2);
+            _vmMain.ItemTapped.Execute(siItem2);
 
             Db.SaveKittyToDbKitty.Ledger.Transactions.Count().Should().Be(8);
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == myEmail).TotalOwed.Should().Be(30M);
@@ -99,10 +102,11 @@ namespace Redirxn.TeamKitty.Tests
             PrepareKitty();
 
             var si = GetFakeAdminKitty().KittyConfig.StockItems.First(si => si.MainName == "Item1");
+            var siItem1 = new StockItemCount { Base = si, MainName = si.MainName, SalePrice = si.SalePrice, Count = 1 };
             Dialogs.Make_SelectOptionReturn("It's My Round");
             _vmMain = new MainViewModel();
 
-            _vmMain.ItemTapped.Execute(si);
+            _vmMain.ItemTapped.Execute(siItem1);
 
             Routes.WasNavigatedTo("MultiTickPage?FromMainName=Item1").Should().BeTrue();
         }

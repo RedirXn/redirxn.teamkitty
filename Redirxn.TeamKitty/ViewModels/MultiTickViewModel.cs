@@ -90,7 +90,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             try
             { 
-                item.Ticked = !item.Ticked;
+                item.Ticked = !item.Ticked;                
 
                 var count = Items.Where(t => t.Ticked).Count();
                 var si = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName);

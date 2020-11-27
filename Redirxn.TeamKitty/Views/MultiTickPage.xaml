@@ -15,11 +15,13 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <StackLayout Padding="10" x:DataType="local:TickDisplay">
-                                <Image Source="tab_money.png" IsVisible="{Binding Ticked}"/>
-                                <Label Text="{Binding DisplayName}" 
-                                    LineBreakMode="NoWrap" 
-                                    Style="{DynamicResource ListItemTextStyle}" 
-                                    FontSize="Small" />
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="*" FontSize="Small" IsVisible="{Binding Ticked}"/>
+                                    <Label Text="{Binding DisplayName}" 
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="Small" />
+                                </StackLayout>
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer 
                                     NumberOfTapsRequired="1"

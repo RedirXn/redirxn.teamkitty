@@ -1,8 +1,13 @@
 ﻿namespace Redirxn.TeamKitty.ViewModels
 {
-    public class TickDisplay
+    public class TickDisplay : BaseViewModel
     {
-        public bool Ticked { get; set; }
+        private bool _ticked;
+        public bool Ticked
+        {
+            get { return _ticked; }
+            set { SetProperty(ref _ticked, value); }
+        }
         public string DisplayName { get; set; }
     }
 }

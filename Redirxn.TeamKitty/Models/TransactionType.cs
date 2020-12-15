@@ -6,5 +6,6 @@
         Payment,
         Provision,
         Expense,
+        Adjustment
     }
 }

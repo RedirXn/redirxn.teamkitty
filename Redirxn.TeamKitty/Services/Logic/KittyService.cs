@@ -159,7 +159,8 @@ namespace Redirxn.TeamKitty.Services.Logic
                 });
             }
             lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Payment).Sum(t => t.TransactionAmount);
-            lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);
+            lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);            
+            lsl.TotalAdjustments = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Adjustment).Sum(t => t.TransactionAmount);
             lsl.Balance = lsl.TotalPaid - lsl.TotalOwed;
 
             return kitty;
@@ -250,6 +251,27 @@ namespace Redirxn.TeamKitty.Services.Logic
             Kitty = kitty;
 
         }
+        public async Task AdjustBalanceBy(string email, decimal amount)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            var me = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email).Person;
+
+            kitty.Ledger.Transactions.Add(new Transaction
+            {
+                Date = DateTime.Now,
+                Person = me,
+                TransactionType = TransactionType.Adjustment,
+                TransactionAmount = amount,
+                TransactionCount = 1,
+                TransactionName = "Cash"
+            });
+
+            kitty = RecalculateLedgerSummary(kitty, email);
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+
+        }
 
         public async Task ProvideStock(string email, StockItem sItem)
         {
@@ -278,12 +300,12 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public string GetKittyBalance()
         {
-            return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalOwed));
+            return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalOwed) + Kitty.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments));
         }
 
         public string GetKittyOnHand()
         {
-            return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalPaid));
+            return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalPaid) + Kitty.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments));
         }
     }
 }

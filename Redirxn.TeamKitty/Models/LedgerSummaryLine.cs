@@ -10,5 +10,6 @@ namespace Redirxn.TeamKitty.Models
         public decimal TotalOwed { get; set; }
         public decimal TotalPaid { get; set; }
         public decimal Balance { get; set; }
+        public decimal TotalAdjustments { get; set; }
     }
 }

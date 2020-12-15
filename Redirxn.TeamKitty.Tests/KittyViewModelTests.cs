@@ -4,6 +4,8 @@ using Redirxn.TeamKitty.Services.Logic;
 using Splat;
 using Redirxn.TeamKitty.Models;
 using FluentAssertions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Redirxn.TeamKitty.Tests
 {
@@ -45,6 +47,26 @@ namespace Redirxn.TeamKitty.Tests
 
             Routes.WasNavigatedTo(@"StatusPage?FromMember=me@myplace").Should().BeTrue();
         }
+        [Test]
+        public void CanAdjustBalance()
+        {
+            var fakeLoginData = new NetworkAuthData { Email = myEmail, Id = myEmail };
+            Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
+            var kitty = GetFakeAdminKitty();
+            kitty.Ledger.Summary.First().Balance = 0;
+            Db.MakeGetKittyReturn(kitty);
+            Locator.Current.GetService<IKittyService>().LoadKitty("anything");
+
+            Dialogs.Make_MoneyInputReturn("100");
+            _vmKitty = new KittyViewModel();
+            _vmKitty.OnAppearing();
+
+            _vmKitty.AdjustCommand.Execute(null);
+
+            Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Adjustment).First().TransactionAmount.Should().Be(100M);
+            Locator.Current.GetService<IKittyService>().GetKittyBalance().Should().Be("100.00");
+        }
+
 
         private Kitty GetFakeAdminKitty()
         {
@@ -66,7 +88,21 @@ namespace Redirxn.TeamKitty.Tests
                             SalePrice=5M
                         }
                     }
-                }
+                },
+                Ledger = new Ledger
+                {
+                    Summary = new List<LedgerSummaryLine>
+                    {
+                        new LedgerSummaryLine
+                        {
+                            Person = new Member
+                            {
+                                Email = myEmail
+                            }
+                        }
+                    },
+                },
+                Id = "me|FakeKitty"
             };
         }
     }

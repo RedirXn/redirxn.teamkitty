@@ -15,7 +15,7 @@
                     HorizontalOptions="CenterAndExpand" />
                 <StackLayout Orientation="Horizontal" IsVisible="{Binding IsChangeable}">
                     <Button Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="CenterAndExpand" />
-                    <Button Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="CenterAndExpand"/>
+                    <Button Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="CenterAndExpand"/>                    
                 </StackLayout>
                 <Label Text="{Binding MyPaidText}"
                     HorizontalOptions="CenterAndExpand" />

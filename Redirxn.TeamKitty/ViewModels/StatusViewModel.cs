@@ -23,6 +23,12 @@ namespace Redirxn.TeamKitty.ViewModels
         private LedgerSummaryLine _summary;
         private bool _loadingFromState;
 
+        private bool _isAdmin = false;
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set { SetProperty(ref _isAdmin, value); }
+        }
         string _myDisplayName;
         public string MyDisplayName
         {
@@ -87,7 +93,8 @@ namespace Redirxn.TeamKitty.ViewModels
                 _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email);
             }
 
-            IsChangeable = _kittyService.AmIAdmin(_identityService.LoginData.Email) || _summary.Person.Email == _identityService.LoginData.Email;
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+            IsChangeable = IsAdmin || _summary.Person.Email == _identityService.LoginData.Email;
             MyDisplayName = _summary.Person.DisplayName;
             UpdateScreenText();
             _loadingFromState = false;
@@ -173,7 +180,6 @@ namespace Redirxn.TeamKitty.ViewModels
             }
 
         }
-
         private string GetBalanceText(decimal balance) 
         {
             if (balance == 0M)

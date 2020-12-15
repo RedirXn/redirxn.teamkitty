@@ -20,6 +20,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task RenameMember(string email, string newName);
         Task TickMultiplePeople(List<string> people, StockItem stockItem);
         Task MakePayment(string email, decimal amount);
+        Task AdjustBalanceBy(string email, decimal amount);
         Task ProvideStock(string email, StockItem sItem);
         string GetKittyBalance();
         string GetKittyOnHand();

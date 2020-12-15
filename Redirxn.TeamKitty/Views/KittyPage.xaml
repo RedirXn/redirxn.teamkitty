@@ -13,6 +13,9 @@
             <Label Text="{Binding KittyOnHandText}"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
+            <Button Text="Adjust Kitty Balance" 
+                    Command="{Binding AdjustCommand}"
+                    IsVisible="{Binding IsAdmin}" />
             <RefreshView x:DataType="local:KittyViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
                         ItemsSource="{Binding Items}"
@@ -30,7 +33,7 @@
                                         LineBreakMode="NoWrap"
                                         Style="{DynamicResource ListItemDetailTextStyle}"
                                         FontSize="Small"
-                                        HorizontalOptions="CenterAndExpand"/>
+                                        HorizontalOptions="EndAndExpand"/>
                                 </StackLayout>
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer 

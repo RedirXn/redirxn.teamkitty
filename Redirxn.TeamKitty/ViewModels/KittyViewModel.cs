@@ -22,9 +22,16 @@ namespace Redirxn.TeamKitty.ViewModels
         IRoutingService _routingService;
 
         public ICommand LoadItemsCommand { get; }
+        public ICommand AdjustCommand { get; set; }
         public Command<LedgerSummaryLine> ItemTapped { get; }
         public ObservableCollection<LedgerSummaryLine> Items { get; }
 
+        private bool _isAdmin = false;
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set { SetProperty(ref _isAdmin, value); }
+        }
         private string _currentKitty = string.Empty;
         public string CurrentKitty
         {
@@ -64,6 +71,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<LedgerSummaryLine>(OnItemSelected);
+            AdjustCommand = new Command(async () => await AdjustmentRequest());
 
         }
         async Task ExecuteLoadItemsCommand()
@@ -92,6 +100,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             IsBusy = true;
             SelectedItem = null;
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
             CurrentKitty = _kittyService.Kitty?.DisplayName;
             KittyBalanceText = "When all money collected: $" + _kittyService.GetKittyBalance();
             KittyOnHandText = " Collected so far: $" + _kittyService.GetKittyOnHand();
@@ -110,6 +119,27 @@ namespace Redirxn.TeamKitty.ViewModels
                 await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
+        private async Task AdjustmentRequest()
+        {
+            try
+            {
+                string strAmount = await _dialogService.GetSingleMoneyInput("Adjustment", "How much do you wish to adjust the balance by?");
+                if (!string.IsNullOrWhiteSpace(strAmount))
+                {
+                    var amount = decimal.Parse(strAmount);
+                    await _kittyService.AdjustBalanceBy(_identityService.LoginData.Email, amount);
+                    KittyBalanceText = "When all money collected: $" + _kittyService.GetKittyBalance();
+                    KittyOnHandText = " Collected so far: $" + _kittyService.GetKittyOnHand();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+
+        }
+
 
     }
 }

@@ -307,5 +307,23 @@ namespace Redirxn.TeamKitty.Services.Logic
         {
             return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalPaid) + Kitty.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments));
         }
+
+        public async Task CombineUsers(string keepUserEmail, string absorbUserEmail)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            kitty.Ledger.Summary = kitty.Ledger.Summary.Where(lsl => lsl.Person.Email != absorbUserEmail).ToList();
+
+            var person = kitty.Ledger.Summary.First(lsl => lsl.Person.Email == keepUserEmail).Person;
+
+            foreach(var t in kitty.Ledger.Transactions.Where(tr => tr.Person.Email == absorbUserEmail))
+            {
+                t.Person = person;
+            }
+            RecalculateLedgerSummary(kitty, keepUserEmail);
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
     }
 }

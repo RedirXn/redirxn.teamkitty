@@ -22,6 +22,9 @@
                 <Button Text="Add a Non-App User to This Kitty" 
                     Command="{Binding AddUserCommand}"
                     IsVisible="{Binding IsAdmin}" />
+                <Button Text="Combine two Users" 
+                    Command="{Binding CombineCommand}"
+                    IsVisible="{Binding IsAdmin}" />
                 <Button Text="Change the name of this Kitty"
                     IsVisible="{Binding IsAdmin}" />
                 <Button Text="Set someone as Admin"

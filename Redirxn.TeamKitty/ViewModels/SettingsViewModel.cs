@@ -22,6 +22,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public ICommand JoinKittyCommand { get; set; }
         public ICommand InviteCommand { get; set; }
         public ICommand AddUserCommand { get; set; }
+        public ICommand CombineCommand { get; set; }
         public ICommand ChangeMyNameCommand { get; set; }
         public ICommand ChangeKittyCommand { get; set; }
 
@@ -61,6 +62,7 @@ namespace Redirxn.TeamKitty.ViewModels
             CreateKittyCommand = new Command(async () => await CreateNewKitty());
             JoinKittyCommand = new Command(async () => await JoinKitty());
             InviteCommand = new Command(async () => await Invite());
+            CombineCommand = new Command(async () => await Combine());
             AddUserCommand = new Command(async () => await AddUser());
             ChangeMyNameCommand = new Command(async () => await ChangeMyName());
             ChangeKittyCommand = new Command(async () => await ChangeKitty());
@@ -187,6 +189,31 @@ namespace Redirxn.TeamKitty.ViewModels
             { 
                 string joinCode = await GetKittyJoinCode();
                 await _dialogService.Alert("Join Code", "Advise people to use this code: " + joinCode + " to join your kitty. (expires in 24 hours)", "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        internal async Task Combine()
+        {
+            try
+            {
+                var userlist = _kittyService.Kitty.Ledger.Summary.Select(s => s.Person);
+                if (userlist.Count() < 2) return;
+                var keep = await _dialogService.SelectOption("Select the user that will stay", "Cancel", userlist.Select(u => u.DisplayName).ToArray());
+                if (!string.IsNullOrEmpty(keep))
+                {
+                    var keepUser = userlist.First(ul => ul.DisplayName == keep);
+                    var absorb = await _dialogService.SelectOption("Select the user that will be removed", "Cancel", userlist.Where(u => u != keepUser).Select(u => u.DisplayName).ToArray());
+                    if (!string.IsNullOrEmpty(absorb))
+                    {
+                        var absorbUser = userlist.First(ul => ul.DisplayName == absorb);
+                        await _kittyService.CombineUsers(keepUser.Email, absorbUser.Email);
+                    }
+                }
+
             }
             catch (Exception ex)
             {

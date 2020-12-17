@@ -24,5 +24,6 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task ProvideStock(string email, StockItem sItem);
         string GetKittyBalance();
         string GetKittyOnHand();
+        Task CombineUsers(string keepUserEmail, string absorbUserEmail);
     }
 }

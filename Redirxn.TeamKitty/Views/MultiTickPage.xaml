@@ -6,6 +6,7 @@
              x:Class="Redirxn.TeamKitty.Views.MultiTickPage">
     <ContentPage.Content>
         <StackLayout>
+            <Entry x:Name="CountEach" Placeholder="1" PlaceholderColor="Olive" Keyboard="Numeric" Text="{Binding CountTick}" IsTabStop="True"/>
             <Button HorizontalOptions="End" Text="{Binding ConfirmText}"  Command="{Binding ConfirmCommand}" />
             <Label Text="Tick Them:" LineBreakMode="NoWrap" FontSize="Small" VerticalOptions="Start" />
             <RefreshView x:DataType="local:MultiTickViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">

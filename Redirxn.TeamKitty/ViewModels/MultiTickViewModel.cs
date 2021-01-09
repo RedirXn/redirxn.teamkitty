@@ -21,6 +21,7 @@ namespace Redirxn.TeamKitty.ViewModels
         IKittyService _kittyService;
         IRoutingService _routingService;
         IDialogService _dialogService;
+        IIdentityService _identityService;
 
         string _itemName;
         public string FromMainName
@@ -40,17 +41,30 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
+        int _countTick = 1;
+        public int CountTick
+        {
+            get { return _countTick; }
+            set { SetProperty(ref _countTick, value); }
+        }
+        private bool _isAdmin = false;
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set { SetProperty(ref _isAdmin, value); }
+        }
 
         public ICommand ConfirmCommand { get; }
         public ICommand LoadItemsCommand { get; }
         public Command<TickDisplay> ItemTapped { get; }
         public ObservableCollection<TickDisplay> Items { get; }
 
-        public MultiTickViewModel(IKittyService kittyService = null, IRoutingService routingService = null, IDialogService dialogService = null)
+        public MultiTickViewModel(IKittyService kittyService = null, IRoutingService routingService = null, IDialogService dialogService = null, IIdentityService identityService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
             _routingService = routingService ?? Locator.Current.GetService<IRoutingService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
+            _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
 
             Items = new ObservableCollection<TickDisplay>();
 
@@ -62,6 +76,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             IsBusy = true;
             CurrentKitty = _kittyService.Kitty?.DisplayName;
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
 
         private async Task Confirmed()
@@ -75,7 +90,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 };
                 if (people.Count() > 0)
                 {
-                    await _kittyService.TickMultiplePeople(people, _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName));
+                    await _kittyService.TickMultiplePeople(people, _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName), _countTick);
                     await _routingService.GoBack();
                 }
             }
@@ -90,9 +105,9 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             try
             { 
-                item.Ticked = !item.Ticked;                
+                item.Ticked = !item.Ticked;
 
-                var count = Items.Where(t => t.Ticked).Count();
+                var count = Items.Where(t => t.Ticked).Count() * _countTick;
                 var si = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName);
 
                 if (count == 0)

@@ -203,7 +203,7 @@ namespace Redirxn.TeamKitty.Services.Logic
             Kitty = kitty;
         }
 
-        public async Task TickMultiplePeople(List<string> people, StockItem item)
+        public async Task TickMultiplePeople(List<string> people, StockItem item, int count)
         {
             var kitty = await _dataStore.GetKitty(Kitty.Id);
             List<string> emails = new List<string>(people.Count());
@@ -216,8 +216,8 @@ namespace Redirxn.TeamKitty.Services.Logic
                     Date = DateTime.Now,
                     Person = summ.Person,
                     TransactionType = TransactionType.Purchase,
-                    TransactionAmount = item.SalePrice,
-                    TransactionCount = 1,
+                    TransactionAmount = item.SalePrice * count,
+                    TransactionCount = count,
                     TransactionName = item.MainName
                 });
             }

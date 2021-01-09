@@ -91,6 +91,24 @@ namespace Redirxn.TeamKitty.Tests
             Db.SaveKittyToDbKitty.Ledger.Transactions.Count().Should().Be(2);
             Routes.WasGoBackCalled().Should().BeTrue();
         }
+        [Test]
+        public void CanShoutMultiple()
+        {
+            PrepareKitty();
+            _vmMultiTick = new MultiTickViewModel();
+            _vmMultiTick.FromMainName = "Item1";
+
+            _vmMultiTick.LoadItemsCommand.Execute(null);
+            _vmMultiTick.CountTick = 10;
+            _vmMultiTick.ItemTapped.Execute(_vmMultiTick.Items[1]);
+            _vmMultiTick.ItemTapped.Execute(_vmMultiTick.Items[2]);
+
+            _vmMultiTick.ConfirmCommand.Execute(null);
+
+            Db.SaveKittyToDbKitty.Ledger.Transactions.Count().Should().Be(2);
+            Locator.Current.GetService<IKittyService>().GetKittyBalance().Should().Be("50.00");
+            Routes.WasGoBackCalled().Should().BeTrue();
+        }
         private void PrepareKitty()
         {
             var fakeKitty = GetFakeAdminKitty();

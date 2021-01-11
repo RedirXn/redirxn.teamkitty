@@ -203,7 +203,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 var userlist = _kittyService.Kitty.Ledger.Summary.Select(s => s.Person);
                 if (userlist.Count() < 2) return;
                 var keep = await _dialogService.SelectOption("Select the user that will stay", "Cancel", userlist.Select(u => u.DisplayName).ToArray());
-                if (!string.IsNullOrEmpty(keep))
+                if (keep != "Cancel")
                 {
                     var keepUser = userlist.First(ul => ul.DisplayName == keep);
                     var absorb = await _dialogService.SelectOption("Select the user that will be removed", "Cancel", userlist.Where(u => u != keepUser).Select(u => u.DisplayName).ToArray());

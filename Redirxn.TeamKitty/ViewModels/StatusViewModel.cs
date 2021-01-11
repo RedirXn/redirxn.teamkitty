@@ -150,14 +150,17 @@ namespace Redirxn.TeamKitty.ViewModels
                 string[] options = _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.StockGrouping + " of " + si.MainName).ToArray();
                 string option = await _dialogService.SelectOption("Provide Stock", "Cancel", options);
 
-                var sItem = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(si => si.StockGrouping + " of " + si.MainName == option);
-
-                if (sItem != null)
+                if (option != "Cancel")
                 {
-                    await _kittyService.ProvideStock(_summary.Person.Email, sItem);
+                    var sItem = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(si => si.StockGrouping + " of " + si.MainName == option);
+
+                    if (sItem != null)
+                    {
+                        await _kittyService.ProvideStock(_summary.Person.Email, sItem);
+                    }
+                    await ExecuteLoadProvisionsCommand();
+                    ReloadSummary();
                 }
-                await ExecuteLoadProvisionsCommand();
-                ReloadSummary();
             }
             catch (Exception ex)
             {

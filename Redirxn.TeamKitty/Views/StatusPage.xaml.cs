@@ -21,9 +21,5 @@ namespace Redirxn.TeamKitty.Views
             ViewModel.OnAppearing();
         }
 
-        protected override bool OnBackButtonPressed()
-        {
-            return true;
-        }
     }
 }

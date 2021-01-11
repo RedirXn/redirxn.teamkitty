@@ -21,12 +21,6 @@ namespace Redirxn.TeamKitty.Views
         }
         internal StockItemViewModel ViewModel { get; set; } = Locator.Current.GetService<StockItemViewModel>();
 
-
-        protected override bool OnBackButtonPressed()
-        {
-            return true;
-        }
-
         private void Generic_TextChanged(object sender, TextChangedEventArgs e)
         {
             // TODO: Should be bindings

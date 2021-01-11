@@ -12,12 +12,12 @@ namespace Redirxn.TeamKitty.Services.Application
 
         public async Task<string> GetSingleMoneyInput(string title, string message)
         {
-            return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message, keyboard: Xamarin.Forms.Keyboard.Numeric);
+            return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message, keyboard: Keyboard.Numeric);
         }
 
         public async Task<string> GetSingleTextInput(string title, string message)
         {
-            return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message, keyboard: Keyboard.Create(KeyboardFlags.CapitalizeWord));
+            return (await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message, keyboard: Keyboard.Create(KeyboardFlags.CapitalizeWord)))?.Trim();
         }
 
         public async Task<string> SelectOption(string title, string cancel, params string[] buttons)

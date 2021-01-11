@@ -90,7 +90,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             if (!_loadingFromState)
             {
-                _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email);
+                ReloadSummary();
             }
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
@@ -101,6 +101,10 @@ namespace Redirxn.TeamKitty.ViewModels
             IsBusy = true;
         }
 
+        private void ReloadSummary()
+        {
+            _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email);
+        }
 
         async Task ExecuteLoadProvisionsCommand()
         {
@@ -153,6 +157,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _kittyService.ProvideStock(_summary.Person.Email, sItem);
                 }
                 await ExecuteLoadProvisionsCommand();
+                ReloadSummary();
             }
             catch (Exception ex)
             {
@@ -171,6 +176,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     var amount = decimal.Parse(strAmount);
                     await _kittyService.MakePayment(_summary.Person.Email, amount);
                 }
+                ReloadSummary();
                 UpdateScreenText();
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace Redirxn.TeamKitty.Services.Application
 {
@@ -16,7 +17,7 @@ namespace Redirxn.TeamKitty.Services.Application
 
         public async Task<string> GetSingleTextInput(string title, string message)
         {
-            return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message);
+            return await Xamarin.Forms.Application.Current.MainPage.DisplayPromptAsync(title, message, keyboard: Keyboard.Create(KeyboardFlags.CapitalizeWord));
         }
 
         public async Task<string> SelectOption(string title, string cancel, params string[] buttons)

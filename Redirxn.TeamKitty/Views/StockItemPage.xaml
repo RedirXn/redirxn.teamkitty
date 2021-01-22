@@ -11,7 +11,7 @@
             <StackLayout x:Name="slayout">
                 <Frame>
                     <StackLayout>
-                        <Label Text="Name" FontSize="Medium" FontAttributes="Bold"/>
+                        <Label Text="Name" FontSize="Large" FontAttributes="Bold"/>
                         <Label x:Name="lblMainName" Text='eg. Get me a Widget please.'/>
                         <Entry x:Name="MainName" Placeholder="Widget" PlaceholderColor="Olive" TextChanged="Generic_TextChanged" Text="{Binding MainName}" IsTabStop="True"/>                        
                         <BoxView Color="DarkGray" HeightRequest="2" HorizontalOptions="Fill"/>
@@ -19,7 +19,7 @@
                 </Frame>
                 <Frame>
                     <StackLayout>
-                        <Label Text="Name of Plural"  FontSize="Medium" FontAttributes="Bold"/>                        
+                        <Label Text="Name of Plural"  FontSize="Large" FontAttributes="Bold"/>                        
                         <Label x:Name="lblMainNamePlural" Text='eg. You have consumed 12 Widgets.'/>
                         <Entry x:Name="MainNamePlural" Placeholder="Widgets" PlaceholderColor="Olive" TextChanged="Generic_TextChanged" Text="{Binding MainNamePlural}" IsTabStop="True"/>
                         <BoxView Color="DarkGray" HeightRequest="2" HorizontalOptions="Fill"/>
@@ -27,7 +27,7 @@
                 </Frame>
                 <Frame>
                     <StackLayout>
-                        <Label Text="Unit of Grouping for Stock" FontSize="Medium" FontAttributes="Bold"/>                        
+                        <Label Text="Unit of Grouping for Stock" FontSize="Large" FontAttributes="Bold"/>                        
                         <Label x:Name="lblStockName" Text='eg. Here is one Flugal of Widgets.'/>
                         <Entry x:Name="StockName" Placeholder="Flugal" PlaceholderColor="Olive" TextChanged="Generic_TextChanged" Text="{Binding StockName}" IsTabStop="True"/>
                         <BoxView Color="DarkGray" HeightRequest="2" HorizontalOptions="Fill"/>
@@ -35,7 +35,7 @@
                 </Frame>
                 <Frame>
                     <StackLayout>
-                        <Label Text="Price to Sell"  FontSize="Medium" FontAttributes="Bold"/>                        
+                        <Label Text="Price to Sell"  FontSize="Large" FontAttributes="Bold"/>                        
                         <Label x:Name="lblPrice" Text='eg. One Widget costs $2.50'/>
                         <Entry x:Name="Price" Placeholder="2.50" PlaceholderColor="Olive" Keyboard="Numeric" TextChanged="Generic_TextChanged" Text="{Binding Price}" IsTabStop="True"/>
                         <BoxView Color="DarkGray" HeightRequest="2" HorizontalOptions="Fill"/>
@@ -43,7 +43,7 @@
                 </Frame>
                 <Frame>
                     <StackLayout>
-                        <Label Text="Expected Cost to Purchase" FontSize="Medium" FontAttributes="Bold"/>                        
+                        <Label Text="Expected Cost to Purchase" FontSize="Large" FontAttributes="Bold"/>                        
                         <Label x:Name="lblStockPrice" Text='eg. One Case of Widgets usually costs $50'/>
                         <Entry x:Name="StockPrice" Placeholder="50" PlaceholderColor="Olive" Keyboard="Numeric" TextChanged="Generic_TextChanged" Text="{Binding StockPrice}" IsTabStop="True"/>
                         <BoxView Color="DarkGray" HeightRequest="2" HorizontalOptions="Fill"/>

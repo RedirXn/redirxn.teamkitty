@@ -10,17 +10,21 @@
             <StackLayout>
                 <Label Text="{Binding MyDisplayName}"
                     VerticalOptions="Start" 
+                    FontSize="Large"
                     HorizontalOptions="CenterAndExpand" />
                 <Label Text="{Binding MyBalanceText}"
+                    FontSize="Large"
                     HorizontalOptions="CenterAndExpand" />
                 <StackLayout Orientation="Horizontal" IsVisible="{Binding IsChangeable}">
                     <Button Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="CenterAndExpand" />
                     <Button Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="CenterAndExpand"/>                    
                 </StackLayout>
                 <Label Text="{Binding MyPaidText}"
+                    FontSize="Large"
                     HorizontalOptions="CenterAndExpand" />
                 <Label Text="Provided:"
                     HorizontalOptions="StartAndExpand"
+                    FontSize="Large"
                     Margin="10,10,0,0"/>
                 <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadProvisionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                     <CollectionView x:Name="ProvisionsListView"
@@ -33,12 +37,12 @@
                                     <Label Text="{Binding Key}" 
                                         LineBreakMode="NoWrap" 
                                         Style="{DynamicResource ListItemTextStyle}" 
-                                        FontSize="Small" 
+                                        FontSize="Large" 
                                         HorizontalOptions="StartAndExpand"/>
                                     <Label Text="{Binding Value}" 
                                         LineBreakMode="NoWrap"
                                         Style="{DynamicResource ListItemDetailTextStyle}"
-                                        FontSize="Small"
+                                        FontSize="Large"
                                         HorizontalOptions="CenterAndExpand"/>
                                     </StackLayout>
                                 </StackLayout>

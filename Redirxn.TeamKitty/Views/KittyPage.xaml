@@ -8,9 +8,11 @@
     <ContentPage.Content>
         <StackLayout>
             <Label Text="{Binding KittyBalanceText}"
+                FontSize="20"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
             <Label Text="{Binding KittyOnHandText}"
+                FontSize="20"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
             <Button Text="Adjust Kitty Balance" 
@@ -27,12 +29,12 @@
                                     <Label Text="{Binding Person.DisplayName}" 
                                         LineBreakMode="NoWrap" 
                                         Style="{DynamicResource ListItemTextStyle}" 
-                                        FontSize="Small" 
+                                        FontSize="Large"
                                         HorizontalOptions="StartAndExpand"/>
                                     <Label Text="{Binding Balance, StringFormat='${0:#.00}'}" 
                                         LineBreakMode="NoWrap"
                                         Style="{DynamicResource ListItemDetailTextStyle}"
-                                        FontSize="Small"
+                                        FontSize="Large"
                                         HorizontalOptions="EndAndExpand"/>
                                 </StackLayout>
                                 <StackLayout.GestureRecognizers>

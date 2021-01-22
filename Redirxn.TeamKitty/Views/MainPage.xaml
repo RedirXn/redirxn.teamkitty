@@ -10,8 +10,8 @@
              Shell.TabBarIsVisible="True"             
              x:Class="Redirxn.TeamKitty.Views.MainPage">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Tick up a:" LineBreakMode="NoWrap" FontSize="16" VerticalOptions="Start" />
+        <StackLayout >
+            <Label Text="Tick up a:" FontSize="Large" LineBreakMode="NoWrap" VerticalOptions="Start" />
             <RefreshView x:DataType="local:MainViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
                 ItemsSource="{Binding Items}"
@@ -20,21 +20,21 @@
                         <DataTemplate>
                             <StackLayout Padding="10" x:DataType="local:StockItemCount">
                                 <StackLayout Orientation="Horizontal">
-                                <Label Text="{Binding MainName}" 
-                                    LineBreakMode="NoWrap" 
-                                    Style="{DynamicResource ListItemTextStyle}" 
-                                    FontSize="Small"
-                                    HorizontalOptions="StartAndExpand"/>
-                                <Label Text="{Binding Count}" 
-                                    LineBreakMode="NoWrap" 
-                                    Style="{DynamicResource ListItemTextStyle}" 
-                                    FontSize="Small"
-                                    HorizontalOptions="CenterAndExpand"/>
+                                    <Label Text="{Binding MainName}" 
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="Large"
+                                        HorizontalOptions="StartAndExpand"/>
+                                    <Label Text="{Binding Count}" 
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="Large"
+                                        HorizontalOptions="CenterAndExpand"/>
                                     <Label Text="{Binding SalePrice, StringFormat='${0:#.00}'}" 
-                                    LineBreakMode="NoWrap"
-                                    Style="{DynamicResource ListItemDetailTextStyle}"
-                                    FontSize="Small"
-                                    HorizontalOptions="CenterAndExpand"/>
+                                        LineBreakMode="NoWrap"
+                                        Style="{DynamicResource ListItemDetailTextStyle}"
+                                        FontSize="Large"
+                                        HorizontalOptions="CenterAndExpand"/>
                                 </StackLayout>
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer 

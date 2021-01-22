@@ -19,12 +19,12 @@
                             <Label Text="{Binding MainName}" 
                                 LineBreakMode="NoWrap" 
                                 Style="{DynamicResource ListItemTextStyle}" 
-                                FontSize="Small"
+                                FontSize="Large"
                                 HorizontalOptions="StartAndExpand"/>
                             <Label Text="{Binding SalePrice, StringFormat='${0:#.00}'}" 
                                 LineBreakMode="NoWrap"
                                 Style="{DynamicResource ListItemDetailTextStyle}"
-                                FontSize="Small"
+                                FontSize="Large"
                                 HorizontalOptions="CenterAndExpand"/>
                         </StackLayout>
                         <StackLayout.GestureRecognizers>

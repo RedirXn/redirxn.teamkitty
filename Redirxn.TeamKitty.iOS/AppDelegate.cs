@@ -1,4 +1,7 @@
-﻿using System;
+using  Syncfusion.XForms.iOS.Graphics;
+using Syncfusion.XForms.iOS.Border;
+using Syncfusion.XForms.iOS.Buttons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,6 +28,9 @@ namespace Redirxn.TeamKitty.iOS
         {
             global::Xamarin.Forms.Forms.SetFlags("CollectionView_Experimental");
             global::Xamarin.Forms.Forms.Init();
+            SfGradientViewRenderer.Init();
+            SfBorderRenderer.Init();
+            SfButtonRenderer.Init();
             LoadApplication(new App());
 
             FacebookClientManager.Initialize(app, options);

@@ -12,6 +12,9 @@
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
     <PackageReference Include="plugin.facebookclient" Version="2.2.1" />
     <PackageReference Include="splat" Version="9.6.1" />
+    <PackageReference Include="Syncfusion.Xamarin.Buttons" Version="18.4.0.35" />
+    <PackageReference Include="Syncfusion.Xamarin.Core" Version="18.4.0.35" />
+    <PackageReference Include="Syncfusion.Xamarin.SfComboBox" Version="18.4.0.35" />
     <PackageReference Include="Xamarin.Forms" Version="4.6.0.1141" />  
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
   </ItemGroup>
@@ -23,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Themes\LightTheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Views\KittyPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
@@ -37,6 +43,15 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Views\SettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SfForms\EmailEntry.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SfForms\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SfForms\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\StatusPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>

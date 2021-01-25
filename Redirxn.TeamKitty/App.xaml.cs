@@ -12,6 +12,9 @@ namespace Redirxn.TeamKitty
 
         public App()
         {
+            //Register Syncfusion license
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mzg4Mzc1QDMxMzgyZTM0MmUzMEZuYVVGMVVCc2NrZVd0MmRWaXM4dGdkaEFFaWRCdk5zOU5LRmdhU2llVGc9");
+            
             InitializeComponent();
             InitializeDi();
                         

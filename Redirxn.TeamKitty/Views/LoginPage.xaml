@@ -26,11 +26,6 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <!--  Binding context for login page  -->
-    <ContentPage.BindingContext>
-        <viewModel:LoginPageViewModel />
-    </ContentPage.BindingContext>
-
     <ContentPage.Content>
         <Grid>
             <gradient:SfGradientView Style="{StaticResource SfGradientViewStyle}" />

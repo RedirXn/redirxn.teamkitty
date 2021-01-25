@@ -13,7 +13,7 @@ namespace Redirxn.TeamKitty
         {
             InitializeComponent();
                         
-            Routing.RegisterRoute("main/login", typeof(Redirxn.TeamKitty.Views.SfForms.LoginPage));
+            Routing.RegisterRoute("main/login", typeof(LoginPage));
             Routing.RegisterRoute(nameof(StockItemPage), typeof(StockItemPage));
             Routing.RegisterRoute(nameof(StockPage), typeof(StockPage));
             Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));

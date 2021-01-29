@@ -6,8 +6,16 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Delete" Command="{Binding OnDeleteStockCommand}" />
     </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
-        <ScrollView>
+        <ScrollView BackgroundColor="{StaticResource MainBackgroundColor}">
             <StackLayout x:Name="slayout">
                 <Frame>
                     <StackLayout>

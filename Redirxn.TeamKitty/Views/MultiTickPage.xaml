@@ -4,8 +4,16 @@
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
              Title="{Binding CurrentKitty}"
              x:Class="Redirxn.TeamKitty.Views.MultiTickPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout BackgroundColor="{StaticResource MainBackgroundColor}">
             <Entry x:Name="CountEach" Placeholder="1" PlaceholderColor="Olive" Keyboard="Numeric" Text="{Binding CountTick}" IsTabStop="True" IsVisible="{Binding IsAdmin}"/>
             <Button HorizontalOptions="End" Text="{Binding ConfirmText}"  Command="{Binding ConfirmCommand}" />
             <Label Text="Tick Them:" LineBreakMode="NoWrap" FontSize="Large" VerticalOptions="Start" />

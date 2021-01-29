@@ -3,14 +3,10 @@
     x:Class="Redirxn.TeamKitty.Views.LoginPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:border="clr-namespace:Syncfusion.XForms.Border;assembly=Syncfusion.Core.XForms"
     xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
-    xmlns:control="clr-namespace:Redirxn.TeamKitty.Controls"
     xmlns:converter="clr-namespace:Redirxn.TeamKitty.Converters"
     xmlns:core="clr-namespace:Syncfusion.XForms.Core;assembly=Syncfusion.Core.XForms"
     xmlns:gradient="clr-namespace:Syncfusion.XForms.Graphics;assembly=Syncfusion.Core.XForms"
-    xmlns:local="clr-namespace:Redirxn.TeamKitty.Views.SfForms"
-    xmlns:viewModel="clr-namespace:Redirxn.TeamKitty.ViewModels.SfForms"
     BackgroundImageSource="{core:OnPlatformOrientationStringValue Default=LoginBackground.png,
                                                                   iOSPhoneLandscape=LoginBackground-Landscape.png,
                                                                   iOSTabletLandscape=LoginBackground-Landscape.png}"
@@ -81,10 +77,11 @@
 
                         <!--  Login through facebook account  -->
                         <buttons:SfButton
+                            IsVisible="{Binding CanClick}"
                             Grid.Row="7"
                             Margin="0,16,0,16"
                             BackgroundColor="{DynamicResource FacebookBlue}"
-                            Command="{Binding OnLoginWithFacebookCommand}"
+                            Command="{Binding OnLoginWithFacebookCommand}"                            
                             CornerRadius="20"
                             HeightRequest="40">
                             <buttons:SfButton.Content>
@@ -96,6 +93,7 @@
                                         FontFamily="{StaticResource FontIcons}"
                                         FontSize="18"
                                         Text="&#xe735;"
+                                        FontAttributes="Bold"
                                         TextColor="{DynamicResource Gray-White}"
                                         VerticalTextAlignment="Center" />
                                     <Label
@@ -106,7 +104,9 @@
                                 </StackLayout>
                             </buttons:SfButton.Content>
                         </buttons:SfButton>
-
+                        <ActivityIndicator Color="{StaticResource MdPrimary}"
+                               IsRunning="True"
+                               IsVisible="{Binding IsLoading}" />
                     </Grid>
 
                 </StackLayout>

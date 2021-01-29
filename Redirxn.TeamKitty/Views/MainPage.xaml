@@ -9,9 +9,18 @@
              Title="{Binding CurrentKitty}"
              Shell.TabBarIsVisible="True"             
              x:Class="Redirxn.TeamKitty.Views.MainPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ContentPage.Content>
-        <StackLayout >
-            <Label Text="Tick up a:" FontSize="Large" LineBreakMode="NoWrap" VerticalOptions="Start" />
+        <StackLayout BackgroundColor="{StaticResource MainBackgroundColor}">
+            <Label Text="Tick up a:" Style="{StaticResource LabelStyle}" FontSize="Large" LineBreakMode="NoWrap" VerticalOptions="Start" />
             <RefreshView x:DataType="local:MainViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
                 ItemsSource="{Binding Items}"
@@ -22,20 +31,21 @@
                                 <StackLayout Orientation="Horizontal">
                                     <Label Text="{Binding MainName}" 
                                         LineBreakMode="NoWrap" 
-                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        Style="{StaticResource ListItemTextStyle}" 
                                         FontSize="Large"
                                         HorizontalOptions="StartAndExpand"/>
                                     <Label Text="{Binding Count}" 
                                         LineBreakMode="NoWrap" 
-                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        Style="{StaticResource ListItemTextStyle}" 
                                         FontSize="Large"
                                         HorizontalOptions="CenterAndExpand"/>
                                     <Label Text="{Binding SalePrice, StringFormat='${0:#.00}'}" 
                                         LineBreakMode="NoWrap"
-                                        Style="{DynamicResource ListItemDetailTextStyle}"
+                                        Style="{StaticResource ListItemDetailTextStyle}"
                                         FontSize="Large"
                                         HorizontalOptions="CenterAndExpand"/>
                                 </StackLayout>
+                                <BoxView BackgroundColor="{StaticResource Primary}" HeightRequest="1"/>
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer 
                                     NumberOfTapsRequired="1"
@@ -49,5 +59,6 @@
                 </CollectionView>
             </RefreshView>
         </StackLayout>
+
     </ContentPage.Content>
 </ContentPage>

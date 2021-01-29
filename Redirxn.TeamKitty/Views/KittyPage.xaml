@@ -3,21 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Redirxn.TeamKitty.Views.KittyPage"
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
-             xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
+             xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"      
+             xmlns:converter="clr-namespace:Redirxn.TeamKitty.Converters"
+             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
              Title="{Binding CurrentKitty}">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converter:BooleanToColorConverter x:Key="ColorConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout BackgroundColor="{StaticResource MdSurface}">
             <Label Text="{Binding KittyBalanceText}"
-                FontSize="20"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+                    FontSize="20"
+                    Style="{StaticResource LabelSurfaceStyle}"
+                    VerticalOptions="CenterAndExpand" 
+                    HorizontalOptions="CenterAndExpand" />
             <Label Text="{Binding KittyOnHandText}"
                 FontSize="20"
+                Style="{StaticResource LabelSurfaceStyle}"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
-            <Button Text="Adjust Kitty Balance" 
+            <buttons:SfButton Text="Adjust Kitty Balance" 
                     Command="{Binding AdjustCommand}"
-                    IsVisible="{Binding IsAdmin}" />
+                    IsVisible="{Binding IsAdmin}" 
+                    Style="{StaticResource SfButtonAdminStyle}"
+                    Margin="8,16,8,16"
+                    CornerRadius="20"
+                    HeightRequest="40"/>
+            <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
             <RefreshView x:DataType="local:KittyViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
                         ItemsSource="{Binding Items}"
@@ -26,17 +45,34 @@
                         <DataTemplate>
                             <StackLayout Padding="10" x:DataType="model:LedgerSummaryLine">
                                 <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding Person.DisplayName}" 
-                                        LineBreakMode="NoWrap" 
-                                        Style="{DynamicResource ListItemTextStyle}" 
-                                        FontSize="Large"
-                                        HorizontalOptions="StartAndExpand"/>
-                                    <Label Text="{Binding Balance, StringFormat='${0:#.00}'}" 
-                                        LineBreakMode="NoWrap"
-                                        Style="{DynamicResource ListItemDetailTextStyle}"
-                                        FontSize="Large"
-                                        HorizontalOptions="EndAndExpand"/>
+                                    <StackLayout Orientation="Vertical">
+                                        <Label Text="{Binding Person.DisplayName}" 
+                                                LineBreakMode="NoWrap" 
+                                                Style="{DynamicResource ListItemTextStyle}" 
+                                                FontSize="Large"
+                                                FontAttributes="Bold"
+                                                HorizontalOptions="StartAndExpand"/>
+                                        <Label Text="{Binding PurchaseText}"                                                
+                                                LineBreakMode="NoWrap" 
+                                                Style="{DynamicResource ListItemTextStyle}" 
+                                                FontSize="Small"
+                                                FontAttributes="Italic"
+                                                HorizontalOptions="StartAndExpand"/>
+                                        <Label Text="{Binding ProvisionText}" 
+                                                LineBreakMode="NoWrap" 
+                                                Style="{DynamicResource ListItemTextStyle}" 
+                                                FontSize="Small"
+                                                FontAttributes="Italic"
+                                                HorizontalOptions="StartAndExpand"/>
+                                    </StackLayout>
+                                    <Label Text="{Binding Balance, StringFormat='{0:C}'}" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Large"
+                                            HorizontalOptions="EndAndExpand"
+                                            VerticalOptions="CenterAndExpand"/>
                                 </StackLayout>
+                                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="3"/>
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer 
                                         NumberOfTapsRequired="1"
@@ -49,6 +85,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </RefreshView>
+
         </StackLayout>
     </ContentPage.Content>
 

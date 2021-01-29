@@ -11,5 +11,7 @@ namespace Redirxn.TeamKitty.Models
         public decimal TotalPaid { get; set; }
         public decimal Balance { get; set; }
         public decimal TotalAdjustments { get; set; }
+        public string PurchaseText { get; set; }
+        public string ProvisionText { get; set; }
     }
 }

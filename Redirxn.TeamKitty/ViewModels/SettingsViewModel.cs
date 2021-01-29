@@ -25,6 +25,9 @@ namespace Redirxn.TeamKitty.ViewModels
         public ICommand CombineCommand { get; set; }
         public ICommand ChangeMyNameCommand { get; set; }
         public ICommand ChangeKittyCommand { get; set; }
+        public ICommand AssignAdminCommand { get; set; }
+        public ICommand ChangeKittyNameCommand { get; set; }
+        public ICommand RecalculateKittyCommand { get; set; }
 
         private bool _isAdmin = false;
         public bool IsAdmin
@@ -66,6 +69,10 @@ namespace Redirxn.TeamKitty.ViewModels
             AddUserCommand = new Command(async () => await AddUser());
             ChangeMyNameCommand = new Command(async () => await ChangeMyName());
             ChangeKittyCommand = new Command(async () => await ChangeKitty());
+            AssignAdminCommand = new Command(async () => await AssignAdmin()); 
+            ChangeKittyNameCommand = new Command(async () => await ChangeKittyName());
+            RecalculateKittyCommand = new Command(async () => await RecalculateKitty());
+
         }
 
         public async Task Init()
@@ -243,6 +250,42 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _kittyService.LoadKitty(nextKitty);
                     await _identityService.SetDefaultKitty(nextKitty);
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        private async Task AssignAdmin()
+        {
+            try
+            {
+                //TODO
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        private async Task ChangeKittyName()
+        {
+            try
+            {
+                //TODO
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        private async Task RecalculateKitty()
+        {
+            try
+            {
+                await _kittyService.RecalculateKitty();
             }
             catch (Exception ex)
             {

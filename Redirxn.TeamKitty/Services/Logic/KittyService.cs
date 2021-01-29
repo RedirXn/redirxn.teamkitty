@@ -144,24 +144,35 @@ namespace Redirxn.TeamKitty.Services.Logic
         {
             var lsl = kitty.Ledger.Summary.FirstOrDefault(s => s.Person.Email == email);
             lsl.Purchases = new List<Purchase>();
-            foreach(var si in kitty.KittyConfig.StockItems)
+            lsl.Provisions = new Dictionary<string, int>();
+            lsl.PurchaseText = "";
+            lsl.ProvisionText = "";
+            foreach (var si in kitty.KittyConfig.StockItems)
             {
                 var filtered = kitty.Ledger.Transactions.Where(t =>
-                        t.Person.Email == lsl.Person.Email &&
-                        t.TransactionType == TransactionType.Purchase &&
+                        t.Person.Email == lsl.Person.Email &&                        
                         t.TransactionName == si.MainName
                         );
+                var filteredPurchases = filtered.Where(t => t.TransactionType == TransactionType.Purchase);
+                var filteredProvisions = filtered.Where(t => t.TransactionType == TransactionType.Provision);
+                var pCount = filteredPurchases.Sum(t => t.TransactionCount);
+                var pvCount = filteredProvisions.Sum(t => t.TransactionCount);
+
                 lsl.Purchases.Add(new Purchase
                 {
                     ProductName = si.MainName,
-                    ProductCount = filtered.Sum(t => t.TransactionCount),
-                    ProductTotal = filtered.Sum(t => t.TransactionAmount)
+                    ProductCount = pCount,
+                    ProductTotal = filteredPurchases.Sum(t => t.TransactionAmount)
                 });
+                lsl.PurchaseText += pCount + " " + si.PluralName + "   ";
+
+                lsl.Provisions[si.MainName] = pvCount;
+                lsl.ProvisionText += pvCount + " " + si.StockGrouping + "   ";
             }
             lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Payment).Sum(t => t.TransactionAmount);
             lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);            
             lsl.TotalAdjustments = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Adjustment).Sum(t => t.TransactionAmount);
-            lsl.Balance = lsl.TotalPaid - lsl.TotalOwed;
+            lsl.Balance = lsl.TotalPaid - lsl.TotalOwed;            
 
             return kitty;
         }
@@ -279,23 +290,18 @@ namespace Redirxn.TeamKitty.Services.Logic
 
             var sl = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
             var me = sl.Person;
-            var iName = sItem.StockGrouping + " of " + sItem.MainName;
             kitty.Ledger.Transactions.Add(new Transaction
             {
                 Date = DateTime.Now,
                 Person = me,
                 TransactionType = TransactionType.Provision,
                 TransactionCount = 1,
-                TransactionName = iName
+                TransactionName = sItem.MainName
             });
-
-            sl.Provisions.TryGetValue(iName, out var prv);
-            sl.Provisions[iName] = prv + 1;
             
             kitty = RecalculateLedgerSummary(kitty, email);
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
-
         }
 
         public string GetKittyBalance()
@@ -322,6 +328,16 @@ namespace Redirxn.TeamKitty.Services.Logic
             }
             RecalculateLedgerSummary(kitty, keepUserEmail);
 
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+        public async Task RecalculateKitty()
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            foreach (var lsl in kitty.Ledger.Summary)
+            {
+                RecalculateLedgerSummary(kitty, lsl.Person.Email);
+            }
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
         }

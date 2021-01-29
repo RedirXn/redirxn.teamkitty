@@ -2,33 +2,58 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Redirxn.TeamKitty.Views.SettingsPage"
+             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
              Title="{Binding CurrentKitty}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
-        <ScrollView>
+        <ScrollView BackgroundColor="{StaticResource MainBackgroundColor}">
             <StackLayout>
-                <Button Text="Change my Displayed Name"
+                <buttons:SfButton Text="Change my Displayed Name"
                         Command="{Binding ChangeMyNameCommand}"
+                        Style="{StaticResource SfButtonStyle}"
                         IsVisible="{Binding KittyExists}"/>
-                <Button Text="Change Kitty" 
+                <buttons:SfButton Text="Change Kitty" 
                         Command="{Binding ChangeKittyCommand}"
+                        Style="{StaticResource SfButtonStyle}"
                         IsVisible="{Binding MultipleKitties}"/>
-                <Button Text="Create a new Kitty" 
+                <buttons:SfButton Text="Create a new Kitty" 
+                        Style="{StaticResource SfButtonStyle}"
                         Command="{Binding CreateKittyCommand}"/>
-                <Button Text="Join a new Kitty" 
+                <buttons:SfButton Text="Join a new Kitty" 
+                    Style="{StaticResource SfButtonStyle}"
                     Command="{Binding JoinKittyCommand}" />
-                <Button Text="Invite Someone to Join This Kitty" 
+                <buttons:SfButton Text="Invite Someone to Join This Kitty" 
                     Command="{Binding InviteCommand}"
+                    Style="{StaticResource SfButtonAdminStyle}"
                     IsVisible="{Binding IsAdmin}" />
-                <Button Text="Add a Non-App User to This Kitty" 
+                <buttons:SfButton Text="Add a Non-App User to This Kitty" 
                     Command="{Binding AddUserCommand}"
+                    Style="{StaticResource SfButtonAdminStyle}"
                     IsVisible="{Binding IsAdmin}" />
-                <Button Text="Combine two Users" 
+                <buttons:SfButton Text="Combine two Users" 
                     Command="{Binding CombineCommand}"
+                    Style="{StaticResource SfButtonAdminStyle}"
                     IsVisible="{Binding IsAdmin}" />
-                <Button Text="Change the name of this Kitty"
+                <buttons:SfButton Text="Change the name of this Kitty"
+                    Command="{Binding ChangeKittyNameCommand}"
+                    Style="{StaticResource SfButtonAdminStyle}"
                     IsVisible="{Binding IsAdmin}" />
-                <Button Text="Set someone as Admin"
+                <buttons:SfButton Text="Set someone as Admin"
+                    Command="{Binding AssignAdminCommand}"
+                    Style="{StaticResource SfButtonAdminStyle}"
                     IsVisible="{Binding IsAdmin}" />
+                <buttons:SfButton Text="Recalculate Kitty"
+                    Command="{Binding RecalculateKittyCommand}"
+                    Style="{StaticResource SfButtonAdminStyle}"
+                    IsVisible="{Binding IsAdmin}" />
+
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

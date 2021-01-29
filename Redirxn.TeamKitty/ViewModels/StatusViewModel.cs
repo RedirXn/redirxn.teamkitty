@@ -21,6 +21,7 @@ namespace Redirxn.TeamKitty.ViewModels
         private IDialogService _dialogService;
 
         private LedgerSummaryLine _summary;
+        private IEnumerable<Transaction> _transactions;
         private bool _loadingFromState;
 
         private bool _isAdmin = false;
@@ -48,6 +49,12 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _myPaidText; }
             set { SetProperty(ref _myPaidText, value); }
         }
+        string _myProvisionText;
+        public string MyProvisionText
+        {
+            get { return _myProvisionText; }
+            set { SetProperty(ref _myProvisionText, value); }
+        }
         private string _currentKitty = string.Empty;
         public string CurrentKitty
         {
@@ -61,10 +68,10 @@ namespace Redirxn.TeamKitty.ViewModels
             set { SetProperty(ref _isChangeable, value); }
         }
 
-        public ObservableCollection<Provision> Provisions { get; }
+        public ObservableCollection<GroupedTransaction> Transactions { get; }
         public ICommand PayCommand { get; set; }
         public ICommand ProvideCommand { get; set; }
-        public ICommand LoadProvisionsCommand { get; set; }
+        public ICommand LoadTransactionsCommand { get; set; }
 
         public string FromMember
         {
@@ -80,9 +87,9 @@ namespace Redirxn.TeamKitty.ViewModels
 
             PayCommand = new Command(async () => await PaymentRequest());
             ProvideCommand = new Command(async () => await ProvisionRequest());
-            LoadProvisionsCommand = new Command(async () => await ExecuteLoadProvisionsCommand());
+            LoadTransactionsCommand = new Command(async () => await ExecuteLoadTransactionsCommand());
 
-            Provisions = new ObservableCollection<Provision>();            
+            Transactions = new ObservableCollection<GroupedTransaction>();            
         }
         public void OnAppearing()
         {            
@@ -90,7 +97,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             if (!_loadingFromState)
             {
-                ReloadSummary();
+                ReloadSummary(_identityService.LoginData.Email);
             }
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
@@ -101,28 +108,37 @@ namespace Redirxn.TeamKitty.ViewModels
             IsBusy = true;
         }
 
-        private void ReloadSummary()
+        private async void ReloadSummary(string email)
         {
-            _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == _identityService.LoginData.Email);
+            _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
+            _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email).OrderBy(t => t.Date);
+            await ExecuteLoadTransactionsCommand();
         }
 
-        async Task ExecuteLoadProvisionsCommand()
+        async Task ExecuteLoadTransactionsCommand()
         {
             IsBusy = true;
 
             try
             {
-                Provisions.Clear();
+                Transactions.Clear();
 
                 if (_summary != null)
                 {
-                    foreach (var item in _summary.Provisions)
+                    var w = new WipTransaction();
+                    foreach (var item in _transactions)
                     {
-                        Provisions.Add(new Provision
+                        var date = item.Date.ToString("ddd, MMM d, yyyy");
+                        if (date != w.Date && !string.IsNullOrEmpty(w.Date))
                         {
-                            Key = item.Key,
-                            Value = item.Value
-                        });
+                            Transactions.Add(GroupedTranFromWip(w));
+                            w = new WipTransaction();
+                        }                        
+                        w.UpdateFromTransaction(date, item);
+                    }
+                    if (!string.IsNullOrEmpty(w.Date))
+                    {
+                        Transactions.Add(GroupedTranFromWip(w));
                     }
                 }
             }
@@ -137,10 +153,24 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
 
+
+        private GroupedTransaction GroupedTranFromWip(WipTransaction w)
+        {
+            return new GroupedTransaction()
+            {
+                Date = w.Date,
+                DayTotal = (w.Total != 0M) ? string.Format("{0:C}", w.Total) : string.Empty,
+                Payments = (w.Payments > 0M) ? string.Format("{0:C}", w.Payments) : string.Empty,
+                Purchases = string.Join(",", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()),
+                Provisions = string.Join(",", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray())
+            };
+        }
+
         private void UpdateScreenText()
         {
             MyBalanceText = GetBalanceText(_summary.Balance);
             MyPaidText = string.Format("Paid so far: {0:C}", Math.Abs(_summary.TotalPaid));
+            MyProvisionText = "Provided: " + _summary.ProvisionText;
         }
 
         private async Task ProvisionRequest()
@@ -158,8 +188,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     {
                         await _kittyService.ProvideStock(_summary.Person.Email, sItem);
                     }
-                    await ExecuteLoadProvisionsCommand();
-                    ReloadSummary();
+                    ReloadSummary(_summary.Person.Email);
                 }
             }
             catch (Exception ex)
@@ -179,7 +208,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     var amount = decimal.Parse(strAmount);
                     await _kittyService.MakePayment(_summary.Person.Email, amount);
                 }
-                ReloadSummary();
+                ReloadSummary(_summary.Person.Email);
                 UpdateScreenText();
             }
             catch (Exception ex)
@@ -215,6 +244,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 MyDisplayName = item.Person.DisplayName;
                 _summary = item;
+                _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == _summary.Person.Email).OrderBy(t => t.Date);
                 UpdateScreenText();
             }
             catch (Exception ex)
@@ -224,11 +254,66 @@ namespace Redirxn.TeamKitty.ViewModels
             }
 
         }
-    }
-    public class Provision
-    {
-        public string Key { get; set; }
-        public int Value { get; set; }
+        public class WipTransaction
+        {
+            public Dictionary<string, int> Purchases = new Dictionary<string, int>();
+            public Dictionary<string, int> Provisions = new Dictionary<string, int>();
+            public decimal Payments = 0M;
+            public decimal Total = 0M;
+            public string Date = string.Empty;
+
+            public void UpdateFromTransaction(string date, Transaction item)
+            {
+                Date = date;
+                switch (item.TransactionType)
+                {
+                    case TransactionType.Payment:
+                        {
+                            Payments += item.TransactionAmount;
+                            Total += item.TransactionAmount;
+                            break;
+                        }
+                    case TransactionType.Purchase:
+                        {
+                            if (Purchases.ContainsKey(item.TransactionName))
+                            {
+                                Purchases[item.TransactionName] += item.TransactionCount;
+                            }
+                            else
+                            {
+                                Purchases[item.TransactionName] = item.TransactionCount;
+                            }
+                            Total -= item.TransactionAmount;
+                            break;
+                        }
+                    case TransactionType.Provision:
+                        {
+                            if (Provisions.ContainsKey(item.TransactionName))
+                            {
+                                Provisions[item.TransactionName] += item.TransactionCount;
+                            }
+                            else
+                            {
+                                Provisions[item.TransactionName] = item.TransactionCount;
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+            }
+
+        }
     }
 
+    public class GroupedTransaction
+    {
+        public string Date { get; set; }        
+        public string Purchases { get; set; }        
+        public string Provisions { get; set; }
+        public string Payments { get; set; }
+        public string DayTotal { get; set; }
+    }
 }

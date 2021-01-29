@@ -11,7 +11,17 @@
             <ResourceDictionary.MergedDictionaries>
                 <themes:LightTheme />
             </ResourceDictionary.MergedDictionaries >
-            <Color x:Key="Primary">#2196F3</Color>
+            <Color x:Key="MdBackground">#303030</Color>
+            <Color x:Key="MdSurface">#333333</Color>
+            <Color x:Key="MdPrimary">#fa6800</Color>
+            <Color x:Key="MdSecondary">#FFE5B4</Color>
+            <Color x:Key="MdOnBackground">#EEEEEE</Color>
+            <Color x:Key="MdOnSurface">#FFFFFF</Color>
+            <Color x:Key="MdOnPrimary">#333333</Color>
+            <Color x:Key="MdOnSecondary">#333333</Color>
+            <Color x:Key="Primary">#303030</Color>
+            <Color x:Key="MainBackgroundColor">#333333</Color>
+            <Color x:Key="HighlightColor">#fa6800</Color>
             <Style TargetType="Button">
                 <Setter Property="TextColor" Value="White"></Setter>
                 <Setter Property="VisualStateManager.VisualStateGroups">
@@ -31,6 +41,7 @@
                     </VisualStateGroupList>
                 </Setter>
             </Style>
+
         </ResourceDictionary>        
     </Application.Resources>
 </Application>

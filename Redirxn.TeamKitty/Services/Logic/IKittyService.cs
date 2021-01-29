@@ -25,5 +25,6 @@ namespace Redirxn.TeamKitty.Services.Logic
         string GetKittyBalance();
         string GetKittyOnHand();
         Task CombineUsers(string keepUserEmail, string absorbUserEmail);
+        Task RecalculateKitty();
     }
 }

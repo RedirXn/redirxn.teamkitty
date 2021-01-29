@@ -6,17 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="awssdk.cognitoidentity" Version="3.5.0.30" />
-    <PackageReference Include="awssdk.core" Version="3.5.1.28" />
-    <PackageReference Include="awssdk.dynamodbv2" Version="3.5.1.6" />
+    <PackageReference Include="awssdk.cognitoidentity" Version="3.5.2.5" />
+    <PackageReference Include="awssdk.core" Version="3.5.2.3" />
+    <PackageReference Include="awssdk.dynamodbv2" Version="3.5.4.23" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
     <PackageReference Include="plugin.facebookclient" Version="2.2.1" />
-    <PackageReference Include="splat" Version="9.6.1" />
-    <PackageReference Include="Syncfusion.Xamarin.Buttons" Version="18.4.0.35" />
-    <PackageReference Include="Syncfusion.Xamarin.Core" Version="18.4.0.35" />
-    <PackageReference Include="Syncfusion.Xamarin.SfComboBox" Version="18.4.0.35" />
-    <PackageReference Include="Xamarin.Forms" Version="4.6.0.1141" />  
-    <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
+    <PackageReference Include="splat" Version="10.0.1" />
+    <PackageReference Include="Syncfusion.Xamarin.Buttons" Version="18.4.0.39" />
+    <PackageReference Include="Syncfusion.Xamarin.Core" Version="18.4.0.39" />
+    <PackageReference Include="Syncfusion.Xamarin.SfChart" Version="18.4.0.39" />
+    <PackageReference Include="Syncfusion.Xamarin.SfComboBox" Version="18.4.0.39" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.1931" />  
+    <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>
 
   <ItemGroup>

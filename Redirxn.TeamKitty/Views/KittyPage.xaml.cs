@@ -12,7 +12,7 @@ namespace Redirxn.TeamKitty.Views
         public KittyPage()
         {
             InitializeComponent();
-            this.BindingContext = ViewModel;
+            this.BindingContext = ViewModel;            
         }
         internal KittyViewModel ViewModel { get; set; } = Locator.Current.GetService<KittyViewModel>();
         protected override void OnAppearing()

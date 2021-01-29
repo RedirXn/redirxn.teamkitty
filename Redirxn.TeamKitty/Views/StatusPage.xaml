@@ -2,49 +2,81 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
+             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
              xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
              Title="{Binding CurrentKitty}"
              x:Class="Redirxn.TeamKitty.Views.StatusPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
-        <ScrollView>
+        <ScrollView BackgroundColor="{StaticResource MainBackgroundColor}">
             <StackLayout>
                 <Label Text="{Binding MyDisplayName}"
                     VerticalOptions="Start" 
+                    Style="{StaticResource LabelStyle}"
                     FontSize="Large"
                     HorizontalOptions="CenterAndExpand" />
+                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
                 <Label Text="{Binding MyBalanceText}"
                     FontSize="Large"
+                    Style="{StaticResource LabelStyle}"
                     HorizontalOptions="CenterAndExpand" />
-                <StackLayout Orientation="Horizontal" IsVisible="{Binding IsChangeable}">
-                    <Button Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="CenterAndExpand" />
-                    <Button Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="CenterAndExpand"/>                    
-                </StackLayout>
+                <Grid IsVisible="{Binding IsChangeable}">
+                    <buttons:SfButton Grid.Column="0" Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />
+                    <buttons:SfButton Grid.Column="1" Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />                                    
+                </Grid>
+                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
                 <Label Text="{Binding MyPaidText}"
                     FontSize="Large"
+                    Style="{StaticResource LabelStyle}"
                     HorizontalOptions="CenterAndExpand" />
-                <Label Text="Provided:"
-                    HorizontalOptions="StartAndExpand"
+                <Label Text="{Binding MyProvisionText}"
                     FontSize="Large"
-                    Margin="10,10,0,0"/>
-                <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadProvisionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+                    Style="{StaticResource LabelStyle}"
+                    HorizontalOptions="CenterAndExpand" />
+                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
+                
+                <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadTransactionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                     <CollectionView x:Name="ProvisionsListView"
-                        ItemsSource="{Binding Provisions}"
+                        ItemsSource="{Binding Transactions}"
                         SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <StackLayout Padding="10" x:DataType="local:Provision">
-                                    <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding Key}" 
-                                        LineBreakMode="NoWrap" 
-                                        Style="{DynamicResource ListItemTextStyle}" 
-                                        FontSize="Large" 
-                                        HorizontalOptions="StartAndExpand"/>
-                                    <Label Text="{Binding Value}" 
-                                        LineBreakMode="NoWrap"
-                                        Style="{DynamicResource ListItemDetailTextStyle}"
-                                        FontSize="Large"
-                                        HorizontalOptions="CenterAndExpand"/>
-                                    </StackLayout>
+                                <StackLayout Padding="10" x:DataType="local:GroupedTransaction">
+
+                                        <Label Text="{Binding Date}" 
+                                            LineBreakMode="NoWrap" 
+                                            Style="{DynamicResource ListItemTextStyle}" 
+                                            FontSize="Large" 
+                                            HorizontalOptions="StartAndExpand"/>
+                                        <Label Text="{Binding Payments}" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Large"
+                                            HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="{Binding Purchases}" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Large"
+                                            HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="{Binding Provisions}" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Large"
+                                            HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="{Binding DayTotal}" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Large"
+                                            HorizontalOptions="CenterAndExpand"/>
+
+                                    <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
                                 </StackLayout>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>

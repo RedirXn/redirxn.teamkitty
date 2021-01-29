@@ -20,7 +20,18 @@ namespace Redirxn.TeamKitty.ViewModels
         IFacebookClient _facebookService = CrossFacebookClient.Current;
 
         public ICommand OnLoginWithFacebookCommand { get; set; }
-
+        public bool _canClick = true;
+        public bool CanClick
+        {
+            get { return _canClick; }
+            set { SetProperty(ref _canClick, value); }
+        }
+        public bool _isLoading = false;
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set { SetProperty(ref _isLoading, value); }
+        }
 
         public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
@@ -35,6 +46,8 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             try
             {
+                CanClick = false;
+                IsLoading = true;
                 //if (_facebookService.IsLoggedIn)
                 //{
                 //    _facebookService.Logout();
@@ -61,8 +74,10 @@ namespace Redirxn.TeamKitty.ViewModels
                             break;
                         case FacebookActionStatus.Canceled:
                             break;
-                    }
 
+                    }
+                    IsLoading = false;
+                    CanClick = true;
                     _facebookService.OnUserData -= userDataDelegate;
                 };
 

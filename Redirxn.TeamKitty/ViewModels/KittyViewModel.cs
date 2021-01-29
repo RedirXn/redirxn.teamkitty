@@ -3,6 +3,7 @@ using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
 using Redirxn.TeamKitty.Views;
 using Splat;
+using Syncfusion.SfChart.XForms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -60,6 +61,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 OnItemSelected(value);
             }
         }
+        public ObservableCollection<ChartDataPoint> KittyMoney { get; set; }
         public KittyViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
             _routingService = navigationService ?? Locator.Current.GetService<IRoutingService>();
@@ -102,8 +104,15 @@ namespace Redirxn.TeamKitty.ViewModels
             SelectedItem = null;
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
             CurrentKitty = _kittyService.Kitty?.DisplayName;
-            KittyBalanceText = "When all money collected: $" + _kittyService.GetKittyBalance();
-            KittyOnHandText = " Collected so far: $" + _kittyService.GetKittyOnHand();
+            var balance = _kittyService.GetKittyBalance();
+            var onHand = _kittyService.GetKittyOnHand();
+            KittyBalanceText = "When all money collected: $" + balance;
+            KittyOnHandText = " Collected so far: $" + onHand;
+            KittyMoney = new ObservableCollection<ChartDataPoint>
+            {
+                new ChartDataPoint("Received", double.Parse(onHand)),
+                new ChartDataPoint("Remaining", double.Parse(balance)-double.Parse(onHand))
+            };
         }
         async void OnItemSelected(LedgerSummaryLine item)
         {

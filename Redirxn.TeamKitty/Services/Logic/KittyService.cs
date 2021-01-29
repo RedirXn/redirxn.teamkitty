@@ -164,10 +164,10 @@ namespace Redirxn.TeamKitty.Services.Logic
                     ProductCount = pCount,
                     ProductTotal = filteredPurchases.Sum(t => t.TransactionAmount)
                 });
-                lsl.PurchaseText += pCount + " " + si.PluralName + "   ";
+                lsl.PurchaseText += (!string.IsNullOrEmpty(lsl.PurchaseText) ? "  " : string.Empty) + pCount + " " + si.PluralName;
 
                 lsl.Provisions[si.MainName] = pvCount;
-                lsl.ProvisionText += pvCount + " " + si.StockGrouping + "   ";
+                lsl.ProvisionText += (!string.IsNullOrEmpty(lsl.ProvisionText) ? "  " : string.Empty) + pvCount + " " + si.StockGrouping;
             }
             lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Payment).Sum(t => t.TransactionAmount);
             lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);            

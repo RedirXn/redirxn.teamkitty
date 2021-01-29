@@ -21,7 +21,7 @@
         <StackLayout BackgroundColor="{StaticResource MdSurface}">
             <Label Text="{Binding KittyBalanceText}"
                     FontSize="20"
-                    Style="{StaticResource LabelSurfaceStyle}"
+                    Style="{StaticResource LabelPrimaryStyle}"
                     VerticalOptions="CenterAndExpand" 
                     HorizontalOptions="CenterAndExpand" />
             <Label Text="{Binding KittyOnHandText}"

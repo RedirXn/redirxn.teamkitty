@@ -111,7 +111,7 @@ namespace Redirxn.TeamKitty.ViewModels
         private async void ReloadSummary(string email)
         {
             _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
-            _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email).OrderBy(t => t.Date);
+            _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email).OrderByDescending(t => t.Date);
             await ExecuteLoadTransactionsCommand();
         }
 
@@ -156,13 +156,19 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private GroupedTransaction GroupedTranFromWip(WipTransaction w)
         {
+            var payments = (w.Payments > 0M) ? "Paid: " + string.Format("{0:C}", w.Payments) : string.Empty;
+            var purchases = (w.Purchases.Count > 0) ? "Purchased: " + string.Join(",", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
+            var provisions = (w.Provisions.Count > 0) ? "Supplied: " + string.Join(",", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
+
+            string summary = purchases + ((!string.IsNullOrEmpty(purchases) && !string.IsNullOrEmpty(provisions)) ? Environment.NewLine : string.Empty) +
+                provisions + ((!string.IsNullOrEmpty(purchases + provisions) && !string.IsNullOrEmpty(payments)) ? Environment.NewLine : string.Empty) + 
+                payments;
+            
             return new GroupedTransaction()
             {
                 Date = w.Date,
                 DayTotal = (w.Total != 0M) ? string.Format("{0:C}", w.Total) : string.Empty,
-                Payments = (w.Payments > 0M) ? string.Format("{0:C}", w.Payments) : string.Empty,
-                Purchases = string.Join(",", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()),
-                Provisions = string.Join(",", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray())
+                Summary = summary
             };
         }
 
@@ -170,7 +176,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             MyBalanceText = GetBalanceText(_summary.Balance);
             MyPaidText = string.Format("Paid so far: {0:C}", Math.Abs(_summary.TotalPaid));
-            MyProvisionText = "Provided: " + _summary.ProvisionText;
+            MyProvisionText = "Supplied: " + _summary.ProvisionText;
         }
 
         private async Task ProvisionRequest()
@@ -311,9 +317,7 @@ namespace Redirxn.TeamKitty.ViewModels
     public class GroupedTransaction
     {
         public string Date { get; set; }        
-        public string Purchases { get; set; }        
-        public string Provisions { get; set; }
-        public string Payments { get; set; }
+        public string Summary { get; set; }
         public string DayTotal { get; set; }
     }
 }

@@ -38,6 +38,12 @@
         <Setter Property="LineHeight" Value="1.25" />
     </Style>
 
+    <Style x:Key="LabelPrimaryStyle" TargetType="Label">
+        <Setter Property="TextColor" Value="{DynamicResource MdPrimary}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="LineHeight" Value="1.25" />
+    </Style>
+
     <Style x:Key="LabelSurfaceStyle" TargetType="Label">
         <Setter Property="TextColor" Value="{DynamicResource MdOnSurface}" />
         <Setter Property="FontSize" Value="14" />

@@ -15,45 +15,44 @@
     <ContentPage.Content>
         <ScrollView BackgroundColor="{StaticResource MainBackgroundColor}">
             <StackLayout>
-                <buttons:SfButton Text="Change my Displayed Name"
-                        Command="{Binding ChangeMyNameCommand}"
+                <StackLayout Padding="20" BackgroundColor="{StaticResource MdSurface}">
+                    <Label Text="Options:" Style="{StaticResource LabelSurfaceStyle}"/>
+                    <buttons:SfButton Text="Change my Displayed Name"
+                            Command="{Binding ChangeMyNameCommand}"
+                            Style="{StaticResource SfButtonStyle}"
+                            IsVisible="{Binding KittyExists}"/>
+                    <buttons:SfButton Text="Change Kitty" 
+                            Command="{Binding ChangeKittyCommand}"
+                            Style="{StaticResource SfButtonStyle}"
+                            IsVisible="{Binding MultipleKitties}"/>
+                    <buttons:SfButton Text="Create a new Kitty" 
+                            Style="{StaticResource SfButtonStyle}"
+                            Command="{Binding CreateKittyCommand}"/>
+                    <buttons:SfButton Text="Join a new Kitty" 
                         Style="{StaticResource SfButtonStyle}"
-                        IsVisible="{Binding KittyExists}"/>
-                <buttons:SfButton Text="Change Kitty" 
-                        Command="{Binding ChangeKittyCommand}"
-                        Style="{StaticResource SfButtonStyle}"
-                        IsVisible="{Binding MultipleKitties}"/>
-                <buttons:SfButton Text="Create a new Kitty" 
-                        Style="{StaticResource SfButtonStyle}"
-                        Command="{Binding CreateKittyCommand}"/>
-                <buttons:SfButton Text="Join a new Kitty" 
-                    Style="{StaticResource SfButtonStyle}"
-                    Command="{Binding JoinKittyCommand}" />
-                <buttons:SfButton Text="Invite Someone to Join This Kitty" 
-                    Command="{Binding InviteCommand}"
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    IsVisible="{Binding IsAdmin}" />
-                <buttons:SfButton Text="Add a Non-App User to This Kitty" 
-                    Command="{Binding AddUserCommand}"
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    IsVisible="{Binding IsAdmin}" />
-                <buttons:SfButton Text="Combine two Users" 
-                    Command="{Binding CombineCommand}"
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    IsVisible="{Binding IsAdmin}" />
-                <buttons:SfButton Text="Change the name of this Kitty"
-                    Command="{Binding ChangeKittyNameCommand}"
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    IsVisible="{Binding IsAdmin}" />
-                <buttons:SfButton Text="Set someone as Admin"
-                    Command="{Binding AssignAdminCommand}"
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    IsVisible="{Binding IsAdmin}" />
-                <buttons:SfButton Text="Recalculate Kitty"
-                    Command="{Binding RecalculateKittyCommand}"
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    IsVisible="{Binding IsAdmin}" />
-
+                        Command="{Binding JoinKittyCommand}" />
+                </StackLayout>
+                <StackLayout Padding="20" IsVisible="{Binding IsAdmin}" BackgroundColor="{StaticResource MdSurface}">
+                    <Label Text="Admin Options:" Style="{StaticResource LabelSurfaceStyle}"/>
+                    <buttons:SfButton Text="Invite Someone to Join This Kitty" 
+                                  Command="{Binding InviteCommand}"
+                                  Style="{StaticResource SfButtonAdminStyle}" />
+                    <buttons:SfButton Text="Add a Non-App User to This Kitty" 
+                        Command="{Binding AddUserCommand}"
+                        Style="{StaticResource SfButtonAdminStyle}"/>
+                    <buttons:SfButton Text="Combine two Users" 
+                        Command="{Binding CombineCommand}"
+                        Style="{StaticResource SfButtonAdminStyle}"/>
+                    <buttons:SfButton Text="Change the name of this Kitty"
+                        Command="{Binding ChangeKittyNameCommand}"
+                        Style="{StaticResource SfButtonAdminStyle}"/>
+                    <buttons:SfButton Text="Set someone as Admin"
+                        Command="{Binding AssignAdminCommand}"
+                        Style="{StaticResource SfButtonAdminStyle}"/>
+                    <buttons:SfButton Text="Recalculate Kitty"
+                        Command="{Binding RecalculateKittyCommand}"
+                        Style="{StaticResource SfButtonAdminStyle}"/>
+                </StackLayout>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

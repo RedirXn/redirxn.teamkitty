@@ -25,7 +25,7 @@ namespace Redirxn.TeamKitty.Services.Logic
                 await _dataStore.DeleteCode(c);
                 keepCode = c.Code;
             }
-            return await _dataStore.SetNewJoinCode(kittyId, keepCode ?? CreateJoinCode());
+            return await _dataStore.SetNewJoinCode(kittyId, string.IsNullOrEmpty(keepCode) ? CreateJoinCode() : keepCode);
         }
 
         public async Task<string> GetKittyIdWithCode(string joinCode)

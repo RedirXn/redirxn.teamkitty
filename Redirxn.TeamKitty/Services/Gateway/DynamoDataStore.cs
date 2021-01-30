@@ -126,7 +126,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
                 ScanIndexForward = true
             };
 
-            var result = await _client.QueryAsync(queryRequest);
+            var result = await _client.QueryAsync(queryRequest); 
 
             List<JoinCode> codes = new List<JoinCode>();
             foreach (var i in result.Items)

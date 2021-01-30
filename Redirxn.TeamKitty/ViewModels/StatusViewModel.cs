@@ -157,8 +157,8 @@ namespace Redirxn.TeamKitty.ViewModels
         private GroupedTransaction GroupedTranFromWip(WipTransaction w)
         {
             var payments = (w.Payments > 0M) ? "Paid: " + string.Format("{0:C}", w.Payments) : string.Empty;
-            var purchases = (w.Purchases.Count > 0) ? "Purchased: " + string.Join(",", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
-            var provisions = (w.Provisions.Count > 0) ? "Supplied: " + string.Join(",", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
+            var purchases = (w.Purchases.Count > 0) ? "Purchased: " + string.Join(", ", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
+            var provisions = (w.Provisions.Count > 0) ? "Supplied: " + string.Join(", ", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
 
             string summary = purchases + ((!string.IsNullOrEmpty(purchases) && !string.IsNullOrEmpty(provisions)) ? Environment.NewLine : string.Empty) +
                 provisions + ((!string.IsNullOrEmpty(purchases + provisions) && !string.IsNullOrEmpty(payments)) ? Environment.NewLine : string.Empty) + 
@@ -269,12 +269,12 @@ namespace Redirxn.TeamKitty.ViewModels
             public string Date = string.Empty;
 
             public void UpdateFromTransaction(string date, Transaction item)
-            {
-                Date = date;
+            {                
                 switch (item.TransactionType)
                 {
                     case TransactionType.Payment:
                         {
+                            Date = date;
                             Payments += item.TransactionAmount;
                             Total += item.TransactionAmount;
                             break;
@@ -289,6 +289,7 @@ namespace Redirxn.TeamKitty.ViewModels
                             {
                                 Purchases[item.TransactionName] = item.TransactionCount;
                             }
+                            Date = date;
                             Total -= item.TransactionAmount;
                             break;
                         }
@@ -302,6 +303,7 @@ namespace Redirxn.TeamKitty.ViewModels
                             {
                                 Provisions[item.TransactionName] = item.TransactionCount;
                             }
+                            Date = date;
                             break;
                         }
                     default:

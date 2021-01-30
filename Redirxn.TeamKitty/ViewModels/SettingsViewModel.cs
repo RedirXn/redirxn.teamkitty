@@ -195,7 +195,7 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             { 
                 string joinCode = await GetKittyJoinCode();
-                await _dialogService.Alert("Join Code", "Advise people to use this code: " + joinCode + " to join your kitty. (expires in 24 hours)", "OK");
+                await _dialogService.Alert("Join Code", joinCode + Environment.NewLine + "Advise people to use this code to join your kitty. (expires in 24 hours)", "OK");
             }
             catch (Exception ex)
             {

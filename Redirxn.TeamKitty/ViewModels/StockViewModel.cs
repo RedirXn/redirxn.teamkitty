@@ -19,12 +19,12 @@ namespace Redirxn.TeamKitty.ViewModels
         private IIdentityService _identityService;
         private IDialogService _dialogService;
 
-        private StockItem _selectedItem;
+        private StockDisplay _selectedItem;
 
         public ICommand OnAddStockCommand { get; set; }        
         public ICommand LoadItemsCommand { get; }
-        public Command<StockItem> ItemTapped { get; }
-        public ObservableCollection<StockItem> Items { get; }
+        public Command<StockDisplay> ItemTapped { get; }
+        public ObservableCollection<StockDisplay> Items { get; }
         public bool IsAdmin { get; set; } = false;
         private string _currentKitty = string.Empty;
         public string CurrentKitty
@@ -40,11 +40,11 @@ namespace Redirxn.TeamKitty.ViewModels
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
-            Items = new ObservableCollection<StockItem>();
+            Items = new ObservableCollection<StockDisplay>();
 
             OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
-            ItemTapped = new Command<StockItem>(OnItemSelected);
+            ItemTapped = new Command<StockDisplay>(OnItemSelected);
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
@@ -57,7 +57,13 @@ namespace Redirxn.TeamKitty.ViewModels
                 Items.Clear();
                 foreach (var item in _kittyService.Kitty.KittyConfig.StockItems)
                 {
-                    Items.Add(item);
+                    var sd = new StockDisplay
+                    {
+                        MainName = item.MainName,
+                        Cost = string.Format("{0:C}", item.SalePrice),
+                        Grouping = item.StockGrouping + " " + item.PluralName + " cost about " + string.Format("{0:C}", item.StockPrice),
+                    };
+                    Items.Add(sd);
                 }
             }
             catch (Exception ex)
@@ -78,7 +84,7 @@ namespace Redirxn.TeamKitty.ViewModels
             CurrentKitty = _kittyService.Kitty?.DisplayName;
         }
 
-        public StockItem SelectedItem
+        public StockDisplay SelectedItem
         {
             get => _selectedItem;
             set
@@ -88,7 +94,7 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
 
-        async void OnItemSelected(StockItem item)
+        async void OnItemSelected(StockDisplay item)
         {
             try
             { 
@@ -103,4 +109,12 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
     }
+
+    public class StockDisplay
+    {
+        public string MainName { get; set; }
+        public string Cost { get; set; }
+        public string Grouping { get; set; }
+    }
+
 }

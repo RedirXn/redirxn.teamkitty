@@ -61,9 +61,9 @@ namespace Redirxn.TeamKitty.Tests
 
             _vmStatus.ProvideCommand.Execute(null);
 
-            Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Provision).First().TransactionName.Should().Be("Case of Item1");
+            Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Provision).First().TransactionName.Should().Be("Item1");
             Db.SaveKittyToDbKitty.Ledger.Transactions.Where(t => t.TransactionType == TransactionType.Provision).First().TransactionCount.Should().Be(1);
-            Db.SaveKittyToDbKitty.Ledger.Summary.First(lsl => lsl.Person.Email == myEmail).Provisions["Case of Item1"].Should().Be(1);
+            Db.SaveKittyToDbKitty.Ledger.Summary.First(lsl => lsl.Person.Email == myEmail).Provisions["Item1"].Should().Be(1);
         }
         private Kitty GetFakeAdminKitty()
         {

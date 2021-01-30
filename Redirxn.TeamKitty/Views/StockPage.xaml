@@ -25,19 +25,28 @@
                     SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <StackLayout Padding="10" x:DataType="model:StockItem">
+                        <StackLayout Padding="20" x:DataType="local:StockDisplay" BackgroundColor="{StaticResource MdSurface}">
                             <StackLayout Orientation="Horizontal">
-                                <Label Text="{Binding MainName}" 
-                                    LineBreakMode="NoWrap" 
-                                    Style="{DynamicResource ListItemTextStyle}" 
-                                    FontSize="Large"
-                                    HorizontalOptions="StartAndExpand"/>
-                                <Label Text="{Binding SalePrice, StringFormat='${0:#.00}'}" 
+                                <StackLayout Orientation="Vertical">
+                                    <Label Text="{Binding MainName}" 
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="Large"
+                                        HorizontalOptions="StartAndExpand"/>
+                                    <Label Text="{Binding Grouping}"
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="Small"
+                                        HorizontalOptions="StartAndExpand"/>                                    
+                                </StackLayout>
+                                <Label Text="{Binding Cost}" 
                                     LineBreakMode="NoWrap"
                                     Style="{DynamicResource ListItemDetailTextStyle}"
                                     FontSize="Large"
-                                    HorizontalOptions="CenterAndExpand"/>
+                                    HorizontalOptions="EndAndExpand"
+                                       VerticalOptions="CenterAndExpand"/>
                             </StackLayout>
+                            <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
                             <StackLayout.GestureRecognizers>
                                 <TapGestureRecognizer 
                                     NumberOfTapsRequired="1"

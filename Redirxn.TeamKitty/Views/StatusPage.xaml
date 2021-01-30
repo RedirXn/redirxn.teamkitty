@@ -35,46 +35,45 @@
             <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
             <StackLayout IsVisible="{Binding IsChangeable}" Orientation="Horizontal">
                 <buttons:SfButton Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />
-                <buttons:SfButton Text="Provide Stock" Command="{Binding ProvideCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />
+                <buttons:SfButton Text="Supply Stock" Command="{Binding ProvideCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />
             </StackLayout>
             <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
 
-                <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadTransactionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
-                    <CollectionView x:Name="TransactionsListView"
+            <RefreshView x:DataType="local:StatusViewModel" Command="{Binding LoadTransactionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+                <CollectionView x:Name="TransactionsListView"
                         ItemsSource="{Binding Transactions}"
                         SelectionMode="None">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <StackLayout Padding="10" x:DataType="local:GroupedTransaction" Orientation="Vertical">
-                                    <Label Text="{Binding Date}" 
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout Padding="10" x:DataType="local:GroupedTransaction" Orientation="Vertical">
+                                <Label Text="{Binding Date}" 
                                             LineBreakMode="NoWrap" 
                                             Style="{DynamicResource ListItemTextStyle}" 
                                             FontSize="Small" 
-                                            HorizontalOptions="EndAndExpand"/>
-                                    <StackLayout Orientation="Horizontal">
-                                        <StackLayout Orientation="Vertical" Padding="3">                                           
-        
+                                            HorizontalOptions="StartAndExpand"/>
+                                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="3" HorizontalOptions="Fill"/>
+                                <StackLayout Orientation="Horizontal">
+                                    <StackLayout Orientation="Vertical" Padding="3">
                                         <Label Text="{Binding Summary}" 
                                             LineBreakMode="WordWrap"
                                             Style="{DynamicResource ListItemDetailTextStyle}"
                                             FontSize="Medium"
                                             HorizontalOptions="StartAndExpand"
                                                VerticalOptions="CenterAndExpand"/>
-                                        </StackLayout>
-                                        <Label Text="{Binding DayTotal}" 
+                                    </StackLayout>                                    
+                                    <Label Text="{Binding DayTotal}" 
                                             LineBreakMode="NoWrap"
                                             Style="{DynamicResource ListItemDetailTextStyle}"
                                             FontSize="Large"
-                                            HorizontalOptions="CenterAndExpand"
+                                            HorizontalOptions="EndAndExpand"
                                             VerticalOptions="CenterAndExpand"/>
-                                    </StackLayout>
-                                    <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
                                 </StackLayout>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </RefreshView>
-
+                                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

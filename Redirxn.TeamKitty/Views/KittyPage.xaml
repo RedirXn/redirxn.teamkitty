@@ -10,7 +10,6 @@
     
     <ContentPage.Resources>
         <ResourceDictionary>
-            <converter:BooleanToColorConverter x:Key="ColorConverter" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="SfForms\Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>

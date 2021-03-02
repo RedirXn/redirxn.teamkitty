@@ -34,8 +34,20 @@
                     HorizontalOptions="CenterAndExpand" />
             <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
             <StackLayout IsVisible="{Binding IsChangeable}" Orientation="Horizontal">
-                <buttons:SfButton Text="Pay" Command="{Binding PayCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />
-                <buttons:SfButton Text="Supply Stock" Command="{Binding ProvideCommand}" HorizontalOptions="FillAndExpand" Style="{StaticResource SfButtonStyle}" />
+                <buttons:SfButton Text="Pay" 
+                                  Command="{Binding PayCommand}" 
+                                  HorizontalOptions="FillAndExpand" 
+                                  Style="{StaticResource SfButtonStyle}" 
+                                  Margin="8,16,8,16"
+                                  CornerRadius="20"
+                                  HeightRequest="40"/>
+                <buttons:SfButton Text="Supply Stock" 
+                                  Command="{Binding ProvideCommand}" 
+                                  HorizontalOptions="FillAndExpand" 
+                                  Style="{StaticResource SfButtonStyle}"
+                                  Margin="8,16,8,16"
+                                  CornerRadius="20"
+                                  HeightRequest="40"/>
             </StackLayout>
             <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
 

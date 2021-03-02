@@ -21,6 +21,7 @@ namespace Redirxn.TeamKitty.Tests
         {
             base.Setup();
 
+            Db.MakeGetUserDetailReturn(new UserInfo());
             var fakeLoginData = new NetworkAuthData { Email = myEmail, Id = myEmail };
             Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
         }

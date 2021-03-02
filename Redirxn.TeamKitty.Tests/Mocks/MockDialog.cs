@@ -1,5 +1,6 @@
 ﻿using Redirxn.TeamKitty.Services.Application;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Tests
@@ -7,8 +8,11 @@ namespace Redirxn.TeamKitty.Tests
     public class MockDialog : IDialogService
     {
         string _optionToReturn;
-        string _inputToReturn;
+        List<string> _inputToReturn = new List<string>();
         string _moneyToReturn;
+        List<bool> _confirmResult = new List<bool>();
+        int _confirmIterator = 0;
+        int _textInputIterator = 0;
 
         public bool SelectOptionCalled { get; private set; }
         public string AlertText { get; private set; }
@@ -19,7 +23,7 @@ namespace Redirxn.TeamKitty.Tests
 
         public async Task<string> GetSingleTextInput(string title, string message)
         {
-            return _inputToReturn;
+            return _inputToReturn[_textInputIterator++];
         }
                 
         public async Task<string> SelectOption(string title, string cancel, params string[] buttons)
@@ -34,7 +38,7 @@ namespace Redirxn.TeamKitty.Tests
         }
         public void Make_TextInputReturn(string thisText)
         {
-            _inputToReturn = thisText;
+            _inputToReturn.Add(thisText);
         }
 
         internal void Make_MoneyInputReturn(string amount)
@@ -45,6 +49,17 @@ namespace Redirxn.TeamKitty.Tests
         public async Task<string> GetSingleMoneyInput(string title, string message)
         {
             return _moneyToReturn;
+        }
+
+        public async Task<bool> Confirm(string title, string message, string okButton, string cancelButton)
+        {
+            return _confirmResult[_confirmIterator++];
+        }
+
+        internal MockDialog Make_ConfirmReturn(bool v)
+        {
+            _confirmResult.Add(v);
+            return this;
         }
     }
 }

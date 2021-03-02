@@ -23,7 +23,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
         public ICommand OnAddStockCommand { get; set; }        
         public ICommand LoadItemsCommand { get; }
-        public Command<StockDisplay> ItemTapped { get; }
+        public ICommand ItemTapped { get; }
         public ObservableCollection<StockDisplay> Items { get; }
         public bool IsAdmin { get; set; } = false;
         private string _currentKitty = string.Empty;
@@ -44,7 +44,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
-            ItemTapped = new Command<StockDisplay>(OnItemSelected);
+            ItemTapped = new Command<StockDisplay>(async (item) => await OnItemSelected(item));
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
@@ -61,7 +61,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     {
                         MainName = item.MainName,
                         Cost = string.Format("{0:C}", item.SalePrice),
-                        Grouping = item.StockGrouping + " " + item.PluralName + " cost about " + string.Format("{0:C}", item.StockPrice),
+                        Grouping = item.StockGrouping + " of " + item.MainName + " cost about " + string.Format("{0:C}", item.StockPrice),
                     };
                     Items.Add(sd);
                 }
@@ -90,11 +90,10 @@ namespace Redirxn.TeamKitty.ViewModels
             set
             {
                 SetProperty(ref _selectedItem, value);
-                OnItemSelected(value);
             }
         }
 
-        async void OnItemSelected(StockDisplay item)
+        async Task OnItemSelected(StockDisplay item)
         {
             try
             { 

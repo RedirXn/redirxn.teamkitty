@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Services.Gateway
 {
-    public class DynamoDataStore : IKittyDataStore, IJoinCodeDataStore, IUserDataStore, IDisposable
+    public class DynamoDataStore : IKittyDataStore, IJoinCodeDataStore, IUserDataStore, ICommsDataStore, IDisposable
     {
         const string CognitoPoolId = "us-east-1:f779f47a-cfed-4016-a282-81f3313bd471";
 
@@ -86,7 +86,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
                 Id = kitty.Id,
                 Config = JsonConvert.SerializeObject(kitty.KittyConfig),
                 LedgerSummary = JsonConvert.SerializeObject(kitty.Ledger),
-                Administrators = kitty.Administrators.ToList()
+                Administrators = kitty.Administrators.ToList(),
+                Session = JsonConvert.SerializeObject(kitty.Session)
             };
         }
 
@@ -97,7 +98,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
                 Id = kittyDb.Id,
                 KittyConfig = JsonConvert.DeserializeObject<KittyConfig>(kittyDb.Config),
                 Ledger = JsonConvert.DeserializeObject<Ledger>(kittyDb.LedgerSummary),
-                Administrators = kittyDb.Administrators
+                Administrators = kittyDb.Administrators,
+                Session = JsonConvert.DeserializeObject<Session>(kittyDb.Session)
             };
         }
         public async Task<string> SetNewJoinCode(string kittyId, string code)
@@ -163,6 +165,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
             public string Config { get; set; }
             public string LedgerSummary { get; set; }
             public List<string> Administrators { get; set; }
+            public string Session { get; set; }
         }
 
         [DynamoDBTable("Users")]

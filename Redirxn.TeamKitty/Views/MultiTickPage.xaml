@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
+             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
              Title="{Binding CurrentKitty}"
              x:Class="Redirxn.TeamKitty.Views.MultiTickPage">
     <ContentPage.Resources>
@@ -13,10 +14,10 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <StackLayout BackgroundColor="{StaticResource MainBackgroundColor}">
-            <Entry x:Name="CountEach" Placeholder="1" PlaceholderColor="Olive" Keyboard="Numeric" Text="{Binding CountTick}" IsTabStop="True" IsVisible="{Binding IsAdmin}"/>
-            <Button HorizontalOptions="End" Text="{Binding ConfirmText}"  Command="{Binding ConfirmCommand}" />
-            <Label Text="Tick Them:" LineBreakMode="NoWrap" FontSize="Large" VerticalOptions="Start" />
+        <StackLayout BackgroundColor="{StaticResource MdSurface}">
+            <Entry x:Name="CountEach" TextColor="{StaticResource MdOnSurface}" Keyboard="Numeric" Text="{Binding CountTick}" IsTabStop="True" IsVisible="{Binding IsAdmin}"/>
+            <buttons:SfButton HorizontalOptions="End" Text="{Binding ConfirmText}" Style="{StaticResource SfButtonStyle}" Command="{Binding ConfirmCommand}" />
+            <Label Text="Tick Them:" Style="{StaticResource LabelSurfaceStyle}" LineBreakMode="NoWrap" FontSize="Large" VerticalOptions="Start" />
             <RefreshView x:DataType="local:MultiTickViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
                     ItemsSource="{Binding Items}"
@@ -25,7 +26,7 @@
                         <DataTemplate>
                             <StackLayout Padding="10" x:DataType="local:TickDisplay">
                                 <StackLayout Orientation="Horizontal">
-                                    <Label Text="*" FontSize="Large" IsVisible="{Binding Ticked}"/>
+                                    <Label Text="*" FontSize="Large" Style="{StaticResource LabelSurfaceStyle}" IsVisible="{Binding Ticked}"/>
                                     <Label Text="{Binding DisplayName}" 
                                         LineBreakMode="NoWrap" 
                                         Style="{DynamicResource ListItemTextStyle}" 

@@ -45,7 +45,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public int CountTick
         {
             get { return _countTick; }
-            set { SetProperty(ref _countTick, value); }
+            set { SetProperty(ref _countTick, value); UpdateCountText(); }
         }
         private bool _isAdmin = false;
         public bool IsAdmin
@@ -104,29 +104,33 @@ namespace Redirxn.TeamKitty.ViewModels
         private async Task OnItemSelected(TickDisplay item)
         {
             try
-            { 
+            {
                 item.Ticked = !item.Ticked;
-
-                var count = Items.Where(t => t.Ticked).Count() * _countTick;
-                var si = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName);
-
-                if (count == 0)
-                {
-                    ConfirmText = "None";
-                }
-                else if (count == 1)
-                {
-                    ConfirmText = $"1 {si.MainName}";
-                }
-                else
-                {
-                    ConfirmText = $"{count} {si.PluralName}";
-                }
+                UpdateCountText();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
                 await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+
+        private void UpdateCountText()
+        {
+            var count = Items.Where(t => t.Ticked).Count() * _countTick;
+            var si = _kittyService.Kitty.KittyConfig.StockItems.FirstOrDefault(s => s.MainName == _itemName);
+
+            if (count == 0)
+            {
+                ConfirmText = "None";
+            }
+            else if (count == 1)
+            {
+                ConfirmText = $"1 {si.MainName}";
+            }
+            else
+            {
+                ConfirmText = $"{count} {si.PluralName}";
             }
         }
 

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
+             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
+             xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"               
+             Title="{Binding CurrentKitty}"
+             Shell.TabBarIsVisible="True"             
+             x:Class="Redirxn.TeamKitty.Views.SessionPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="{StaticResource MdBackground}">
+            <StackLayout 
+                Orientation="Horizontal" 
+                BackgroundColor="{StaticResource MdSurface}">
+                <buttons:SfButton 
+                    Text="{Binding SessionButtonText}"               
+                    Command="{Binding SessionToggleCommand}"                    
+                    Style="{StaticResource SfButtonStyle}"
+                    HorizontalOptions="CenterAndExpand"/>
+            </StackLayout>
+            <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
+            <StackLayout Orientation="Vertical" 
+                         BackgroundColor="{StaticResource MdSurface}"
+                         IsVisible="{Binding InSession}">
+
+                <buttons:SfButton Text="I'm Going to the Fridge" 
+                            Command="{Binding ToTheFridgeCommand}"                    
+                            Style="{StaticResource SfButtonStyle}"
+                                    IsVisible="{Binding CanStartOrder}"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="{Binding OrderTaker, StringFormat='{0} is going to the fridge'}" 
+                       Style="{StaticResource LabelPrimaryStyle}" 
+                       FontSize="Large" 
+                       LineBreakMode="WordWrap" 
+                       VerticalOptions="Start"
+                           HorizontalOptions="StartAndExpand"
+                       IsVisible="{Binding TakingOrders}"/>
+                    <buttons:SfButton Text="Cancel" 
+                                      Command="{Binding CancelFridgeCommand}"                    
+                                      Style="{StaticResource SfButtonStyle}"
+                                      HorizontalOptions="End"
+                                      IsVisible="{Binding MeTakingOrders}"/>
+                    <buttons:SfButton Text="Done" 
+                                      Command="{Binding CompleteOrderCommand}"                    
+                                      Style="{StaticResource SfButtonStyle}"
+                                      HorizontalOptions="End"
+                                      IsVisible="{Binding MeTakingOrders}"/>
+                </StackLayout>
+                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
+                <buttons:SfButton Text="I'll have one" 
+                    Command="{Binding GrabOneForMeCommand}"                    
+                    Style="{StaticResource SfButtonStyle}"
+                    IsVisible="{Binding CanOrderOne}"/>
+                <Label Text="{Binding MyItem, StringFormat='You have a {0} on order.'}"  
+                   Style="{StaticResource LabelPrimaryStyle}" 
+                   FontSize="Large" 
+                   LineBreakMode="NoWrap" 
+                   VerticalOptions="Start" 
+                    IsVisible="{Binding InWaiting}"/>
+                <buttons:SfButton Text="{Binding MyItem, StringFormat='Yep, {0} Received'}"
+                    Command="{Binding ItemReceivedCommand}"                    
+                    Style="{StaticResource SfButtonStyle}"
+                    IsVisible="{Binding InWaiting}"/>
+                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
+                <RefreshView x:DataType="local:SessionViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}" IsVisible="{Binding TakingOrders}">
+                    <CollectionView x:Name="ItemsListView"
+                    ItemsSource="{Binding Items}"
+                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Padding="10" x:DataType="local:TickDisplay">
+                                    <StackLayout Orientation="Horizontal">
+                                        <Label Text="*" FontSize="Large" IsVisible="{Binding Ticked}"/>
+                                        <Label Text="{Binding DisplayName}" 
+                                        LineBreakMode="NoWrap" 
+                                        Style="{DynamicResource ListItemTextStyle}" 
+                                        FontSize="Large" />
+                                    </StackLayout>
+                                    <StackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                    NumberOfTapsRequired="1"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:SessionViewModel}}, Path=ItemTapped}"		
+                                    CommandParameter="{Binding .}">
+                                        </TapGestureRecognizer>
+                                    </StackLayout.GestureRecognizers>
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
+                <Label Text="{Binding OrderListText}" 
+                       Style="{StaticResource LabelPrimaryStyle}" 
+                       FontSize="Large" 
+                       LineBreakMode="WordWrap" 
+                       VerticalOptions="Start"
+                       IsVisible="{Binding IsOrders}"/>
+            </StackLayout>
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

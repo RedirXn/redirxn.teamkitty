@@ -14,8 +14,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task DeleteStockItem(string stockName);
         Task<string> CreateNewKitty(string email, string userName, string newKittyName);
         bool AmIAdmin(string email);
-        Task AddNewUser(string newUser);
-        Task TickMeASingle(string email, string personDisplayName, StockItem item);
+        Task AddNewUser(string newUser);        
         Task AddRegisteredUser(string email, string name, string kittyId = null);
         Task RenameMember(string email, string newName);
         Task TickMultiplePeople(List<string> people, StockItem stockItem, int count);
@@ -26,5 +25,14 @@ namespace Redirxn.TeamKitty.Services.Logic
         string GetKittyOnHand();
         Task CombineUsers(string keepUserEmail, string absorbUserEmail);
         Task RecalculateKitty();
+        Task StartTakingOrdersInSession(string userDisplay);
+        Task StartSession();
+        Task OrderItemInSession(string userId, string displayName, string stockItem, string option);
+        Task CancelOrderInSession(string userId);
+        Task ClearAllOpenOrdersInSession();
+        Task CloseOrderTakingInSession();
+        Task ReceivedItemIsSession(string userId);
+        Task EndSession();
+        string GetOrderListText();
     }
 }

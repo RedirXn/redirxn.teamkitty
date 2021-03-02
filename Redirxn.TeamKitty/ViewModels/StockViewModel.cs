@@ -61,7 +61,7 @@ namespace Redirxn.TeamKitty.ViewModels
                     {
                         MainName = item.MainName,
                         Cost = string.Format("{0:C}", item.SalePrice),
-                        Grouping = item.StockGrouping + " " + item.PluralName + " cost about " + string.Format("{0:C}", item.StockPrice),
+                        Grouping = item.StockGrouping + " of " + item.MainName + " cost about " + string.Format("{0:C}", item.StockPrice),
                     };
                     Items.Add(sd);
                 }

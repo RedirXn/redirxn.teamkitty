@@ -17,6 +17,7 @@ namespace Redirxn.TeamKitty.Tests
         private string _kittyReturnCondition = "";
         private string _kittyReturnId;
         private List<JoinCode> _codes;
+        private UserInfo _userDetailToReturn;
         
         public MockDataStore()
         {
@@ -40,6 +41,11 @@ namespace Redirxn.TeamKitty.Tests
             return _codes;
         }
 
+        internal void MakeGetUserDetailReturn(UserInfo userInfo)
+        {
+            _userDetailToReturn = userInfo;
+        }
+
         public async Task<Kitty> GetKitty(string kittyId)
         {
             if (kittyId == _kittyReturnCondition)
@@ -59,7 +65,7 @@ namespace Redirxn.TeamKitty.Tests
 
         public async Task<UserInfo> GetUserDetail(string email)
         {
-            return new UserInfo();
+            return _userDetailToReturn ?? new UserInfo() { Id = email, Name = "oiyioy" };
         }
 
         public void Init(string activeToken)

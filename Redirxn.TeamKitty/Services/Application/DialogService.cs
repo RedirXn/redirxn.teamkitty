@@ -9,6 +9,10 @@ namespace Redirxn.TeamKitty.Services.Application
         {
             await Xamarin.Forms.Application.Current.MainPage.DisplayAlert(title, message, okButton);
         }
+        public async Task<bool> Confirm(string title, string message, string okButton, string cancelButton)
+        {
+            return await Xamarin.Forms.Application.Current.MainPage.DisplayAlert(title, message, okButton, cancelButton);
+        }
 
         public async Task<string> GetSingleMoneyInput(string title, string message)
         {

@@ -53,7 +53,7 @@ namespace Redirxn.TeamKitty.Tests
                 SalePrice = 2.5M
             };
 
-            _vmStock.ItemTapped.Execute(si);
+            _vmStock.ItemTapped.Execute(si);      
 
             Routes.WasNavigatedTo("StockItemPage?FromMainName=Item1").Should().BeTrue();
         }

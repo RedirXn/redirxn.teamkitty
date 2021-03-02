@@ -114,10 +114,8 @@ namespace Redirxn.TeamKitty.Services.Logic
             return Kitty.Administrators.Any(s => s.Equals(email, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task TickMeASingle(string email, string personDisplayName, StockItem item)
+        private void TickMeASingle(Kitty kitty, string email, string personDisplayName, StockItem item)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
-
             var me = new Member
             {
                 Email = email,
@@ -135,9 +133,6 @@ namespace Redirxn.TeamKitty.Services.Logic
             });
 
             kitty = RecalculateLedgerSummary(kitty, email);
-            await _dataStore.SaveKittyToDb(kitty);
-            Kitty = kitty;
-
         }
 
         private Kitty RecalculateLedgerSummary(Kitty kitty, string email)
@@ -340,6 +335,151 @@ namespace Redirxn.TeamKitty.Services.Logic
             }
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
+        }
+
+        public async Task StartTakingOrdersInSession(string userDisplay)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            if (kitty.Session == null || !kitty.Session.IsStarted || !string.IsNullOrWhiteSpace(kitty.Session.PersonTakingOrders))
+            {
+                return;
+            }
+
+            kitty.Session.PersonTakingOrders = userDisplay;
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+
+        public async Task StartSession()
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            if (kitty.Session == null || !kitty.Session.IsStarted)
+            {
+                var sess = new Session { 
+                    IsStarted = true,
+                    Orders = new List<SessionOrder>(),
+                    OrderOptions = kitty.Session.OrderOptions
+                };
+
+                kitty.Session = sess;
+                await _dataStore.SaveKittyToDb(kitty);
+                Kitty = kitty;
+            }
+        }
+        public async Task EndSession()
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            if (kitty.Session.IsStarted)
+            {
+                var sess = new Session
+                {
+                    IsStarted = false,
+                    Orders = new List<SessionOrder>(),
+                    OrderOptions = kitty.Session.OrderOptions
+                };
+
+                kitty.Session = sess;
+                await _dataStore.SaveKittyToDb(kitty);
+                Kitty = kitty;
+            }
+        }
+
+        public async Task OrderItemInSession(string userId, string displayName, string stockItem, string option)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            if (string.IsNullOrWhiteSpace(kitty.Session.PersonTakingOrders))
+            {
+                return;
+            }
+            var os = kitty.Session.Orders.ToList();
+            os.RemoveAll(o => o.PersonId == userId);
+            kitty.Session.Orders = os;
+            kitty.Session.Orders.Add(new SessionOrder
+            {
+                PersonId = userId,
+                PersonDisplayName = displayName,
+                StockItemName = stockItem,
+                OptionName = option,
+                IsDelivered = false
+            });
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+
+        public async Task CancelOrderInSession(string userId)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            var os = kitty.Session.Orders.ToList();
+            os.RemoveAll(o => o.PersonId == userId);
+            kitty.Session.Orders = os;
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+
+        public async Task ClearAllOpenOrdersInSession()
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            kitty.Session.Orders = new List<SessionOrder>();
+            kitty.Session.PersonTakingOrders = string.Empty;
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+
+        public async Task CloseOrderTakingInSession()
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            kitty.Session.PersonTakingOrders = string.Empty;
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+
+        public async Task ReceivedItemIsSession(string userId)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            var i = kitty.Session.Orders.Single(o => o.PersonId == userId);
+            var si = kitty.KittyConfig.StockItems.Single(s => s.MainName == i.StockItemName);
+            
+            TickMeASingle(kitty, i.PersonId, i.PersonDisplayName, si);
+            var os = kitty.Session.Orders.ToList();
+            os.RemoveAll(o => o.PersonId == userId);
+            kitty.Session.Orders = os;
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+        }
+        public string GetOrderListText()
+        {
+            string orderList = string.Empty;
+            foreach (var si in Kitty.KittyConfig.StockItems)
+            {
+                if (!string.IsNullOrEmpty(orderList))
+                {
+                    orderList += Environment.NewLine;
+                }
+                var list = Kitty.Session.Orders.Where(o => o.StockItemName == si.MainName);
+                orderList += si.MainName + " : " + list.Count();
+                if (list.Count() > 0)
+                {
+                    foreach(var o in list)
+                    {
+                        orderList += Environment.NewLine + o.PersonDisplayName;
+                    }
+                }
+            }
+            return orderList;           
         }
     }
 }

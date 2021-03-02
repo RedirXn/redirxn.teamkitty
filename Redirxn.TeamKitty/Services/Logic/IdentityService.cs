@@ -69,5 +69,4 @@ namespace Redirxn.TeamKitty.Services.Logic
             await _dataStore.SaveUserDetailToDb(UserDetail);
         }
     }
-
 }

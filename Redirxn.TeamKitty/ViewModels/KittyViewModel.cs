@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -21,9 +22,20 @@ namespace Redirxn.TeamKitty.ViewModels
         IIdentityService _identityService;
         IDialogService _dialogService;
         IRoutingService _routingService;
+        IInviteService _inviteService;
 
         public ICommand LoadItemsCommand { get; }
         public ICommand AdjustCommand { get; set; }
+        public ICommand ChangeKittyCommand { get; set; }
+        public ICommand CreateKittyCommand { get; set; }
+        public ICommand JoinKittyCommand { get; set; }
+        public ICommand InviteCommand { get; set; }
+        public ICommand AddUserCommand { get; set; }
+        public ICommand CombineCommand { get; set; }
+        public ICommand AssignAdminCommand { get; set; }
+        public ICommand ChangeKittyNameCommand { get; set; }
+        public ICommand RecalculateKittyCommand { get; set; }
+
         public Command<LedgerSummaryLine> ItemTapped { get; }
         public ObservableCollection<LedgerSummaryLine> Items { get; }
 
@@ -62,19 +74,30 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
         public ObservableCollection<ChartDataPoint> KittyMoney { get; set; }
-        public KittyViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
+        public KittyViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null, IInviteService inviteService = null)
         {
             _routingService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
+            _inviteService = inviteService ?? Locator.Current.GetService<IInviteService>();
 
             Items = new ObservableCollection<LedgerSummaryLine>();
 
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<LedgerSummaryLine>(OnItemSelected);
             AdjustCommand = new Command(async () => await AdjustmentRequest());
+            ChangeKittyCommand = new Command(async () => await ChangeKitty());
+            CreateKittyCommand = new Command(async () => await CreateNewKitty());
+            JoinKittyCommand = new Command(async () => await JoinKitty()); 
+            InviteCommand = new Command(async () => await Invite());
+            CombineCommand = new Command(async () => await Combine());
+            AddUserCommand = new Command(async () => await AddUser());
+            AssignAdminCommand = new Command(async () => await AssignAdmin());
+            ChangeKittyNameCommand = new Command(async () => await ChangeKittyName());
+            RecalculateKittyCommand = new Command(async () => await RecalculateKitty());
 
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
         async Task ExecuteLoadItemsCommand()
         {
@@ -102,7 +125,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             IsBusy = true;
             SelectedItem = null;
-            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+            
             CurrentKitty = _kittyService.Kitty?.DisplayName;
             var balance = _kittyService.GetKittyBalance();
             var onHand = _kittyService.GetKittyOnHand();
@@ -147,6 +170,182 @@ namespace Redirxn.TeamKitty.ViewModels
                 await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
 
+        }
+        private async Task ChangeKitty()
+        {
+            try
+            {
+                var kitties = _identityService.UserDetail.KittyNames;
+                var displayKitties = kitties.Select(k => k.Split('|')[1]).ToArray();
+                string nextKittyDisplay = await _dialogService.SelectOption("Choose Kitty", "Cancel", displayKitties);
+
+                if (!string.IsNullOrWhiteSpace(nextKittyDisplay))
+                {
+                    var nextKitty = kitties.First(k => k.EndsWith("|" + nextKittyDisplay));
+                    await _kittyService.LoadKitty(nextKitty);
+                    await _identityService.SetDefaultKitty(nextKitty);
+                    OnAppearing();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        internal async Task CreateNewKitty()
+        {
+            try
+            {
+                string newKittyName = await _dialogService.GetSingleTextInput("Create a Kitty", "Enter the name for your new Kitty:");
+
+                if (!string.IsNullOrWhiteSpace(newKittyName))
+                {
+                    await CreateNewKittyWithName(newKittyName);
+                    await _routingService.NavigateTo($"///main");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+
+        internal async Task CreateNewKittyWithName(string newKittyName)
+        {
+            if (!_identityService.KittyNameExists(newKittyName))
+            {
+                var kittyId = await _kittyService.CreateNewKitty(_identityService.LoginData.Email, _identityService.LoginData.Name, newKittyName);
+                await _identityService.AddMeToKitty(kittyId);
+            }
+        }
+        internal async Task JoinKittyWithCode(string joinCode)
+        {
+            var kittyId = await _inviteService.GetKittyIdWithCode(joinCode);
+            if (!string.IsNullOrEmpty(kittyId))
+            {
+                await _kittyService.AddRegisteredUser(_identityService.LoginData.Email, _identityService.UserDetail.Name, kittyId);
+                await _identityService.AddMeToKitty(kittyId);
+            }
+        }
+        internal async Task JoinKitty()
+        {
+            try
+            {
+                string joinCode = await _dialogService.GetSingleTextInput("Join a Kitty", "Enter the code given to you by the Kitty Administrator:");
+
+                if (!string.IsNullOrWhiteSpace(joinCode))
+                {
+                    await JoinKittyWithCode(joinCode);
+                    await _routingService.NavigateTo($"///main");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        internal async Task AddUser()
+        {
+            try
+            {
+                string newUser = await _dialogService.GetSingleTextInput("Add a Non-App User", "Enter the name for the person:");
+
+                if (!string.IsNullOrWhiteSpace(newUser))
+                {
+                    await AddNewUser(newUser);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+
+        internal async Task Invite()
+        {
+            try
+            {
+                string joinCode = await GetKittyJoinCode();
+                await _dialogService.Alert("Join Code", joinCode + Environment.NewLine + "Advise people to use this code to join your kitty. (expires in 24 hours)", "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        internal async Task Combine()
+        {
+            try
+            {
+                var userlist = _kittyService.Kitty.Ledger.Summary.Select(s => s.Person);
+                if (userlist.Count() < 2) return;
+                var keep = await _dialogService.SelectOption("Select the user that will stay", "Cancel", userlist.Select(u => u.DisplayName).ToArray());
+                if (keep != "Cancel")
+                {
+                    var keepUser = userlist.First(ul => ul.DisplayName == keep);
+                    var absorb = await _dialogService.SelectOption("Select the user that will be removed", "Cancel", userlist.Where(u => u != keepUser).Select(u => u.DisplayName).ToArray());
+                    if (!string.IsNullOrEmpty(absorb))
+                    {
+                        var absorbUser = userlist.First(ul => ul.DisplayName == absorb);
+                        await _kittyService.CombineUsers(keepUser.Email, absorbUser.Email);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        internal Task<string> GetKittyJoinCode()
+        {
+            return _inviteService.GetJoinCode(_kittyService.Kitty.Id);
+        }
+        internal async Task AddNewUser(string newUser)
+        {
+            await _kittyService.AddNewUser(newUser);
+        }
+        private async Task AssignAdmin()
+        {
+            try
+            {
+                //TODO
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        private async Task ChangeKittyName()
+        {
+            try
+            {
+                //TODO
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+        private async Task RecalculateKitty()
+        {
+            try
+            {
+                await _kittyService.RecalculateKitty();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
 
 

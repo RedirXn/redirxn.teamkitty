@@ -15,8 +15,12 @@
 
     <ContentPage.Content>
         <StackLayout BackgroundColor="{StaticResource MdSurface}">
-            <Entry x:Name="CountEach" TextColor="{StaticResource MdOnSurface}" Keyboard="Numeric" Text="{Binding CountTick}" IsTabStop="True" IsVisible="{Binding IsAdmin}"/>
-            <buttons:SfButton HorizontalOptions="End" Text="{Binding ConfirmText}" Style="{StaticResource SfButtonStyle}" Command="{Binding ConfirmCommand}" />
+            <StackLayout Orientation="Horizontal">
+                <Entry x:Name="CountEach" TextColor="{StaticResource MdOnSurface}" 
+                       Keyboard="Numeric" Text="{Binding CountTick}" IsTabStop="True" IsVisible="{Binding IsAdmin}" 
+                       WidthRequest="100" HorizontalOptions="StartAndExpand"/>
+                <buttons:SfButton HorizontalOptions="End" Text="{Binding ConfirmText}" Style="{StaticResource SfButtonStyle}" Command="{Binding ConfirmCommand}" />
+            </StackLayout>
             <Label Text="Tick Them:" Style="{StaticResource LabelSurfaceStyle}" LineBreakMode="NoWrap" FontSize="Large" VerticalOptions="Start" />
             <RefreshView x:DataType="local:MultiTickViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"

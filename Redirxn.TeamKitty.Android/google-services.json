@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "512791967601",
+    "project_id": "teamkitty-df901",
+    "storage_bucket": "teamkitty-df901.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512791967601:android:8da737c490ad0191cea8d0",
+        "android_client_info": {
+          "package_name": "com.redirxn.teamkitty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "512791967601-ilhacn897m5tslo9k9k7m7phukmv8fj6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLYC9LlfHGksSLGML_Z6EKSUZGtYckkAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "512791967601-ilhacn897m5tslo9k9k7m7phukmv8fj6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -73,11 +73,18 @@
     <PackageReference Include="Syncfusion.Xamarin.SfComboBox">
       <Version>18.4.0.39</Version>
     </PackageReference>
+    <PackageReference Include="xamarin.firebase.messaging">
+      <Version>121.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.1931" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
+    <PackageReference Include="xamarin.googleplayservices.base">
+      <Version>117.6.0</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
+    <Compile Include="MyFirebaseIIDService.cs" />
     <Compile Include="Renderers\BorderlessEntryRenderer.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,6 +95,7 @@
     <AndroidAsset Include="Assets\Montserrat-Medium.ttf" />
     <AndroidAsset Include="Assets\Montserrat-Regular.ttf" />
     <AndroidAsset Include="Assets\Montserrat-SemiBold.ttf" />
+    <GoogleServicesJson Include="google-services.json" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />

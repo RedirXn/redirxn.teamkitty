@@ -60,7 +60,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 if (string.IsNullOrEmpty(CurrentKitty))
                 {
-                    await _routingService.NavigateTo($"{nameof(SettingsPage)}");
+                    await _routingService.NavigateTo($"{nameof(KittyPage)}");
                 }
                 else if (string.IsNullOrWhiteSpace(_identityService.UserDetail.Name) || _identityService.UserDetail.Name == _identityService.UserDetail.Id)
                 {

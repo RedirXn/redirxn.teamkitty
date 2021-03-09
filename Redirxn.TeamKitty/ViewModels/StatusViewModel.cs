@@ -20,6 +20,11 @@ namespace Redirxn.TeamKitty.ViewModels
         private IIdentityService _identityService;
         private IDialogService _dialogService;
 
+        public ICommand PayCommand { get; set; }
+        public ICommand ProvideCommand { get; set; }
+        public ICommand LoadTransactionsCommand { get; set; }
+        public ICommand ChangeMyNameCommand { get; set; }
+
         private LedgerSummaryLine _summary;
         private IEnumerable<Transaction> _transactions;
         private bool _loadingFromState;
@@ -69,9 +74,6 @@ namespace Redirxn.TeamKitty.ViewModels
         }
 
         public ObservableCollection<GroupedTransaction> Transactions { get; }
-        public ICommand PayCommand { get; set; }
-        public ICommand ProvideCommand { get; set; }
-        public ICommand LoadTransactionsCommand { get; set; }
 
         public string FromMember
         {
@@ -88,8 +90,11 @@ namespace Redirxn.TeamKitty.ViewModels
             PayCommand = new Command(async () => await PaymentRequest());
             ProvideCommand = new Command(async () => await ProvisionRequest());
             LoadTransactionsCommand = new Command(async () => await ExecuteLoadTransactionsCommand());
+            ChangeMyNameCommand = new Command(async () => await ChangeMyName());
 
-            Transactions = new ObservableCollection<GroupedTransaction>();            
+            Transactions = new ObservableCollection<GroupedTransaction>();
+
+            
         }
         public void OnAppearing()
         {            
@@ -98,11 +103,11 @@ namespace Redirxn.TeamKitty.ViewModels
             if (!_loadingFromState)
             {
                 ReloadSummary(_identityService.LoginData.Email);
-            }
-
-            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+            }            
             IsChangeable = IsAdmin || _summary.Person.Email == _identityService.LoginData.Email;
             MyDisplayName = _summary.Person.DisplayName;
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+            IsChangeable = IsAdmin || _summary.Person.Email == _identityService.LoginData.Email;
             UpdateScreenText();
             _loadingFromState = false;
             IsBusy = true;
@@ -260,6 +265,33 @@ namespace Redirxn.TeamKitty.ViewModels
             }
 
         }
+        internal async Task ChangeMyName()
+        {
+            try
+            {
+                string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");
+
+                if (!string.IsNullOrWhiteSpace(newName))
+                {
+                    await ChangeMyNameTo(newName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+
+        private async Task ChangeMyNameTo(string newName)
+        {
+            if (_kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.DisplayName == newName) == null)
+            {
+                await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
+                await _identityService.Rename(newName);
+            }
+        }
+
         public class WipTransaction
         {
             public Dictionary<string, int> Purchases = new Dictionary<string, int>();

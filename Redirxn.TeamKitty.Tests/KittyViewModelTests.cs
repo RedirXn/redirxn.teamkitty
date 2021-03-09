@@ -6,6 +6,7 @@ using Redirxn.TeamKitty.Models;
 using FluentAssertions;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace Redirxn.TeamKitty.Tests
 {
@@ -13,7 +14,26 @@ namespace Redirxn.TeamKitty.Tests
     public class KittyViewModelTests : BaseTest
     {
         private const string myEmail = "me@myplace";
+        private const string TestCode = "MYCODE";
+
         private KittyViewModel _vmKitty;
+
+        //public override void Setup()
+        //{
+        //    base.Setup();
+
+        //    var fakeLoginData = new NetworkAuthData
+        //    {
+        //        Email = myEmail,
+        //        Id = myEmail
+        //    };
+        //    Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
+        //}
+        //private async Task SetupAsync()
+        //{
+        //    vmSettings = new SettingsViewModel();
+        //    await vmSettings.Init();
+        //}
 
         [SetUp]
         public override void Setup()
@@ -67,6 +87,81 @@ namespace Redirxn.TeamKitty.Tests
             Locator.Current.GetService<IKittyService>().GetKittyBalance().Should().Be("100.00");
         }
 
+        [Test]
+        public void CanCreateANewKitty()
+        {
+            
+
+            string NewKittyName = CreateTestKitty();
+
+            AssertKittyIsCreatedCorrectly(NewKittyName);
+            AssertIWasMadeAdmin();
+        }
+
+        private string CreateTestKitty()
+        {
+            const string NewKittyName = "TestKittyName";
+            Dialogs.Make_TextInputReturn(NewKittyName);
+
+            _vmKitty.CreateKittyCommand.Execute(null);
+            return NewKittyName;
+        }
+
+        private void AssertIWasMadeAdmin()
+        {
+            Db.SaveKittyToDbKitty.Administrators.Should().Contain(myEmail);
+        }
+
+        private void AssertKittyIsCreatedCorrectly(string NewKittyName)
+        {
+            Db.SaveKittyToDbKitty.DisplayName.Should().Be(NewKittyName);
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.Email == myEmail).Should().NotBeNull();
+            Db.SaveUserDetailToDbUser.DefaultKitty.Should().Be(Db.SaveKittyToDbKitty.Id);
+            Db.SaveUserDetailToDbUser.Id.Should().Be(myEmail);
+            Db.SaveUserDetailToDbUser.KittyNames.Should().Contain(Db.SaveKittyToDbKitty.Id);
+        }
+
+        [Test]
+        public void CanJoinAnExistingKitty()
+        {
+
+            const string testId = "IhaveAn|Id";
+            Dialogs.Make_TextInputReturn(TestCode);
+            Db.MakeGetKittyIdReturnThisId(testId);
+            Db.MakeGetKittyReturn(new Kitty { Id = testId }, testId);
+
+            _vmKitty.JoinKittyCommand.Execute(null);
+
+            AssertKittyIsCreatedCorrectly("Id");
+        }
+        [Test]
+        public void CanInviteToKitty()
+        {
+
+            string NewKittyName = CreateTestKitty();
+            Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = TestCode, Expiry = DateTime.Now.AddHours(1) } });
+
+            _vmKitty.InviteCommand.Execute(null);
+
+            Dialogs.AlertText.Should().NotBeNullOrEmpty();
+            Db.DeletedCodes.First(jc => jc.Code == TestCode).Should().NotBeNull();
+            Db.JoinCodeThatWasSet.Should().Be(TestCode);
+        }
+        [Test]
+        public void CanAddUser()
+        {
+            
+            string NewKittyName = CreateTestKitty();
+            const string userName = "NewGuy";
+            Dialogs.Make_TextInputReturn(userName);
+            Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
+
+            _vmKitty.AddUserCommand.Execute(null);
+
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.Email == userName).Should().NotBeNull();
+        }
+
 
         private Kitty GetFakeAdminKitty()
         {
@@ -105,5 +200,6 @@ namespace Redirxn.TeamKitty.Tests
                 Id = "me|FakeKitty"
             };
         }
+
     }
 }

@@ -16,7 +16,6 @@ namespace Redirxn.TeamKitty
             Routing.RegisterRoute("main/login", typeof(LoginPage));
             Routing.RegisterRoute(nameof(StockItemPage), typeof(StockItemPage));
             Routing.RegisterRoute(nameof(StockPage), typeof(StockPage));
-            Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
             Routing.RegisterRoute(nameof(MultiTickPage), typeof(MultiTickPage));
             Routing.RegisterRoute(nameof(KittyPage), typeof(KittyPage));
             Routing.RegisterRoute(nameof(StatusPage), typeof(StatusPage));

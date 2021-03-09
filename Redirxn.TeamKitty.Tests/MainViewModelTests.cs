@@ -27,13 +27,13 @@ namespace Redirxn.TeamKitty.Tests
         }
 
         [Test]
-        public async Task KittylessRedirectsToSettingsPage()
+        public async Task KittylessRedirectsToKittyPage()
         {
             _vmMain = new MainViewModel();
 
             await _vmMain.Init();
 
-            Routes.WasNavigatedTo(nameof(SettingsPage)).Should().BeTrue();
+            Routes.WasNavigatedTo(nameof(KittyPage)).Should().BeTrue();
         }
 
         [Test]

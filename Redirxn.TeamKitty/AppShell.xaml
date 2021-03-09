@@ -45,9 +45,8 @@
                       Title="Tick" />
         <ShellContent Title="Status" Icon="tab_money.png" ContentTemplate="{DataTemplate local:StatusPage}" />
         <ShellContent Title="Kitty" Icon="tab_money.png" ContentTemplate="{DataTemplate local:KittyPage}" />
-	<ShellContent Title="Session" Icon="tab_money.png" ContentTemplate="{DataTemplate local:SessionPage}" />
+	    <!--ShellContent Title="Session" Icon="tab_money.png" ContentTemplate="{DataTemplate local:SessionPage}" -->
         <ShellContent Title="Stock" Icon="tab_stock.png" ContentTemplate="{DataTemplate local:StockPage}" />
-        <ShellContent Title="Settings" Icon="tab_settings.png" ContentTemplate="{DataTemplate local:SettingsPage}" />
     </TabBar>
 
 </Shell>

@@ -4,10 +4,22 @@
              x:Class="Redirxn.TeamKitty.Views.KittyPage"
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
              xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"      
-             xmlns:converter="clr-namespace:Redirxn.TeamKitty.Converters"
-             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
+             xmlns:controls="clr-namespace:Redirxn.TeamKitty.Controls"
              Title="{Binding CurrentKitty}">
-    
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Change Kitty" Command="{Binding ChangeKittyCommand}" Order="Secondary"/>
+        <ToolbarItem Text="Create a New Kitty" Command="{Binding CreateKittyCommand}" Order="Secondary"/>
+        <ToolbarItem Text="Join a Kitty" Command="{Binding JoinKittyCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="---" IsVisible="{Binding IsAdmin}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Adjust Balance" IsVisible="{Binding IsAdmin}" Command="{Binding AdjustCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Invite an App User" IsVisible="{Binding IsAdmin}" Command="{Binding InviteCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Add a non-App User" IsVisible="{Binding IsAdmin}" Command="{Binding AddUserCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Combine Users" IsVisible="{Binding IsAdmin}" Command="{Binding CombineCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Set a User As Admin" IsVisible="{Binding IsAdmin}" Command="{Binding AssignAdminCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Change Kitty Name" IsVisible="{Binding IsAdmin}" Command="{Binding ChangeKittyNameCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Recalculate Kitty" IsVisible="{Binding IsAdmin}" Command="{Binding RecalculateKittyCommand}" Order="Secondary"/>
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -28,13 +40,6 @@
                 Style="{StaticResource LabelSurfaceStyle}"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
-            <buttons:SfButton Text="Adjust Kitty Balance" 
-                    Command="{Binding AdjustCommand}"
-                    IsVisible="{Binding IsAdmin}" 
-                    Style="{StaticResource SfButtonAdminStyle}"
-                    Margin="8,16,8,16"
-                    CornerRadius="20"
-                    HeightRequest="40"/>
             <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
             <RefreshView x:DataType="local:KittyViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"

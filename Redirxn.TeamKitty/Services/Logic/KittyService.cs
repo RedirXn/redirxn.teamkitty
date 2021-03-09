@@ -174,7 +174,7 @@ namespace Redirxn.TeamKitty.Services.Logic
                 lsl.Provisions[si.MainName] = pvCount;
                 lsl.ProvisionText += (!string.IsNullOrEmpty(lsl.ProvisionText) ? "  " : string.Empty) + pvCount + " " + si.StockGrouping + " of " + si.MainName;
             }
-            lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Payment).Sum(t => t.TransactionAmount);
+            lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && (t.TransactionType == TransactionType.Payment || t.TransactionType == TransactionType.CarryOver)).Sum(t => t.TransactionAmount);
             lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);            
             lsl.TotalAdjustments = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Adjustment).Sum(t => t.TransactionAmount);
             lsl.Balance = lsl.TotalPaid - lsl.TotalOwed;            
@@ -490,6 +490,43 @@ namespace Redirxn.TeamKitty.Services.Logic
                 }
             }
             return orderList;           
+        }
+
+        public async Task CombineKitties(string oldKittyId, string newKittyId)
+        {
+            var kitty1 = await _dataStore.GetKitty(oldKittyId);
+            kitty1.KittyConfig.Locked = true;
+            await _dataStore.SaveKittyToDb(kitty1);
+
+            var kitty2 = await _dataStore.GetKitty(newKittyId);
+
+            foreach (var lsl in kitty1.Ledger.Summary)
+            {
+                var existLsl = kitty2.Ledger.Summary.FirstOrDefault(l => l.Person.Email == lsl.Person.Email);
+                if (existLsl == null)
+                {
+                    kitty2.Ledger.Summary.Add(new LedgerSummaryLine
+                    {
+                        Person = lsl.Person,
+                        Balance = 0M,
+                        TotalOwed = 0M,
+                        TotalPaid = 0M
+                    });
+                }
+                
+                kitty2.Ledger.Transactions.Add(new Transaction()
+                {
+                    Date = DateTime.Now,
+                    Person = (existLsl != null) ? existLsl.Person : lsl.Person,
+                    TransactionType = TransactionType.CarryOver,
+                    TransactionAmount = lsl.Balance,
+                    TransactionName = kitty1.DisplayName
+                });
+                RecalculateLedgerSummary(kitty2, lsl.Person.Email);
+            }
+            
+            await _dataStore.SaveKittyToDb(kitty2);
+            Kitty = kitty2;
         }
     }
 }

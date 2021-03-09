@@ -35,6 +35,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public ICommand AssignAdminCommand { get; set; }
         public ICommand ChangeKittyNameCommand { get; set; }
         public ICommand RecalculateKittyCommand { get; set; }
+        public ICommand CarryoverKittyCommand { get; set; }
 
         public Command<LedgerSummaryLine> ItemTapped { get; }
         public ObservableCollection<LedgerSummaryLine> Items { get; }
@@ -96,6 +97,7 @@ namespace Redirxn.TeamKitty.ViewModels
             AssignAdminCommand = new Command(async () => await AssignAdmin());
             ChangeKittyNameCommand = new Command(async () => await ChangeKittyName());
             RecalculateKittyCommand = new Command(async () => await RecalculateKitty());
+            CarryoverKittyCommand = new Command(async () => await CarryoverKitty());
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
         }
@@ -212,13 +214,15 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
 
-        internal async Task CreateNewKittyWithName(string newKittyName)
+        internal async Task<string> CreateNewKittyWithName(string newKittyName)
         {
             if (!_identityService.KittyNameExists(newKittyName))
             {
                 var kittyId = await _kittyService.CreateNewKitty(_identityService.LoginData.Email, _identityService.LoginData.Name, newKittyName);
                 await _identityService.AddMeToKitty(kittyId);
+                return kittyId;
             }
+            return null;
         }
         internal async Task JoinKittyWithCode(string joinCode)
         {
@@ -310,6 +314,7 @@ namespace Redirxn.TeamKitty.ViewModels
         internal async Task AddNewUser(string newUser)
         {
             await _kittyService.AddNewUser(newUser);
+            OnAppearing(); 
         }
         private async Task AssignAdmin()
         {
@@ -348,6 +353,52 @@ namespace Redirxn.TeamKitty.ViewModels
             }
         }
 
+        private async Task CarryoverKitty()
+        {
+            try
+            {
+                var carryType = await _dialogService.SelectOption("Create a New Kitty or Combine with Existing", "Cancel", new[] { "New Kitty", "Combine" });
+                if (carryType == "Cancel")
+                {
+                    return;
+                }
+                var oldKittyId = _kittyService.Kitty.Id;
+                if (carryType == "New Kitty")
+                {                    
+                    var newKittyName = await _dialogService.GetSingleTextInput("New Kitty Name", "Enter a name for the new Kitty:");
+                    if (string.IsNullOrWhiteSpace(newKittyName))
+                    {
+                        return;
+                    }
+                    var newKittyId = await CreateNewKittyWithName(newKittyName);
+                    await CombineKitties(oldKittyId, newKittyId);
+                }
+                if (carryType == "Combine")
+                {
+                    var kitties = _identityService.UserDetail.KittyNames;
+                    var displayKitties = kitties.Select(k => k.Split('|')[1]).ToArray();
+                    var newKittyName = await _dialogService.SelectOption("Select the Kitty to Carry Over to:", "Cancel", displayKitties);
+                    if (newKittyName == "Cancel")
+                    {
+                        return;
+                    }
+                    var newKitty = kitties.First(k => k.EndsWith("|" + newKittyName));
+                    await CombineKitties(oldKittyId, newKitty);
+                }
 
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
+        }
+
+        private async Task CombineKitties(string oldKittyId, string newKittyId)
+        {
+            await _kittyService.CombineKitties(oldKittyId, newKittyId);
+            await _identityService.SetDefaultKitty(newKittyId);
+            OnAppearing();
+        }
     }
 }

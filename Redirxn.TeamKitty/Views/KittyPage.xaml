@@ -18,6 +18,7 @@
         <controls:BindableToolbarItem Text="Set a User As Admin" IsVisible="{Binding IsAdmin}" Command="{Binding AssignAdminCommand}" Order="Secondary"/>
         <controls:BindableToolbarItem Text="Change Kitty Name" IsVisible="{Binding IsAdmin}" Command="{Binding ChangeKittyNameCommand}" Order="Secondary"/>
         <controls:BindableToolbarItem Text="Recalculate Kitty" IsVisible="{Binding IsAdmin}" Command="{Binding RecalculateKittyCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Carryover Kitty" IsVisible="{Binding IsAdmin}" Command="{Binding CarryoverKittyCommand}" Order="Secondary"/>
     </ContentPage.ToolbarItems>
 
     <ContentPage.Resources>

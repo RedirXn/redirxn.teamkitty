@@ -35,6 +35,6 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task ReceivedItemIsSession(string userId);
         Task EndSession();
         string GetOrderListText();
-        
+        Task CombineKitties(string oldKittyId, string newKittyId);
     }
 }

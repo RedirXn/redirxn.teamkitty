@@ -6,6 +6,7 @@
         Payment,
         Provision,
         Expense,
-        Adjustment
+        Adjustment,
+        CarryOver
     }
 }

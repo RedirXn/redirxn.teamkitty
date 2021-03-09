@@ -18,23 +18,6 @@ namespace Redirxn.TeamKitty.Tests
 
         private KittyViewModel _vmKitty;
 
-        //public override void Setup()
-        //{
-        //    base.Setup();
-
-        //    var fakeLoginData = new NetworkAuthData
-        //    {
-        //        Email = myEmail,
-        //        Id = myEmail
-        //    };
-        //    Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
-        //}
-        //private async Task SetupAsync()
-        //{
-        //    vmSettings = new SettingsViewModel();
-        //    await vmSettings.Init();
-        //}
-
         [SetUp]
         public override void Setup()
         {
@@ -90,8 +73,6 @@ namespace Redirxn.TeamKitty.Tests
         [Test]
         public void CanCreateANewKitty()
         {
-            
-
             string NewKittyName = CreateTestKitty();
 
             AssertKittyIsCreatedCorrectly(NewKittyName);
@@ -149,8 +130,7 @@ namespace Redirxn.TeamKitty.Tests
         }
         [Test]
         public void CanAddUser()
-        {
-            
+        {            
             string NewKittyName = CreateTestKitty();
             const string userName = "NewGuy";
             Dialogs.Make_TextInputReturn(userName);
@@ -161,7 +141,6 @@ namespace Redirxn.TeamKitty.Tests
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.Email == userName).Should().NotBeNull();
         }
-
 
         private Kitty GetFakeAdminKitty()
         {

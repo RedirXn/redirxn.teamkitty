@@ -162,11 +162,13 @@ namespace Redirxn.TeamKitty.ViewModels
             var payments = (w.Payments > 0M) ? "Paid: " + string.Format("{0:C}", w.Payments) : string.Empty;
             var purchases = (w.Purchases.Count > 0) ? "Purchased: " + string.Join(", ", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
             var provisions = (w.Provisions.Count > 0) ? "Supplied: " + string.Join(", ", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
+            var carried = (w.Carries.Count > 0) ? "Carried Over: " + string.Join(", ", w.Carries.Select(kv => string.Format("{0:C}", kv.Value) + " " +  kv.Key).ToArray()) : string.Empty;
 
             string summary = purchases + ((!string.IsNullOrEmpty(purchases) && !string.IsNullOrEmpty(provisions)) ? Environment.NewLine : string.Empty) +
-                provisions + ((!string.IsNullOrEmpty(purchases + provisions) && !string.IsNullOrEmpty(payments)) ? Environment.NewLine : string.Empty) + 
-                payments;
-            
+                provisions + ((!string.IsNullOrEmpty(purchases + provisions) && !string.IsNullOrEmpty(payments)) ? Environment.NewLine : string.Empty) +
+                payments + ((!string.IsNullOrEmpty(purchases + provisions + payments) && !string.IsNullOrEmpty(carried)) ? Environment.NewLine : string.Empty) +
+                carried;
+
             return new GroupedTransaction()
             {
                 Date = w.Date,
@@ -295,6 +297,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             public Dictionary<string, int> Purchases = new Dictionary<string, int>();
             public Dictionary<string, int> Provisions = new Dictionary<string, int>();
+            public Dictionary<string, decimal> Carries = new Dictionary<string, decimal>();
             public decimal Payments = 0M;
             public decimal Total = 0M;
             public string Date = string.Empty;
@@ -303,14 +306,29 @@ namespace Redirxn.TeamKitty.ViewModels
             {                
                 switch (item.TransactionType)
                 {
-                    case TransactionType.Payment:
+                    case TransactionType.CarryOver:
                         {
+                            if (Carries.ContainsKey(item.TransactionName))
+                            {
+                                Carries[item.TransactionName] += item.TransactionAmount;
+                            }
+                            else
+                            {
+                                Carries[item.TransactionName] = item.TransactionAmount;
+                            }
                             Date = date;
                             Payments += item.TransactionAmount;
                             Total += item.TransactionAmount;
                             break;
                         }
-                    case TransactionType.Purchase:
+                    case TransactionType.Payment:
+                        {                            
+                            Date = date;
+                            Payments += item.TransactionAmount;
+                            Total += item.TransactionAmount;
+                            break;
+                        }
+                    case TransactionType.Purchase:                    
                         {
                             if (Purchases.ContainsKey(item.TransactionName))
                             {

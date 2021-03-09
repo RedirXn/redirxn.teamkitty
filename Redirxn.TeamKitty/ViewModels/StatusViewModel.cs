@@ -92,9 +92,7 @@ namespace Redirxn.TeamKitty.ViewModels
             LoadTransactionsCommand = new Command(async () => await ExecuteLoadTransactionsCommand());
             ChangeMyNameCommand = new Command(async () => await ChangeMyName());
 
-            Transactions = new ObservableCollection<GroupedTransaction>();
-
-            
+            Transactions = new ObservableCollection<GroupedTransaction>();           
         }
         public void OnAppearing()
         {            
@@ -200,6 +198,7 @@ namespace Redirxn.TeamKitty.ViewModels
                         await _kittyService.ProvideStock(_summary.Person.Email, sItem);
                     }
                     ReloadSummary(_summary.Person.Email);
+                    UpdateScreenText();
                 }
             }
             catch (Exception ex)

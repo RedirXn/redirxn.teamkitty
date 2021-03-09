@@ -172,7 +172,7 @@ namespace Redirxn.TeamKitty.Services.Logic
                 lsl.PurchaseText += (!string.IsNullOrEmpty(lsl.PurchaseText) ? "  " : string.Empty) + pCount + " " + si.PluralName;
 
                 lsl.Provisions[si.MainName] = pvCount;
-                lsl.ProvisionText += (!string.IsNullOrEmpty(lsl.ProvisionText) ? "  " : string.Empty) + pvCount + " " + si.StockGrouping;
+                lsl.ProvisionText += (!string.IsNullOrEmpty(lsl.ProvisionText) ? "  " : string.Empty) + pvCount + " " + si.StockGrouping + " of " + si.MainName;
             }
             lsl.TotalPaid = kitty.Ledger.Transactions.Where(t => t.Person.Email == lsl.Person.Email && t.TransactionType == TransactionType.Payment).Sum(t => t.TransactionAmount);
             lsl.TotalOwed = lsl.Purchases.Sum(p => p.ProductTotal);            

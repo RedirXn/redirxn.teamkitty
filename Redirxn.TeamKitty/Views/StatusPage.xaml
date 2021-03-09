@@ -64,7 +64,7 @@
                             <StackLayout Padding="10" x:DataType="local:GroupedTransaction" Orientation="Vertical">
                                 <Label Text="{Binding Date}" 
                                             LineBreakMode="NoWrap" 
-                                            Style="{DynamicResource ListItemTextStyle}" 
+                                            Style="{DynamicResource LabelBackgroundStyle}" 
                                             FontSize="Small" 
                                             HorizontalOptions="StartAndExpand"/>
                                 <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="3" HorizontalOptions="Fill"/>

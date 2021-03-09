@@ -320,7 +320,13 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             try
             {
-                //TODO
+                var users = _kittyService.GetNonAdminAppUsers();
+                var user = await _dialogService.SelectOption("Select Person to Make Admin", "Cancel", users.Select(u => u.Item2).ToArray());
+                if (user != "Cancel")
+                {
+                    var adminUser = users.First(u => u.Item2 == user);
+                    await _kittyService.MakeUserAdmin(adminUser.Item1);
+                }
             }
             catch (Exception ex)
             {

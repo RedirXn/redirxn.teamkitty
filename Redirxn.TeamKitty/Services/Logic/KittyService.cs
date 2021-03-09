@@ -528,5 +528,24 @@ namespace Redirxn.TeamKitty.Services.Logic
             await _dataStore.SaveKittyToDb(kitty2);
             Kitty = kitty2;
         }
+
+        public Tuple<string, string>[] GetNonAdminAppUsers()
+        {
+            return Kitty.Ledger.Summary.Where(lsl => lsl.Person.Email != lsl.Person.DisplayName && !Kitty.Administrators.Contains(lsl.Person.Email))
+                .Select(lsl => Tuple.Create(lsl.Person.Email, lsl.Person.DisplayName)).ToArray();
+        }
+
+        public async Task MakeUserAdmin(string adminUser)
+        {
+            var kitty = await _dataStore.GetKitty(Kitty.Id);
+
+            var admins = kitty.Administrators.ToList();
+            admins.Add(adminUser);
+            kitty.Administrators = admins;
+
+            await _dataStore.SaveKittyToDb(kitty);
+            Kitty = kitty;
+
+        }
     }
 }

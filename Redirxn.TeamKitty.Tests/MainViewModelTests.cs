@@ -111,6 +111,7 @@ namespace Redirxn.TeamKitty.Tests
 
             Routes.WasNavigatedTo("MultiTickPage?FromMainName=Item1").Should().BeTrue();
         }
+
         private void PrepareKitty()
         {
             var fakeKitty = GetFakeAdminKitty();

@@ -36,5 +36,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task EndSession();
         string GetOrderListText();
         Task CombineKitties(string oldKittyId, string newKittyId);
+        Tuple<string, string>[] GetNonAdminAppUsers();
+        Task MakeUserAdmin(string adminUser);
     }
 }

@@ -141,7 +141,19 @@ namespace Redirxn.TeamKitty.Tests
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.Email == userName).Should().NotBeNull();
         }
+        [Test]
+        public void CanMakeSomeoneAdmin()
+        {
+            string NewKittyName = CreateTestKitty();
+            const string userEmail = "AppUser email";
+            Db.SaveKittyToDbKitty.Ledger.Summary.Add(new LedgerSummaryLine { Person = new Member { DisplayName = "App User", Email = userEmail } });
+            Dialogs.Make_SelectOptionReturn("App User");
+            Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
 
+            _vmKitty.AssignAdminCommand.Execute(null);
+
+            Db.SaveKittyToDbKitty.Administrators.Should().Contain(userEmail);
+        }
         private Kitty GetFakeAdminKitty()
         {
             return new Kitty

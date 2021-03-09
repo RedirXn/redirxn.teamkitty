@@ -21,29 +21,43 @@
                        WidthRequest="100" HorizontalOptions="StartAndExpand"/>
                 <buttons:SfButton HorizontalOptions="End" Text="{Binding ConfirmText}" Style="{StaticResource SfButtonStyle}" Command="{Binding ConfirmCommand}" />
             </StackLayout>
-            <Label Text="Tick Them:" Style="{StaticResource LabelSurfaceStyle}" LineBreakMode="NoWrap" FontSize="Large" VerticalOptions="Start" />
+            <Label Text="Start Ticking" Style="{StaticResource LabelSurfaceStyle}" LineBreakMode="NoWrap" FontSize="Large" HorizontalOptions="CenterAndExpand" />
             <RefreshView x:DataType="local:MultiTickViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
-                    ItemsSource="{Binding Items}"
-                    SelectionMode="None">
+                                ItemsSource="{Binding Items}"
+                                SelectionMode="None"
+                                ItemSizingStrategy="MeasureAllItems">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2"/>
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <StackLayout Padding="10" x:DataType="local:TickDisplay">
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="*" FontSize="Large" Style="{StaticResource LabelSurfaceStyle}" IsVisible="{Binding Ticked}"/>
+                            <Grid Padding="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="80" />
+                                </Grid.RowDefinitions>
+                                <Image Aspect="AspectFill" Source="{Binding .} "/>
+                                <StackLayout Padding="10" x:DataType="local:TickDisplay">
+                                    <BoxView BackgroundColor="{StaticResource MdPrimary}" HeightRequest="3" Margin="3" HorizontalOptions="Fill" IsVisible="{Binding Ticked}"/>                                       
                                     <Label Text="{Binding DisplayName}" 
-                                        LineBreakMode="NoWrap" 
-                                        Style="{DynamicResource ListItemTextStyle}" 
-                                        FontSize="Large" />
+                                           HorizontalOptions="CenterAndExpand"
+                                           VerticalOptions="CenterAndExpand"
+                                           LineBreakMode="NoWrap" 
+                                           Style="{DynamicResource ListItemTextStyle}" 
+                                           FontSize="Large" />                                         
+                                    <BoxView BackgroundColor="{StaticResource MdPrimary}" HeightRequest="3" Margin="3" HorizontalOptions="Fill" IsVisible="{Binding Ticked}"/>
+                                    <StackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer NumberOfTapsRequired="1"
+                                                              Command="{Binding Source={RelativeSource AncestorType={x:Type local:MultiTickViewModel}}, Path=ItemTapped}"		
+                                                              CommandParameter="{Binding .}">
+                                        </TapGestureRecognizer>
+                                    </StackLayout.GestureRecognizers>
                                 </StackLayout>
-                                <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer 
-                                    NumberOfTapsRequired="1"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:MultiTickViewModel}}, Path=ItemTapped}"		
-                                    CommandParameter="{Binding .}">
-                                    </TapGestureRecognizer>
-                                </StackLayout.GestureRecognizers>
-                            </StackLayout>
+                            </Grid>
+
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

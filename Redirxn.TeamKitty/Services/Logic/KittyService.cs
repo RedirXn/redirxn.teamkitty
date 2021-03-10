@@ -192,6 +192,8 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task RenameMember(string email, string newName)
         {
+            // Only supports renaming self / app users
+            // Non App users should create new and combine
             var kitty = await _dataStore.GetKitty(Kitty.Id);
 
             var me = new Member

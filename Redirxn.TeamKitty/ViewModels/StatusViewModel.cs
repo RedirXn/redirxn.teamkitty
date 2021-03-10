@@ -272,7 +272,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");
 
-                if (!string.IsNullOrWhiteSpace(newName))
+                if (!string.IsNullOrWhiteSpace(newName) && newName != "Cancel")
                 {
                     await ChangeMyNameTo(newName);
                 }

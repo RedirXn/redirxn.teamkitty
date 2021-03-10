@@ -87,6 +87,7 @@ namespace Redirxn.TeamKitty.Tests
             _vmStatus.ChangeMyNameCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Should().NotBeNull();
+            Db.SaveKittyToDbKitty.Ledger.Summary.FirstOrDefault(ls => ls.Person.DisplayName == userName).Person.Email.Should().NotBe(userName);
             Db.SaveUserDetailToDbUser.Name.Should().Be(userName);
         }
         private Kitty GetFakeAdminKitty()

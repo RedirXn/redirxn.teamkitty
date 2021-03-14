@@ -105,7 +105,6 @@ namespace Redirxn.TeamKitty.Tests
         [Test]
         public void CanJoinAnExistingKitty()
         {
-
             const string testId = "IhaveAn|Id";
             Dialogs.Make_TextInputReturn(TestCode);
             Db.MakeGetKittyIdReturnThisId(testId);

@@ -90,7 +90,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         }
         public async Task AddUser(string name, string email = null, string kittyId = null)
         {
-            Kitty kitty = await GetUnlockedKitty();
+            Kitty kitty = await GetUnlockedKitty(kittyId);
 
             if ((email == null && kitty.Ledger.Summary.Any(m => m.Person.DisplayName == name))
                 || (kitty.Ledger.Summary.Any(m => m.Person.Email == email)))

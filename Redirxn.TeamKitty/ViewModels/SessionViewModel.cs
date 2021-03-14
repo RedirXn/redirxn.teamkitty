@@ -132,6 +132,8 @@ namespace Redirxn.TeamKitty.ViewModels
             ItemReceivedCommand = new Command(async () => await ExecuteItemReceivedCommand());
             AddOptionCommand = new Command<string>(async (s) => await ExecuteAddOptionCommand(s));
             RemoveOptionCommand = new Command<string>(async (s) => await ExecuteRemoveOptionCommand(s));
+
+            StateRefresh();
         }
 
         internal string[] GetStockItems()

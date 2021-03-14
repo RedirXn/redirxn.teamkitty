@@ -28,7 +28,6 @@ namespace Redirxn.TeamKitty.Tests
         [Test]
         public async Task NoSessionCanInitialiseCorrectly()
         {
-            Dialogs.Make_TextInputReturn("DisplayName");
             await PrepareKitty();
             
             _vmSession.InSession.Should().BeFalse();
@@ -175,7 +174,6 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanAddAnOption()
         {
             await PrepareKitty();
-            Dialogs.Make_TextInputReturn("DisplayName");
             Dialogs.Make_TextInputReturn("Option1");
 
             _vmSession.SessionToggleCommand.Execute(null);
@@ -187,7 +185,6 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanAddOptions()
         {
             await PrepareKitty();
-            Dialogs.Make_TextInputReturn("DisplayName");
             Dialogs.Make_TextInputReturn("Option1");
             Dialogs.Make_TextInputReturn("Option2");
             Dialogs.Make_TextInputReturn("Option3");
@@ -206,7 +203,6 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanRemoveAnOption(string remove, string expect1, string expect2)
         {
             await PrepareKitty();
-            Dialogs.Make_TextInputReturn("DisplayName");
             Dialogs.Make_TextInputReturn("Option1");
             Dialogs.Make_TextInputReturn("Option2");
             Dialogs.Make_TextInputReturn("Option3");
@@ -225,7 +221,6 @@ namespace Redirxn.TeamKitty.Tests
         public async Task CanEmptyOptions()
         {
             await PrepareKitty();
-            Dialogs.Make_TextInputReturn("DisplayName");
             Dialogs.Make_TextInputReturn("Option1");
             Dialogs.Make_TextInputReturn("Option2");
             Dialogs.Make_TextInputReturn("Option3");
@@ -245,8 +240,7 @@ namespace Redirxn.TeamKitty.Tests
             var fakeKitty = GetFakeAdminKitty();
             Db.MakeGetKittyReturn(fakeKitty);
             await Locator.Current.GetService<IKittyService>().LoadKitty("anything");
-            _vmSession = new SessionViewModel();
-            await _vmSession.Init();
+            _vmSession = new SessionViewModel();            
         }
         private Kitty GetFakeAdminKitty()
         {

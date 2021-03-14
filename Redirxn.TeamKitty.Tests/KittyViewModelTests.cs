@@ -105,6 +105,7 @@ namespace Redirxn.TeamKitty.Tests
         [Test]
         public void CanJoinAnExistingKitty()
         {
+
             const string testId = "IhaveAn|Id";
             Dialogs.Make_TextInputReturn(TestCode);
             Db.MakeGetKittyIdReturnThisId(testId);
@@ -117,6 +118,7 @@ namespace Redirxn.TeamKitty.Tests
         [Test]
         public void CanInviteToKitty()
         {
+
             string NewKittyName = CreateTestKitty();
             Db.MakeGetCodesForKittyIdReturn(new List<JoinCode> { new JoinCode { Code = TestCode, Expiry = DateTime.Now.AddHours(1) } });
 

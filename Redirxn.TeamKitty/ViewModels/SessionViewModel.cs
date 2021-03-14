@@ -41,12 +41,6 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
-        private bool _isKittyLocked = false;
-        public bool IsKittyLocked
-        {
-            get => _isKittyLocked;
-            set { SetProperty(ref _isKittyLocked, value); }
-        }
         private string _sessionButtonText;
         public string SessionButtonText
         {
@@ -149,7 +143,6 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
                 }
                 CurrentKitty = _kittyService.Kitty?.DisplayName;
-
 
                 if (string.IsNullOrEmpty(CurrentKitty))
                 {

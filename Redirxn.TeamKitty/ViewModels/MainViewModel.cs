@@ -31,12 +31,7 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
-        private bool _isKittyLocked = false;
-        public bool IsKittyLocked
-        {
-            get => _isKittyLocked;
-            set { SetProperty(ref _isKittyLocked, value); }
-        }
+
         public MainViewModel(IIdentityService identityService = null, IKittyService kittyService = null, IDialogService dialogService = null, IInviteService inviteService = null, IRoutingService routingService = null)
         {            
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
@@ -49,7 +44,6 @@ namespace Redirxn.TeamKitty.ViewModels
 
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<StockItemCount>(async (item) => await OnItemSelected(item));
-            IsKittyLocked = _kittyService.Kitty.KittyConfig.Locked;
         }
 
         public async Task Init()

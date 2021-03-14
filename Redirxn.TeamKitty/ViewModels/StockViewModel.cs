@@ -26,12 +26,6 @@ namespace Redirxn.TeamKitty.ViewModels
         public ICommand ItemTapped { get; }
         public ObservableCollection<StockDisplay> Items { get; }
         public bool IsAdmin { get; set; } = false;
-        private bool _isKittyLocked = false;
-        public bool IsKittyLocked
-        {
-            get => _isKittyLocked;
-            set { SetProperty(ref _isKittyLocked, value); }
-        }
         private string _currentKitty = string.Empty;
         public string CurrentKitty
         {

@@ -20,7 +20,6 @@ namespace Redirxn.TeamKitty.Views
         {
             base.OnAppearing();
 
-            await ViewModel.Init();
             LoadToolBarItems();
         }
 

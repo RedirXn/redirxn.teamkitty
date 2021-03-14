@@ -134,37 +134,6 @@ namespace Redirxn.TeamKitty.ViewModels
             RemoveOptionCommand = new Command<string>(async (s) => await ExecuteRemoveOptionCommand(s));
         }
 
-        public async Task Init()
-        {
-            try 
-            {
-                if(_kittyService.Kitty == null && !string.IsNullOrWhiteSpace(_identityService.UserDetail.DefaultKitty))
-                {
-                    await _kittyService.LoadKitty(_identityService.UserDetail.DefaultKitty);
-                }
-                CurrentKitty = _kittyService.Kitty?.DisplayName;
-
-                if (string.IsNullOrEmpty(CurrentKitty))
-                {
-                    await _routingService.NavigateTo($"{nameof(KittyPage)}");
-                }
-                else if (string.IsNullOrWhiteSpace(_identityService.UserDetail.Name) || _identityService.UserDetail.Name == _identityService.UserDetail.Id)
-                {
-                    var newName = await _dialogService.GetSingleTextInput("Name Input", "What name would you like to appear in the kitty as?");
-                    if (newName != null)
-                    {
-                        await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
-                        await _identityService.Rename(newName);
-                    }
-                }
-                StateRefresh();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-                await _dialogService.Alert("Error", "An Error Occurred", "OK");
-            }
-        }
         internal string[] GetStockItems()
         {
             return _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.MainName).ToArray();
@@ -268,6 +237,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     item.Ticked = false;
                 }
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
@@ -277,114 +250,208 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private async Task ExecuteSessionToggleCommand()
         {
-            if (InSession)
+            try
             {
-                await _kittyService.EndSession();
+                if (InSession)
+                {
+                    await _kittyService.EndSession();
+                }
+                else
+                {
+                    await _kittyService.StartSession();
+                }
+
+                StateRefresh();
+                /*
+                 * End Session needs a confirm if open orders
+                 * 
+                 */
             }
-            else
+            catch (ApplicationException ex)
             {
-                await _kittyService.StartSession();               
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
-            
-            StateRefresh();
-            /*
-             * End Session needs a confirm if open orders
-             * 
-             */
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         private async Task ExecuteToTheFridgeCommand()
         {
-            var p = _kittyService.Kitty.Ledger.Summary.Single(lsl => lsl.Person.Email == _identityService.LoginData.Email).Person;
-            await _kittyService.StartTakingOrdersInSession(p.DisplayName);
-            StateRefresh();
+            try
+            {
+                var p = _kittyService.Kitty.Ledger.Summary.Single(lsl => lsl.Person.Email == _identityService.LoginData.Email).Person;
+                await _kittyService.StartTakingOrdersInSession(p.DisplayName);
+                StateRefresh();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
 
 
         private async Task ExecuteCancelFridgeCommand()
         {
-            var doCancel = await _dialogService.Confirm("Cancel", "Cancel all open orders?", "Yes, Cancel", "No, Keep Taking");
-            if (doCancel)
+            try
             {
-                await _kittyService.ClearAllOpenOrdersInSession();
+                var doCancel = await _dialogService.Confirm("Cancel", "Cancel all open orders?", "Yes, Cancel", "No, Keep Taking");
+                if (doCancel)
+                {
+                    await _kittyService.ClearAllOpenOrdersInSession();
+                }
+                StateRefresh();
             }
-            StateRefresh();
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         private async Task ExecuteCompleteOrderCommand()
-        {            
-            await _kittyService.CloseOrderTakingInSession();
+        {
+            try
+            {
+                await _kittyService.CloseOrderTakingInSession();
 
 
-            /*
-             * Show Summary of Order
-             * 
-             * cancel individual line litems on order
-             * 
-             * Show Delivered Button
-             * 
-             */
-            StateRefresh();
+                /*
+                 * Show Summary of Order
+                 * 
+                 * cancel individual line litems on order
+                 * 
+                 * Show Delivered Button
+                 * 
+                 */
+                StateRefresh();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         private async Task ExecuteGrabOneForMeCommand()
         {
-            var orderItem = await _dialogService.SelectOption("Order: ", "Cancel", _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.MainName).ToArray());
-            if (orderItem == "Cancel")
+            try
             {
-                return;
-            }
-            
-            string option = string.Empty;
-            if (_kittyService.Kitty.Session.OrderOptions.ContainsKey(orderItem))
-            {
-                option = await _dialogService.SelectOption("Select One", "Cancel", _kittyService.Kitty.Session.OrderOptions[orderItem].Split('|'));
-                if (option == "Cancel")
+                var orderItem = await _dialogService.SelectOption("Order: ", "Cancel", _kittyService.Kitty.KittyConfig.StockItems.Select(si => si.MainName).ToArray());
+                if (orderItem == "Cancel")
                 {
                     return;
                 }
-            }
 
-            var p = _kittyService.Kitty.Ledger.Summary.First(lsl => lsl.Person.Email == _identityService.LoginData.Email).Person;
-            await _kittyService.OrderItemInSession(p.Email, p.DisplayName,  orderItem, option);                
-            
-            StateRefresh();
+                string option = string.Empty;
+                if (_kittyService.Kitty.Session.OrderOptions.ContainsKey(orderItem))
+                {
+                    option = await _dialogService.SelectOption("Select One", "Cancel", _kittyService.Kitty.Session.OrderOptions[orderItem].Split('|'));
+                    if (option == "Cancel")
+                    {
+                        return;
+                    }
+                }
+
+                var p = _kittyService.Kitty.Ledger.Summary.First(lsl => lsl.Person.Email == _identityService.LoginData.Email).Person;
+                await _kittyService.OrderItemInSession(p.Email, p.DisplayName, orderItem, option);
+
+                StateRefresh();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         private async Task ExecuteItemReceivedCommand()
         {
-            await _kittyService.ReceivedItemIsSession(_identityService.LoginData.Email);
-            StateRefresh();            
+            try
+            {
+                await _kittyService.ReceivedItemIsSession(_identityService.LoginData.Email);
+                StateRefresh();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
+            }
         }
         private async Task ExecuteAddOptionCommand(string sItem)
         {
-            string newOption = await _dialogService.GetSingleTextInput("Name for " + sItem + " option", "Option:");
-            if (!string.IsNullOrWhiteSpace(newOption))
+            try { 
+                string newOption = await _dialogService.GetSingleTextInput("Name for " + sItem + " option", "Option:");
+                if (!string.IsNullOrWhiteSpace(newOption))
+                {
+                    if (_kittyService.Kitty.Session.OrderOptions.ContainsKey(sItem))
+                    {
+                        _kittyService.Kitty.Session.OrderOptions[sItem] += '|' + newOption;
+                    }
+                    else
+                    {
+                        _kittyService.Kitty.Session.OrderOptions[sItem] = newOption;
+                    }
+                }
+            }
+            catch (ApplicationException ex)
             {
-                if (_kittyService.Kitty.Session.OrderOptions.ContainsKey(sItem))
-                {
-                    _kittyService.Kitty.Session.OrderOptions[sItem] += '|' + newOption;
-                }
-                else
-                {
-                    _kittyService.Kitty.Session.OrderOptions[sItem] = newOption;
-                }
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
         private async Task ExecuteRemoveOptionCommand(string sItem)
         {
-            string newOption = await _dialogService.GetSingleTextInput("Name of " + sItem + " option to remove", "Option:");
-            if (!string.IsNullOrWhiteSpace(newOption))
+            try
             {
-                if (_kittyService.Kitty.Session.OrderOptions.ContainsKey(sItem))
+                string newOption = await _dialogService.GetSingleTextInput("Name of " + sItem + " option to remove", "Option:");
+                if (!string.IsNullOrWhiteSpace(newOption))
                 {
-                    _kittyService.Kitty.Session.OrderOptions[sItem] = _kittyService.Kitty.Session.OrderOptions[sItem].Replace("|" + newOption, "");
-                    _kittyService.Kitty.Session.OrderOptions[sItem] = _kittyService.Kitty.Session.OrderOptions[sItem].Replace(newOption + "|", "");
-                    _kittyService.Kitty.Session.OrderOptions[sItem] = _kittyService.Kitty.Session.OrderOptions[sItem].Replace(newOption, "");
-                    if (string.IsNullOrWhiteSpace(_kittyService.Kitty.Session.OrderOptions[sItem]))
+                    if (_kittyService.Kitty.Session.OrderOptions.ContainsKey(sItem))
                     {
-                        _kittyService.Kitty.Session.OrderOptions.Remove(sItem);
+                        _kittyService.Kitty.Session.OrderOptions[sItem] = _kittyService.Kitty.Session.OrderOptions[sItem].Replace("|" + newOption, "");
+                        _kittyService.Kitty.Session.OrderOptions[sItem] = _kittyService.Kitty.Session.OrderOptions[sItem].Replace(newOption + "|", "");
+                        _kittyService.Kitty.Session.OrderOptions[sItem] = _kittyService.Kitty.Session.OrderOptions[sItem].Replace(newOption, "");
+                        if (string.IsNullOrWhiteSpace(_kittyService.Kitty.Session.OrderOptions[sItem]))
+                        {
+                            _kittyService.Kitty.Session.OrderOptions.Remove(sItem);
+                        }
                     }
+
                 }
-                
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                await _dialogService.Alert("Error", "An Error Occurred", "OK");
             }
         }
-
     }
 }

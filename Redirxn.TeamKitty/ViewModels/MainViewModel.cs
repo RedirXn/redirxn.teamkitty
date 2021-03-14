@@ -76,6 +76,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     await ExecuteLoadItemsCommand();
                 }
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
@@ -153,6 +157,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     default:
                         break;
                 }
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
             catch (Exception ex)
             {

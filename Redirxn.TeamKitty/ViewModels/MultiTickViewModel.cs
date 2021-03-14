@@ -94,6 +94,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _routingService.GoBack();
                 }
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());

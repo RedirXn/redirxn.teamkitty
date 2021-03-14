@@ -30,7 +30,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task SaveStockItem(StockItem stockItem)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if (kitty.KittyConfig.StockItems.Any(si => si.MainName == stockItem.MainName))
             {
@@ -47,7 +47,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task DeleteStockItem(string mainName)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if (!kitty.KittyConfig.StockItems.Any(si => si.MainName == mainName))
             {
@@ -90,7 +90,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         }
         public async Task AddUser(string name, string email = null, string kittyId = null)
         {
-            var kitty = await _dataStore.GetKitty(kittyId ?? Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if ((email == null && kitty.Ledger.Summary.Any(m => m.Person.DisplayName == name))
                 || (kitty.Ledger.Summary.Any(m => m.Person.Email == email)))
@@ -116,12 +116,23 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task TickMeASingle(string email, string name, StockItem item)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             TickSomeoneASingle(kitty, email, name, item);
 
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
+        }
+
+        private async Task<Kitty> GetUnlockedKitty(string kittyId)
+        {
+            var kitty = await _dataStore.GetKitty(kittyId);
+            if (kitty.KittyConfig.Locked) { throw new ApplicationException("Cannot change a Kitty that is locked"); }
+            return kitty;
+        }
+        private async Task<Kitty> GetUnlockedKitty()
+        {
+            return await GetUnlockedKitty(Kitty.Id);
         }
 
         private void TickSomeoneASingle(Kitty kitty, string email, string personDisplayName, StockItem item)
@@ -194,7 +205,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         {
             // Only supports renaming self / app users
             // Non App users should create new and combine
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             var me = new Member
             {
@@ -223,7 +234,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task TickMultiplePeople(List<string> people, StockItem item, int count)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
             List<string> emails = new List<string>(people.Count());
             foreach (var p in people)
             {
@@ -250,8 +261,8 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task MakePayment(string email, decimal amount)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
-                        
+            Kitty kitty = await GetUnlockedKitty();
+
             var me = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email).Person;
 
             kitty.Ledger.Transactions.Add(new Transaction
@@ -271,7 +282,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         }
         public async Task AdjustBalanceBy(string email, decimal amount)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             var me = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email).Person;
 
@@ -293,7 +304,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task ProvideStock(string email, StockItem sItem)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             var sl = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
             var me = sl.Person;
@@ -323,7 +334,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task CombineUsers(string keepUserEmail, string absorbUserEmail)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             kitty.Ledger.Summary = kitty.Ledger.Summary.Where(lsl => lsl.Person.Email != absorbUserEmail).ToList();
 
@@ -340,7 +351,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         }
         public async Task RecalculateKitty()
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
             foreach (var lsl in kitty.Ledger.Summary)
             {
                 RecalculateLedgerSummary(kitty, lsl.Person.Email);
@@ -351,7 +362,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task StartTakingOrdersInSession(string userDisplay)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if (kitty.Session == null || !kitty.Session.IsStarted || !string.IsNullOrWhiteSpace(kitty.Session.PersonTakingOrders))
             {
@@ -366,7 +377,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task StartSession()
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if (kitty.Session == null || !kitty.Session.IsStarted)
             {
@@ -383,7 +394,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         }
         public async Task EndSession()
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if (kitty.Session.IsStarted)
             {
@@ -402,7 +413,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task OrderItemInSession(string userId, string displayName, string stockItem, string option)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             if (string.IsNullOrWhiteSpace(kitty.Session.PersonTakingOrders))
             {
@@ -426,7 +437,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task CancelOrderInSession(string userId)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             var os = kitty.Session.Orders.ToList();
             os.RemoveAll(o => o.PersonId == userId);
@@ -438,7 +449,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task ClearAllOpenOrdersInSession()
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             kitty.Session.Orders = new List<SessionOrder>();
             kitty.Session.PersonTakingOrders = string.Empty;
@@ -449,7 +460,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task CloseOrderTakingInSession()
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             kitty.Session.PersonTakingOrders = string.Empty;
 
@@ -459,7 +470,7 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task ReceivedItemIsSession(string userId)
         {
-            var kitty = await _dataStore.GetKitty(Kitty.Id);
+            Kitty kitty = await GetUnlockedKitty();
 
             var i = kitty.Session.Orders.Single(o => o.PersonId == userId);
             var si = kitty.KittyConfig.StockItems.Single(s => s.MainName == i.StockItemName);
@@ -496,16 +507,16 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task CombineKitties(string oldKittyId, string newKittyId)
         {
-            var kitty1 = await _dataStore.GetKitty(oldKittyId);
-            kitty1.KittyConfig.Locked = true;
-            await _dataStore.SaveKittyToDb(kitty1);
+            var kitty1 = await GetUnlockedKitty(oldKittyId);
+            var kitty2 = await GetUnlockedKitty(newKittyId);
 
-            var kitty2 = await _dataStore.GetKitty(newKittyId);
+            kitty1.KittyConfig.Locked = true;
+            await _dataStore.SaveKittyToDb(kitty1);            
 
             foreach (var lsl in kitty1.Ledger.Summary)
             {
-                var existLsl = kitty2.Ledger.Summary.FirstOrDefault(l => l.Person.Email == lsl.Person.Email);
-                if (existLsl == null)
+                var newPerson = kitty2.Ledger.Summary.FirstOrDefault(l => l.Person.Email == lsl.Person.Email)?.Person;
+                if (newPerson == null)
                 {
                     kitty2.Ledger.Summary.Add(new LedgerSummaryLine
                     {
@@ -514,20 +525,32 @@ namespace Redirxn.TeamKitty.Services.Logic
                         TotalOwed = 0M,
                         TotalPaid = 0M
                     });
+                    newPerson = lsl.Person;
                 }
                 
-                kitty2.Ledger.Transactions.Add(new Transaction()
+                kitty2.Ledger.Transactions.Add(new Transaction
                 {
                     Date = DateTime.Now,
-                    Person = (existLsl != null) ? existLsl.Person : lsl.Person,
+                    Person = newPerson,
                     TransactionType = TransactionType.CarryOver,
                     TransactionAmount = lsl.Balance,
                     TransactionName = kitty1.DisplayName
                 });
-                RecalculateLedgerSummary(kitty2, lsl.Person.Email);
+                RecalculateLedgerSummary(kitty2, newPerson.Email);
+
+                kitty1.Ledger.Transactions.Add(new Transaction
+                {
+                    Date = DateTime.Now,
+                    Person = lsl.Person,
+                    TransactionType = TransactionType.CarryOver,
+                    TransactionAmount = -(lsl.Balance),
+                    TransactionName = kitty2.DisplayName
+                });
+                RecalculateLedgerSummary(kitty1, lsl.Person.Email);
             }
             
             await _dataStore.SaveKittyToDb(kitty2);
+            await _dataStore.SaveKittyToDb(kitty1);
             Kitty = kitty2;
         }
 

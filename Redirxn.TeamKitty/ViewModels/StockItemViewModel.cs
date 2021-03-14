@@ -90,6 +90,10 @@ namespace Redirxn.TeamKitty.ViewModels
                 await _kittyService.SaveStockItem(stockItem);
                 await ClosePage();
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
@@ -130,6 +134,10 @@ namespace Redirxn.TeamKitty.ViewModels
                 // ToDO: confirmation, or check not already in use.
                 await _kittyService.DeleteStockItem(MainName);
                 await ClosePage();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
             catch (Exception ex)
             {

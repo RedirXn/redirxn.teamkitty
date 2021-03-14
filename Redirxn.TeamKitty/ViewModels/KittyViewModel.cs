@@ -328,6 +328,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     await _kittyService.MakeUserAdmin(adminUser.Item1);
                 }
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
@@ -340,6 +344,10 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 //TODO
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
@@ -351,6 +359,10 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             {
                 await _kittyService.RecalculateKitty();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
             catch (Exception ex)
             {
@@ -392,6 +404,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     await CombineKitties(oldKittyId, newKitty);
                 }
 
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
             catch (Exception ex)
             {

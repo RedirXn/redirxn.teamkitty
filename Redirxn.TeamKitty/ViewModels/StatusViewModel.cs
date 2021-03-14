@@ -203,6 +203,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     UpdateScreenText();
                 }
             }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
@@ -222,6 +226,10 @@ namespace Redirxn.TeamKitty.ViewModels
                 }
                 ReloadSummary(_summary.Person.Email);
                 UpdateScreenText();
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
             catch (Exception ex)
             {
@@ -256,7 +264,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 MyDisplayName = item.Person.DisplayName;
                 _summary = item;
-                _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == _summary.Person.Email).OrderBy(t => t.Date);
+                _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == _summary.Person.Email).OrderByDescending(t => t.Date);
                 UpdateScreenText();
             }
             catch (Exception ex)
@@ -276,6 +284,10 @@ namespace Redirxn.TeamKitty.ViewModels
                 {
                     await ChangeMyNameTo(newName);
                 }
+            }
+            catch (ApplicationException ex)
+            {
+                await _dialogService.Alert("Error", ex.Message, "OK");
             }
             catch (Exception ex)
             {

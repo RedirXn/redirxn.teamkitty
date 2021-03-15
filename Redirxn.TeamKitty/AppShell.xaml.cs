@@ -19,6 +19,7 @@ namespace Redirxn.TeamKitty
             Routing.RegisterRoute(nameof(MultiTickPage), typeof(MultiTickPage));
             Routing.RegisterRoute(nameof(KittyPage), typeof(KittyPage));
             Routing.RegisterRoute(nameof(StatusPage), typeof(StatusPage));
+            Routing.RegisterRoute(nameof(HistoryPage), typeof(HistoryPage));
 
             BindingContext = this;
         }

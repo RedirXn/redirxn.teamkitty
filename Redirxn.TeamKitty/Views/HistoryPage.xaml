@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
+             xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
+             xmlns:controls="clr-namespace:Redirxn.TeamKitty.Controls"
+             Title="{Binding CurrentKitty}"
+             x:Class="Redirxn.TeamKitty.Views.HistoryPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SfForms\Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="{StaticResource MdSurface}">
+            <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
+
+            <RefreshView x:DataType="local:HistoryViewModel" Command="{Binding LoadTransactionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+                <CollectionView x:Name="TransactionsListView"
+                                ItemsSource="{Binding Transactions}"
+                                IsGrouped="True"
+                                SelectionMode="None">
+                    <CollectionView.GroupHeaderTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding Name}"
+                                   x:DataType="local:DatedGroupedTransaction"
+                                   Style="{DynamicResource LabelPrimaryStyle}" 
+                                   FontSize="Small"
+                                   FontAttributes="Italic" />
+                        </DataTemplate>
+                    </CollectionView.GroupHeaderTemplate>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout Padding="10" x:DataType="local:GroupedTransaction" Orientation="Vertical">
+                                <Label Text="{Binding Person}" 
+                                            LineBreakMode="NoWrap" 
+                                            Style="{DynamicResource LabelBackgroundStyle}" 
+                                            FontSize="Small" 
+                                            HorizontalOptions="StartAndExpand"/>
+                                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="3" HorizontalOptions="Fill"/>
+                                <StackLayout Orientation="Horizontal">
+                                    <StackLayout Orientation="Vertical" Padding="3">
+                                        <Label Text="{Binding Summary}" 
+                                            LineBreakMode="WordWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Small"
+                                            HorizontalOptions="StartAndExpand"
+                                               VerticalOptions="CenterAndExpand"/>
+                                    </StackLayout>                                    
+                                    <Label Text="{Binding DayTotal}" 
+                                            LineBreakMode="NoWrap"
+                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            FontSize="Large"
+                                            HorizontalOptions="EndAndExpand"
+                                            VerticalOptions="CenterAndExpand"/>
+                                </StackLayout>
+                                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -14,7 +14,7 @@ using Xamarin.Forms;
 namespace Redirxn.TeamKitty.ViewModels
 {
     [QueryProperty(nameof(FromMember), nameof(FromMember))]
-    public class StatusViewModel : BaseViewModel
+    public partial class StatusViewModel : BaseViewModel
     {
         private IKittyService _kittyService;
         private IIdentityService _identityService;
@@ -114,7 +114,8 @@ namespace Redirxn.TeamKitty.ViewModels
         private async void ReloadSummary(string email)
         {
             _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
-            _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email).OrderByDescending(t => t.Date);
+            _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email && t.TransactionType != TransactionType.Adjustment)
+                .OrderByDescending(t => t.Date);
             await ExecuteLoadTransactionsCommand();
         }
 
@@ -134,14 +135,14 @@ namespace Redirxn.TeamKitty.ViewModels
                         var date = item.Date.ToString("ddd, MMM d, yyyy");
                         if (date != w.Date && !string.IsNullOrEmpty(w.Date))
                         {
-                            Transactions.Add(GroupedTranFromWip(w));
+                            Transactions.Add(w.ToGroupedTran());
                             w = new WipTransaction();
                         }                        
                         w.UpdateFromTransaction(date, item);
                     }
                     if (!string.IsNullOrEmpty(w.Date))
                     {
-                        Transactions.Add(GroupedTranFromWip(w));
+                        Transactions.Add(w.ToGroupedTran());
                     }
                 }
             }
@@ -154,27 +155,6 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 IsBusy = false;
             }
-        }
-
-
-        private GroupedTransaction GroupedTranFromWip(WipTransaction w)
-        {
-            var payments = (w.Payments > 0M) ? "Paid: " + string.Format("{0:C}", w.Payments) : string.Empty;
-            var purchases = (w.Purchases.Count > 0) ? "Purchased: " + string.Join(", ", w.Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
-            var provisions = (w.Provisions.Count > 0) ? "Supplied: " + string.Join(", ", w.Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
-            var carried = (w.Carries.Count > 0) ? "Carried Over: " + string.Join(", ", w.Carries.Select(kv => string.Format("{0:C}", kv.Value) + " " +  kv.Key).ToArray()) : string.Empty;
-
-            string summary = purchases + ((!string.IsNullOrEmpty(purchases) && !string.IsNullOrEmpty(provisions)) ? Environment.NewLine : string.Empty) +
-                provisions + ((!string.IsNullOrEmpty(purchases + provisions) && !string.IsNullOrEmpty(payments)) ? Environment.NewLine : string.Empty) +
-                payments + ((!string.IsNullOrEmpty(purchases + provisions + payments) && !string.IsNullOrEmpty(carried)) ? Environment.NewLine : string.Empty) +
-                carried;
-
-            return new GroupedTransaction()
-            {
-                Date = w.Date,
-                DayTotal = (w.Total != 0M) ? string.Format("{0:C}", w.Total) : string.Empty,
-                Summary = summary
-            };
         }
 
         private void UpdateScreenText()
@@ -304,83 +284,5 @@ namespace Redirxn.TeamKitty.ViewModels
                 await _identityService.Rename(newName);
             }
         }
-
-        public class WipTransaction
-        {
-            public Dictionary<string, int> Purchases = new Dictionary<string, int>();
-            public Dictionary<string, int> Provisions = new Dictionary<string, int>();
-            public Dictionary<string, decimal> Carries = new Dictionary<string, decimal>();
-            public decimal Payments = 0M;
-            public decimal Total = 0M;
-            public string Date = string.Empty;
-
-            public void UpdateFromTransaction(string date, Transaction item)
-            {                
-                switch (item.TransactionType)
-                {
-                    case TransactionType.CarryOver:
-                        {
-                            if (Carries.ContainsKey(item.TransactionName))
-                            {
-                                Carries[item.TransactionName] += item.TransactionAmount;
-                            }
-                            else
-                            {
-                                Carries[item.TransactionName] = item.TransactionAmount;
-                            }
-                            Date = date;
-                            Payments += item.TransactionAmount;
-                            Total += item.TransactionAmount;
-                            break;
-                        }
-                    case TransactionType.Payment:
-                        {                            
-                            Date = date;
-                            Payments += item.TransactionAmount;
-                            Total += item.TransactionAmount;
-                            break;
-                        }
-                    case TransactionType.Purchase:                    
-                        {
-                            if (Purchases.ContainsKey(item.TransactionName))
-                            {
-                                Purchases[item.TransactionName] += item.TransactionCount;
-                            }
-                            else
-                            {
-                                Purchases[item.TransactionName] = item.TransactionCount;
-                            }
-                            Date = date;
-                            Total -= item.TransactionAmount;
-                            break;
-                        }
-                    case TransactionType.Provision:
-                        {
-                            if (Provisions.ContainsKey(item.TransactionName))
-                            {
-                                Provisions[item.TransactionName] += item.TransactionCount;
-                            }
-                            else
-                            {
-                                Provisions[item.TransactionName] = item.TransactionCount;
-                            }
-                            Date = date;
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }
-            }
-
-        }
-    }
-
-    public class GroupedTransaction
-    {
-        public string Date { get; set; }        
-        public string Summary { get; set; }
-        public string DayTotal { get; set; }
     }
 }

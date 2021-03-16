@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
              xmlns:buttons="clr-namespace:Syncfusion.XForms.Buttons;assembly=Syncfusion.Buttons.XForms"
              xmlns:controls="clr-namespace:Redirxn.TeamKitty.Controls"
+             x:DataType="local:StatusViewModel"
              Title="{Binding CurrentKitty}"
              x:Class="Redirxn.TeamKitty.Views.StatusPage">
     <ContentPage.ToolbarItems>

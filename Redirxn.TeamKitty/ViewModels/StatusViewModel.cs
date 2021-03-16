@@ -92,7 +92,9 @@ namespace Redirxn.TeamKitty.ViewModels
             LoadTransactionsCommand = new Command(async () => await ExecuteLoadTransactionsCommand());
             ChangeMyNameCommand = new Command(async () => await ChangeMyName());
 
-            Transactions = new ObservableCollection<GroupedTransaction>();           
+            Transactions = new ObservableCollection<GroupedTransaction>();
+            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+            IsChangeable = IsAdmin;
         }
         public void OnAppearing()
         {            
@@ -102,10 +104,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 ReloadSummary(_identityService.LoginData.Email);
             }            
-            IsChangeable = IsAdmin || _summary.Person.Email == _identityService.LoginData.Email;
             MyDisplayName = _summary.Person.DisplayName;
-            IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
-            IsChangeable = IsAdmin || _summary.Person.Email == _identityService.LoginData.Email;
             UpdateScreenText();
             _loadingFromState = false;
             IsBusy = true;

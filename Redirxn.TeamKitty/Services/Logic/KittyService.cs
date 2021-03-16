@@ -209,6 +209,11 @@ namespace Redirxn.TeamKitty.Services.Logic
             // Non App users should create new and combine
             Kitty kitty = await GetUnlockedKitty();
 
+            if (kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.DisplayName == newName) != null)
+            {
+                throw new ApplicationException("That name is already in use.");
+            }
+
             var me = new Member
             {
                 Email = email,

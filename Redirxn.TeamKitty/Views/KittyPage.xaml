@@ -5,6 +5,7 @@
              xmlns:local="clr-namespace:Redirxn.TeamKitty.ViewModels"  
              xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"      
              xmlns:controls="clr-namespace:Redirxn.TeamKitty.Controls"
+             x:DataType="local:KittyViewModel"
              Title="{Binding CurrentKitty}">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Change Kitty" Command="{Binding ChangeKittyCommand}" Order="Secondary"/>
@@ -42,7 +43,7 @@
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
             <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5"/>
-            <RefreshView x:DataType="local:KittyViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+            <RefreshView Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
                         ItemsSource="{Binding Items}"
                         SelectionMode="None">

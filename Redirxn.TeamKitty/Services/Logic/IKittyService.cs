@@ -35,7 +35,7 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task ReceivedItemIsSession(string userId);
         Task EndSession();
         string GetOrderListText();
-        Task CombineKitties(string oldKittyId, string newKittyId);
+        Task CombineKitties(string oldKittyId, string newKittyId, string userEmail);
         Tuple<string, string>[] GetNonAdminAppUsers();
         Task MakeUserAdmin(string adminUser);
     }

@@ -512,7 +512,7 @@ namespace Redirxn.TeamKitty.Services.Logic
             return orderList;           
         }
 
-        public async Task CombineKitties(string oldKittyId, string newKittyId)
+        public async Task CombineKitties(string oldKittyId, string newKittyId, string userEmail)
         {
             var kitty1 = await GetUnlockedKitty(oldKittyId);
             var kitty2 = await GetUnlockedKitty(newKittyId);
@@ -552,10 +552,21 @@ namespace Redirxn.TeamKitty.Services.Logic
                     TransactionType = TransactionType.CarryOver,
                     TransactionAmount = -(lsl.Balance),
                     TransactionName = kitty2.DisplayName
-                });
+                }) ;
                 RecalculateLedgerSummary(kitty1, lsl.Person.Email);
             }
-            
+
+            var person = kitty2.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == userEmail).Person;
+            kitty2.Ledger.Transactions.Add(new Transaction
+            {
+                Date = DateTime.Now,
+                Person = person,
+                TransactionType = TransactionType.Adjustment,
+                TransactionAmount = kitty1.Ledger.Summary.Sum(lsl => lsl.TotalOwed) + kitty1.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments),
+                TransactionName = kitty1.DisplayName
+            });
+
+
             await _dataStore.SaveKittyToDb(kitty2);
             await _dataStore.SaveKittyToDb(kitty1);
             Kitty = kitty2;

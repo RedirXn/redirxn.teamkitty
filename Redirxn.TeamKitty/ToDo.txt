@@ -1,2 +1,5 @@
 ﻿
 * Change Kitty Name
+    Will require change to Kitty Id : has knock on effects
+* Remember facebook login
+    Will need a logout button

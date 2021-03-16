@@ -418,7 +418,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private async Task CombineKitties(string oldKittyId, string newKittyId)
         {
-            await _kittyService.CombineKitties(oldKittyId, newKittyId);
+            await _kittyService.CombineKitties(oldKittyId, newKittyId, _identityService.UserDetail.Id);
             await _identityService.SetDefaultKitty(newKittyId);
             OnAppearing();
         }

@@ -118,7 +118,9 @@ namespace Redirxn.TeamKitty.Services.Logic
         {
             Kitty kitty = await GetUnlockedKitty();
 
-            TickSomeoneASingle(kitty, email, name, item);
+            var dName = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email)?.Person.DisplayName;
+
+            TickSomeoneASingle(kitty, email, dName ?? name, item);
 
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;

@@ -146,7 +146,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 Items.Clear();
 
-                foreach (var item in _kittyService.Kitty?.Ledger.Summary)
+                foreach (var item in _kittyService.Kitty?.Ledger.Summary.OrderByDescending(lsl => lsl.TotalOwed))
                 {
                     Items.Add(new TickDisplay
                     {

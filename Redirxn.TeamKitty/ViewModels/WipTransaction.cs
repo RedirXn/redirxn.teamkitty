@@ -90,7 +90,7 @@ namespace Redirxn.TeamKitty.ViewModels
             var purchases = (Purchases.Count > 0) ? "Purchased: " + string.Join(", ", Purchases.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
             var provisions = (Provisions.Count > 0) ? "Supplied: " + string.Join(", ", Provisions.Select(kv => kv.Value + " " + kv.Key).ToArray()) : string.Empty;
             var carried = (Carries.Count > 0) ? "Carried Over: " + string.Join(", ", Carries.Select(kv => string.Format("{0:C}", kv.Value) + " " + kv.Key).ToArray()) : string.Empty;
-            var adjustments = (Adjustments > 0M) ? "Adjusted: " + string.Format("{0:C}", Adjustments) : string.Empty;
+            var adjustments = (Adjustments != 0M) ? "Adjusted: " + string.Format("{0:C}", Adjustments) : string.Empty;
 
             string summary = purchases + ((!string.IsNullOrEmpty(purchases) && !string.IsNullOrEmpty(provisions)) ? Environment.NewLine : string.Empty) +
                 provisions + ((!string.IsNullOrEmpty(purchases + provisions) && !string.IsNullOrEmpty(payments)) ? Environment.NewLine : string.Empty) +

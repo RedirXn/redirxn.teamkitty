@@ -54,21 +54,19 @@
                                     <StackLayout Orientation="Vertical">
                                         <Label Text="{Binding Person.DisplayName}" 
                                                 LineBreakMode="NoWrap" 
-                                                Style="{DynamicResource ListItemTextStyle}" 
-                                                FontSize="Large"
-                                                FontAttributes="Bold"
+                                                Style="{DynamicResource LabelPrimaryStyle}" 
+                                                FontSize="Medium"
+                                               FontAttributes="Italic"
                                                 HorizontalOptions="StartAndExpand"/>
                                         <Label Text="{Binding PurchaseText}"                                                
                                                 LineBreakMode="NoWrap" 
                                                 Style="{DynamicResource ListItemTextStyle}" 
                                                 FontSize="Small"
-                                                FontAttributes="Italic"
                                                 HorizontalOptions="StartAndExpand"/>
                                         <Label Text="{Binding ProvisionText}" 
                                                 LineBreakMode="NoWrap" 
                                                 Style="{DynamicResource ListItemTextStyle}" 
                                                 FontSize="Small"
-                                                FontAttributes="Italic"
                                                 HorizontalOptions="StartAndExpand"/>
                                     </StackLayout>
                                     <Label Text="{Binding Balance, StringFormat='{0:C}'}" 

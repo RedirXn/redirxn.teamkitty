@@ -1,3 +1,2 @@
 ﻿
-* Tile the kitty page?
 * Change Kitty Name

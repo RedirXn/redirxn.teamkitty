@@ -108,7 +108,7 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             {
                 Items.Clear();
-                foreach (var item in _kittyService.Kitty.Ledger.Summary)
+                foreach (var item in _kittyService.Kitty.Ledger.Summary.OrderBy(lsl => lsl.Person.DisplayName))
                 {
                     Items.Add(item);
                 }

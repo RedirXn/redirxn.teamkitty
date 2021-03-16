@@ -34,17 +34,18 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <StackLayout Padding="10" x:DataType="local:GroupedTransaction" Orientation="Vertical">
-                                <Label Text="{Binding Person}" 
-                                            LineBreakMode="NoWrap" 
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding Person}" 
+                                            LineBreakMode="WordWrap" 
                                             Style="{DynamicResource LabelBackgroundStyle}" 
                                             FontSize="Small" 
-                                            HorizontalOptions="StartAndExpand"/>
-                                <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="3" HorizontalOptions="Fill"/>
-                                <StackLayout Orientation="Horizontal">
+                                            HorizontalOptions="Start"
+                                           WidthRequest="100"/>
+                                
                                     <StackLayout Orientation="Vertical" Padding="3">
                                         <Label Text="{Binding Summary}" 
                                             LineBreakMode="WordWrap"
-                                            Style="{DynamicResource ListItemDetailTextStyle}"
+                                            Style="{DynamicResource LabelBackgroundStyle}"
                                             FontSize="Small"
                                             HorizontalOptions="StartAndExpand"
                                                VerticalOptions="CenterAndExpand"/>

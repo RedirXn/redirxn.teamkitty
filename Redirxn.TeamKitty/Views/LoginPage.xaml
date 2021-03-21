@@ -74,7 +74,7 @@
                             HorizontalTextAlignment="Center"
                             Style="{StaticResource LabelStyle}"
                             Text="Log In" />
-
+                        <Button Text="Login" Clicked="Button_Clicked" />
                         <!--  Login through facebook account  -->
                         <buttons:SfButton
                             IsVisible="{Binding CanClick}"

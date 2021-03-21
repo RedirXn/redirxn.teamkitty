@@ -14,7 +14,8 @@ namespace Redirxn.TeamKitty.Services.Gateway
 {
     public class DynamoDataStore : IKittyDataStore, IJoinCodeDataStore, IUserDataStore, ICommsDataStore, IDisposable
     {
-        const string CognitoPoolId = "us-east-1:f779f47a-cfed-4016-a282-81f3313bd471";
+        const string CognitoIdentityPoolId = "us-east-1:f779f47a-cfed-4016-a282-81f3313bd471";
+        const string CognitoUserPoolId = "us-east-1_EnMDRXOrG";
 
         CognitoAWSCredentials _credentials;
         AmazonDynamoDBClient _client;
@@ -30,12 +31,13 @@ namespace Redirxn.TeamKitty.Services.Gateway
         public void Init(string activeToken)
         {
             if (_context == null)
-            {
+            {               
                 _credentials = new CognitoAWSCredentials(
-                   CognitoPoolId,
+                   CognitoIdentityPoolId,
                    RegionEndpoint.USEast1
                    );
-                _credentials.AddLogin("graph.facebook.com", activeToken);
+                
+                _credentials.AddLogin($"cognito-idp.us-east-1.amazonaws.com/{CognitoUserPoolId}", activeToken);
 
                 _client = new AmazonDynamoDBClient(_credentials, RegionEndpoint.USEast1);
                 _context = new DynamoDBContext(_client);
@@ -44,7 +46,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
         public async Task<UserInfo> GetUserDetail(string email)
         {
-            var u = await _context.LoadAsync<DynamoUser>(email);
+            var u = await _context.LoadAsync<DynamoUser>(email.ToLower());
             if (u == null || u.Info == "{}") return new UserInfo();
             var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
             return myInfo;

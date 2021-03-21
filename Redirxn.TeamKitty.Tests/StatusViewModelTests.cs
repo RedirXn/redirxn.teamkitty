@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Redirxn.TeamKitty.Tests
 {
     [TestFixture]
-    public class StatusViewModelTests : BaseTest
+    public partial class StatusViewModelTests : BaseTest
     {
         private const string myEmail = "me@myplace";
         StatusViewModel _vmStatus;
@@ -42,6 +42,7 @@ namespace Redirxn.TeamKitty.Tests
                 Id = myEmail
             };
             await Locator.Current.GetService<IIdentityService>().Init("fakeToken", fakeLoginData);
+
             var kitty = GetFakeAdminKitty();
 
             kitty.Ledger.Summary.First().Balance = balance;

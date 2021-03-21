@@ -11,16 +11,20 @@ using Java.Security;
 using Android.Content;
 using Android.Gms.Common;
 using Firebase.Messaging;
+using Auth0.OidcClient;
+using Xamarin.Forms;
+using Redirxn.TeamKitty.Models;
 
 namespace Redirxn.TeamKitty.Droid
 {
-    [Activity(Label = "Redirxn.TeamKitty", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
+    [Activity(Label = "Redirxn.TeamKitty", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTask, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         static readonly string TAG = "MainActivity";
         internal static readonly string CHANNEL_ID = "my_notification_channel";
         internal static readonly int NOTIFICATION_ID = 100;
-        protected override void OnCreate(Bundle savedInstanceState)
+
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
@@ -30,14 +34,16 @@ namespace Redirxn.TeamKitty.Droid
             IsPlayServicesAvailable(); //You can use this method to check if play services are available.
             CreateNotificationChannel();
 
-            FacebookClientManager.Initialize(this);
+            // FacebookClientManager.Initialize(this);
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-
             
             GetAppSignature(); // Remove once registered on Play store
-                        
+
+            
+            var login = new AndroidLogin();
+            DependencyService.RegisterSingleton<ILoginProvider>(login);
 
             LoadApplication(new App());
         }
@@ -46,15 +52,15 @@ namespace Redirxn.TeamKitty.Droid
         {
             try
             {
-                PackageInfo info = Android.App.Application.Context.PackageManager.GetPackageInfo(Android.App.Application.Context.PackageName, PackageInfoFlags.Signatures);
-                foreach (var signature in info.Signatures)
-                {
-                    MessageDigest md = MessageDigest.GetInstance("SHA");
-                    md.Update(signature.ToByteArray());
+                //PackageInfo info = Application.Context.PackageManager.GetPackageInfo(Android.App.Application.Context.PackageName, PackageInfoFlags.Signatures);
+                //foreach (var signature in info.Signatures)
+                //{
+                //    MessageDigest md = MessageDigest.GetInstance("SHA");
+                //    md.Update(signature.ToByteArray());
 
-                    System.Diagnostics.Debug.WriteLine("************ Signature ******************");
-                    System.Diagnostics.Debug.WriteLine(Convert.ToBase64String(md.Digest()));
-                }
+                //    System.Diagnostics.Debug.WriteLine("************ Signature ******************");
+                //    System.Diagnostics.Debug.WriteLine(Convert.ToBase64String(md.Digest()));
+                //}
             }
             catch (NoSuchAlgorithmException e)
             {
@@ -115,5 +121,6 @@ namespace Redirxn.TeamKitty.Droid
             notificationManager.CreateNotificationChannel(channel);
         }
     }
-    
+
+
 }

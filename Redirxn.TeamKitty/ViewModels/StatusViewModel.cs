@@ -104,7 +104,7 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 ReloadSummary(_identityService.LoginData.Email);
             }            
-            MyDisplayName = _summary.Person.DisplayName;
+            MyDisplayName = _summary?.Person?.DisplayName ?? _identityService.LoginData.Name;
             UpdateScreenText();
             _loadingFromState = false;
             IsBusy = true;
@@ -158,9 +158,9 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private void UpdateScreenText()
         {
-            MyBalanceText = GetBalanceText(_summary.Balance);
-            MyPaidText = string.Format("Paid so far: {0:C}", Math.Abs(_summary.TotalPaid));
-            MyProvisionText = "Supplied: " + _summary.ProvisionText;
+            MyBalanceText = (_summary != null) ? GetBalanceText(_summary.Balance) : string.Empty;
+            MyPaidText = (_summary != null) ? string.Format("Paid so far: {0:C}", Math.Abs(_summary.TotalPaid)) : string.Empty;
+            MyProvisionText = (_summary != null) ? "Supplied: " + _summary.ProvisionText : string.Empty;
         }
 
         private async Task ProvisionRequest()

@@ -9,9 +9,11 @@ namespace Redirxn.TeamKitty
 {
     public partial class App : Application
     {
-
+        public Command LoginNeeded { get; set; }
+        
         public App()
         {
+        
             //Register Syncfusion license
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mzg4Mzc1QDMxMzgyZTM0MmUzMEZuYVVGMVVCc2NrZVd0MmRWaXM4dGdkaEFFaWRCdk5zOU5LRmdhU2llVGc9");
             
@@ -41,7 +43,7 @@ namespace Redirxn.TeamKitty
 
             // ViewModels
             Locator.CurrentMutable.Register(() => new LoadingViewModel());
-            Locator.CurrentMutable.Register(() => new LoginViewModel());
+            Locator.CurrentMutable.Register(() => new LoginViewModel(this));
             Locator.CurrentMutable.Register(() => new MainViewModel());
             Locator.CurrentMutable.Register(() => new MultiTickViewModel());
             Locator.CurrentMutable.Register(() => new SessionViewModel());

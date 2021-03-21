@@ -111,6 +111,8 @@ namespace Redirxn.TeamKitty.Services.Logic
         }
         public bool AmIAdmin(string email)
         {
+            if (Kitty == null)
+                return false;
             return Kitty.Administrators.Any(s => s.Equals(email, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -331,11 +333,15 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public string GetKittyBalance()
         {
+            if (Kitty == null)
+                return string.Empty;
             return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalOwed) + Kitty.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments));
         }
 
         public string GetKittyOnHand()
         {
+            if (Kitty == null)
+                return string.Empty;
             return string.Format("{0:#.00}", Kitty.Ledger.Summary.Sum(lsl => lsl.TotalPaid) + Kitty.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments));
         }
 

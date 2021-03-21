@@ -74,7 +74,6 @@ namespace Redirxn.TeamKitty.ViewModels
                 OnItemSelected(value);
             }
         }
-        public ObservableCollection<ChartDataPoint> KittyMoney { get; set; }
         public KittyViewModel(IRoutingService navigationService = null, IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null, IInviteService inviteService = null)
         {
             _routingService = navigationService ?? Locator.Current.GetService<IRoutingService>();
@@ -108,9 +107,12 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             {
                 Items.Clear();
-                foreach (var item in _kittyService.Kitty.Ledger.Summary.OrderBy(lsl => lsl.Person.DisplayName))
+                if (_kittyService.Kitty != null)
                 {
-                    Items.Add(item);
+                    foreach (var item in _kittyService.Kitty?.Ledger.Summary.OrderBy(lsl => lsl.Person.DisplayName))
+                    {
+                        Items.Add(item);
+                    }
                 }
             }
             catch (Exception ex)
@@ -127,17 +129,14 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             IsBusy = true;
             SelectedItem = null;
+
             
-            CurrentKitty = _kittyService.Kitty?.DisplayName;
-            var balance = _kittyService.GetKittyBalance();
-            var onHand = _kittyService.GetKittyOnHand();
+                CurrentKitty = _kittyService.Kitty?.DisplayName;
+                var balance = _kittyService.GetKittyBalance();
+                var onHand = _kittyService.GetKittyOnHand();
+            
             KittyBalanceText = "When all money collected: $" + balance;
             KittyOnHandText = " Collected so far: $" + onHand;
-            KittyMoney = new ObservableCollection<ChartDataPoint>
-            {
-                new ChartDataPoint("Received", double.Parse(onHand)),
-                new ChartDataPoint("Remaining", double.Parse(balance)-double.Parse(onHand))
-            };
         }
         async void OnItemSelected(LedgerSummaryLine item)
         {

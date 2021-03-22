@@ -82,7 +82,6 @@ namespace Redirxn.TeamKitty.ViewModels
                 PluralName = _mainNamePlural,
                 StockGrouping = _stockName,
                 SalePrice = _price,
-                StockPrice = _stockPrice
             };
 
             try
@@ -117,7 +116,6 @@ namespace Redirxn.TeamKitty.ViewModels
                 MainNamePlural = item.PluralName;
                 StockName = item.StockGrouping;
                 Price = item.SalePrice;
-                StockPrice = item.StockPrice;
             }
             catch (Exception ex)
             {
@@ -130,10 +128,12 @@ namespace Redirxn.TeamKitty.ViewModels
         private async Task ExecuteDeleteItemCommand()
         {
             try
-            { 
-                // ToDO: confirmation, or check not already in use.
-                await _kittyService.DeleteStockItem(MainName);
-                await ClosePage();
+            {
+                if (await _dialogService.Confirm("Delete Stock Item", "Are you sure you want to delete this item?", "Delete", "Cancel"))
+                {
+                    await _kittyService.DeleteStockItem(MainName);
+                    await ClosePage();
+                }
             }
             catch (ApplicationException ex)
             {

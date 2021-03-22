@@ -37,6 +37,8 @@ namespace Redirxn.TeamKitty.Tests
         public void CanDeleteStockItem()
         {
             _vmStockItem.MainName = "Item2";
+            Dialogs.Make_ConfirmReturn(true);
+
             _vmStockItem.OnDeleteStockCommand.Execute(null);
 
             Db.SaveKittyToDbKitty.KittyConfig.StockItems.FirstOrDefault(si => si.MainName == "Item2").Should().BeNull();

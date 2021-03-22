@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Plugin.FacebookClient;
 using Redirxn.TeamKitty.Models;
 using Redirxn.TeamKitty.Services.Application;
 using Redirxn.TeamKitty.Services.Logic;
@@ -20,58 +19,60 @@ namespace Redirxn.TeamKitty.ViewModels
         private IDialogService _dialogService;
 
         public ICommand OnLoginCommand { get; set; }
-        public bool _canClick = true;
-        public bool CanClick
-        {
-            get { return _canClick; }
-            set { SetProperty(ref _canClick, value); }
-        }
-        public bool _isLoading = false;
-        private App _app;
 
-        public bool IsLoading
+        internal async void OnAppearing()
         {
-            get { return _isLoading; }
-            set { SetProperty(ref _isLoading, value); }
+            bool isLoggedIn = (
+                Application.Current.Properties.ContainsKey("IsLoggedIn") &&
+                Convert.ToBoolean(Application.Current.Properties["IsLoggedIn"]) &&
+                Application.Current.Properties.ContainsKey("LoginData") &&
+                Application.Current.Properties.ContainsKey("Token"));
+            if (!isLoggedIn)
+            {
+                await LoginAsync();
+            }
+            else
+            {
+                var socialLoginData = JsonConvert.DeserializeObject<NetworkAuthData>(Application.Current.Properties["LoginData"].ToString());
+                var token = Application.Current.Properties["Token"].ToString();
+
+                await _identityService.Init(token, socialLoginData);
+                await _navigationService.NavigateTo("///main/home");
+            }
         }
 
-        public LoginViewModel(App app, IRoutingService navigationService = null, IIdentityService identityService = null, IDialogService dialogService = null)
+        public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
-            this._app = app;
             _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
-
-            OnLoginCommand = new Command(async () => await LoginAsync());
         }
 
         async Task LoginAsync()
         {
             try
             {
-                IsLoading = true;
-                CanClick = false;
-
                 var loginDetail = await DependencyService.Get<ILoginProvider>().GetEmailByLoggingIn();
 
+                if (loginDetail == null)
+                {
+                    return;
+                }
                 var socialLoginData = new NetworkAuthData
                 {
                     Email = loginDetail.Item2.Id,
                     Name = loginDetail.Item2.Name,
                     Id = loginDetail.Item2.Id
                 };
-                await _identityService.Init(loginDetail.Item1, socialLoginData);
-                await _navigationService.NavigateTo("///main/home");
-
-                IsLoading = false;
-                CanClick = true;
+                
+                Application.Current.Properties["IsLoggedIn"] = Boolean.TrueString;
+                Application.Current.Properties["Token"] = loginDetail.Item1;
+                Application.Current.Properties["LoginData"] = JsonConvert.SerializeObject(socialLoginData);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
                 await _dialogService.Alert("Error", "An Error Occurred", "OK");
-                IsLoading = false;
-                CanClick = true;
             }
         }
 

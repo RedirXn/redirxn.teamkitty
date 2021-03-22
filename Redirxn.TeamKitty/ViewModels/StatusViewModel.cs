@@ -19,11 +19,13 @@ namespace Redirxn.TeamKitty.ViewModels
         private IKittyService _kittyService;
         private IIdentityService _identityService;
         private IDialogService _dialogService;
+        private IRoutingService _navigationService;
 
         public ICommand PayCommand { get; set; }
         public ICommand ProvideCommand { get; set; }
         public ICommand LoadTransactionsCommand { get; set; }
         public ICommand ChangeMyNameCommand { get; set; }
+        public ICommand LogOutCommand { get; set; }
 
         private LedgerSummaryLine _summary;
         private IEnumerable<Transaction> _transactions;
@@ -81,21 +83,30 @@ namespace Redirxn.TeamKitty.ViewModels
             set { LoadFromState(value); }
         }
 
-        public StatusViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
+        public StatusViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null, IRoutingService navigationService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
+            _navigationService = navigationService ?? Locator.Current.GetService<IRoutingService>();
 
             PayCommand = new Command(async () => await PaymentRequest());
             ProvideCommand = new Command(async () => await ProvisionRequest());
             LoadTransactionsCommand = new Command(async () => await ExecuteLoadTransactionsCommand());
             ChangeMyNameCommand = new Command(async () => await ChangeMyName());
+            LogOutCommand = new Command(async () => await LogOut());
 
             Transactions = new ObservableCollection<GroupedTransaction>();
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
             IsChangeable = IsAdmin;
         }
+
+        private async Task LogOut()
+        {
+            Application.Current.Properties["IsLoggedIn"] = Boolean.FalseString;
+            await _navigationService.NavigateTo("main/login");
+        }
+
         public void OnAppearing()
         {            
             CurrentKitty = _kittyService.Kitty?.DisplayName;
@@ -201,7 +212,7 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             { 
                 string strAmount = await _dialogService.GetSingleMoneyInput("Payment", "How much are you paying?");
-                if (!string.IsNullOrWhiteSpace(strAmount))
+                if (!string.IsNullOrWhiteSpace(strAmount) )
                 {
                     var amount = decimal.Parse(strAmount);
                     await _kittyService.MakePayment(_summary.Person.Email, amount);

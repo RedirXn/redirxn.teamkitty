@@ -10,6 +10,5 @@ namespace Redirxn.TeamKitty.Models
         public string PluralName { get; set; }
         public string StockGrouping { get; set; }
         public decimal SalePrice { get; set; }
-        public decimal StockPrice { get; set; }
     }    
 }

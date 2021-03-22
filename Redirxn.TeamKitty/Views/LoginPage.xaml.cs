@@ -25,6 +25,10 @@ namespace Redirxn.TeamKitty.Views
         {
             return true;
         }
-
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            ViewModel.OnAppearing();
+        }
     }
 }

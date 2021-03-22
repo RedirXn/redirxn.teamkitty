@@ -49,14 +49,6 @@
                         <BoxView Color="{StaticResource MdBackground}" HeightRequest="2" HorizontalOptions="Fill"/>
                     </StackLayout>
                 </Frame>
-                <Frame BackgroundColor="{StaticResource MdSurface}">
-                    <StackLayout>
-                        <Label Text="Expected Cost to Purchase" FontSize="Large" Style="{StaticResource LabelSurfaceStyle}" FontAttributes="Bold"/>
-                        <Label x:Name="lblStockPrice" Text='eg. One Case of Widgets usually costs $50' Style="{StaticResource LabelSurfaceStyle}" />
-                        <Entry x:Name="StockPrice" TextColor="{StaticResource MdOnSurface}" Placeholder="50" PlaceholderColor="{StaticResource Gray-600}" Keyboard="Numeric" TextChanged="Generic_TextChanged" Text="{Binding StockPrice}" IsTabStop="True"/>
-                        <BoxView Color="{StaticResource MdBackground}" HeightRequest="2" HorizontalOptions="Fill"/>
-                    </StackLayout>
-                </Frame>
                 <Button Text="Save"
                         Command="{Binding SaveItemCommand}"/>
             </StackLayout>

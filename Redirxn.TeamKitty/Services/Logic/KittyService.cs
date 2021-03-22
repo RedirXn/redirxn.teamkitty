@@ -270,6 +270,10 @@ namespace Redirxn.TeamKitty.Services.Logic
 
         public async Task MakePayment(string email, decimal amount)
         {
+            if (amount == 0)
+            {
+                return;
+            }
             Kitty kitty = await GetUnlockedKitty();
 
             var me = kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email).Person;
@@ -287,7 +291,6 @@ namespace Redirxn.TeamKitty.Services.Logic
             kitty = RecalculateLedgerSummary(kitty, email);
             await _dataStore.SaveKittyToDb(kitty);
             Kitty = kitty;
-
         }
         public async Task AdjustBalanceBy(string email, decimal amount)
         {
@@ -571,7 +574,6 @@ namespace Redirxn.TeamKitty.Services.Logic
                 TransactionAmount = kitty1.Ledger.Summary.Sum(lsl => lsl.TotalOwed) + kitty1.Ledger.Summary.Sum(lsl => lsl.TotalAdjustments),
                 TransactionName = kitty1.DisplayName
             });
-
 
             await _dataStore.SaveKittyToDb(kitty2);
             await _dataStore.SaveKittyToDb(kitty1);

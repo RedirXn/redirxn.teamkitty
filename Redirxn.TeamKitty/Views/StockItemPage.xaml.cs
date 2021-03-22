@@ -32,7 +32,6 @@ namespace Redirxn.TeamKitty.Views
             lblMainNamePlural.Text = $"eg. You have consumed 12 {MainNamePlural.Text ?? MainNamePlural.Placeholder}.";
             lblStockName.Text = $"eg. Here is one {StockName.Text ?? StockName.Placeholder} of {MainNamePlural.Text ?? MainNamePlural.Placeholder}.";
             lblPrice.Text = $"eg. One {MainName.Text ?? MainName.Placeholder} costs ${Price.Text ?? Price.Placeholder}";
-            lblStockPrice.Text = $"eg. One {StockName.Text ?? StockName.Placeholder} of {MainNamePlural.Text ?? MainNamePlural.Placeholder} usually costs ${StockPrice.Text ?? StockPrice.Placeholder}";
         }
     }
 }

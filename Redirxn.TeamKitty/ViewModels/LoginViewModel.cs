@@ -19,7 +19,7 @@ namespace Redirxn.TeamKitty.ViewModels
         private IIdentityService _identityService;
         private IDialogService _dialogService;
 
-        public ICommand OnLoginWithFacebookCommand { get; set; }
+        public ICommand OnLoginCommand { get; set; }
         public bool _canClick = true;
         public bool CanClick
         {
@@ -42,14 +42,15 @@ namespace Redirxn.TeamKitty.ViewModels
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
-            OnLoginWithFacebookCommand = new Command(async () => await LoginFacebookAsync());
+            OnLoginCommand = new Command(async () => await LoginAsync());
         }
 
-        async Task LoginFacebookAsync()
+        async Task LoginAsync()
         {
             try
             {
                 IsLoading = true;
+                CanClick = false;
 
                 var loginDetail = await DependencyService.Get<ILoginProvider>().GetEmailByLoggingIn();
 
@@ -63,12 +64,14 @@ namespace Redirxn.TeamKitty.ViewModels
                 await _navigationService.NavigateTo("///main/home");
 
                 IsLoading = false;
+                CanClick = true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
                 await _dialogService.Alert("Error", "An Error Occurred", "OK");
                 IsLoading = false;
+                CanClick = true;
             }
         }
 

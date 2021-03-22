@@ -112,10 +112,13 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private async void ReloadSummary(string email)
         {
-            _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
-            _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email && t.TransactionType != TransactionType.Adjustment)
-                .OrderByDescending(t => t.Date);
-            await ExecuteLoadTransactionsCommand();
+            if (_kittyService.Kitty != null)
+            {
+                _summary = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(lsl => lsl.Person.Email == email);
+                _transactions = _kittyService.Kitty.Ledger.Transactions.Where(t => t.Person.Email == email && t.TransactionType != TransactionType.Adjustment)
+                    .OrderByDescending(t => t.Date);
+                await ExecuteLoadTransactionsCommand();
+            }
         }
 
         async Task ExecuteLoadTransactionsCommand()

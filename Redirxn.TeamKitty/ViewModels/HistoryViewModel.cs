@@ -29,6 +29,17 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
+        private bool _noKitty;
+        public bool NoKitty
+        {
+            get { return _noKitty; }
+            set { SetProperty(ref _noKitty, value); }
+        }
+        public bool HasKitty
+        {
+            get { return !_noKitty; }
+        }
+
         public HistoryViewModel(IKittyService kittyService = null, IIdentityService identityService = null, IDialogService dialogService = null)
         {
             _kittyService = kittyService ?? Locator.Current.GetService<IKittyService>();
@@ -43,7 +54,7 @@ namespace Redirxn.TeamKitty.ViewModels
         public void OnAppearing()
         {
             CurrentKitty = _kittyService.Kitty?.DisplayName;
-
+            NoKitty = _kittyService.Kitty == null;
             IsBusy = true;
         }
         async Task ExecuteLoadTransactionsCommand()
@@ -52,40 +63,43 @@ namespace Redirxn.TeamKitty.ViewModels
 
             try
             {
-                _transactions = _kittyService.Kitty.Ledger.Transactions.OrderByDescending(t => t.Date.Date).ThenBy(t => t.Person.DisplayName);
-                Transactions.Clear();
-
-                var w = new WipTransaction();
-                var dgt = new DatedGroupedTransaction("", new List<GroupedTransaction>());
-                foreach (var item in _transactions)
+                if (_kittyService.Kitty != null)
                 {
-                    var date = item.Date.ToString("ddd, MMM d, yyyy");
-                    if (date != w.Date && !string.IsNullOrEmpty(w.Date))
+                    _transactions = _kittyService.Kitty.Ledger.Transactions.OrderByDescending(t => t.Date.Date).ThenBy(t => t.Person.DisplayName);
+                    Transactions.Clear();
+
+                    var w = new WipTransaction();
+                    var dgt = new DatedGroupedTransaction("", new List<GroupedTransaction>());
+                    foreach (var item in _transactions)
+                    {
+                        var date = item.Date.ToString("ddd, MMM d, yyyy");
+                        if (date != w.Date && !string.IsNullOrEmpty(w.Date))
+                        {
+                            dgt.Add(w.ToGroupedTran());
+                            Transactions.Add(dgt);
+                            w = new WipTransaction();
+                            dgt = new DatedGroupedTransaction(date, new List<GroupedTransaction>());
+                        }
+                        else
+                        {
+                            var person = item.Person.DisplayName;
+                            if (person != w.Person && !string.IsNullOrEmpty(w.Person))
+                            {
+                                dgt.Add(w.ToGroupedTran());
+                                w = new WipTransaction();
+                            }
+                            if (string.IsNullOrEmpty(dgt.Name))
+                            {
+                                dgt.Name = date;
+                            }
+                        }
+                        w.UpdateFromTransaction(date, item);
+                    }
+                    if (!string.IsNullOrEmpty(w.Date))
                     {
                         dgt.Add(w.ToGroupedTran());
                         Transactions.Add(dgt);
-                        w = new WipTransaction();
-                        dgt = new DatedGroupedTransaction(date, new List<GroupedTransaction>());
                     }
-                    else
-                    {
-                        var person = item.Person.DisplayName;
-                        if (person != w.Person && !string.IsNullOrEmpty(w.Person))
-                        {
-                            dgt.Add(w.ToGroupedTran());
-                            w = new WipTransaction();
-                        }
-                        if (string.IsNullOrEmpty(dgt.Name))
-                        {
-                            dgt.Name = date;
-                        }
-                    }
-                    w.UpdateFromTransaction(date, item);
-                }
-                if (!string.IsNullOrEmpty(w.Date))
-                {
-                    dgt.Add(w.ToGroupedTran());
-                    Transactions.Add(dgt);
                 }
             }
             catch (Exception ex)

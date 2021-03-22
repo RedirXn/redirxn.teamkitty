@@ -42,7 +42,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             Items = new ObservableCollection<StockDisplay>();
 
-            OnAddStockCommand = new Command(async () => await _navigationService.NavigateTo($"{nameof(StockItemPage)}"));            
+            OnAddStockCommand = new Command(async () => { if (_kittyService.Kitty != null) await _navigationService.NavigateTo($"{nameof(StockItemPage)}"); });            
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTapped = new Command<StockDisplay>(async (item) => await OnItemSelected(item));
 
@@ -55,15 +55,18 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             {
                 Items.Clear();
-                foreach (var item in _kittyService.Kitty.KittyConfig.StockItems)
+                if (_kittyService.Kitty != null)
                 {
-                    var sd = new StockDisplay
+                    foreach (var item in _kittyService.Kitty.KittyConfig.StockItems)
                     {
-                        MainName = item.MainName,
-                        Cost = string.Format("{0:C}", item.SalePrice),
-                        Grouping = item.StockGrouping + " of " + item.MainName + " cost about " + string.Format("{0:C}", item.StockPrice),
-                    };
-                    Items.Add(sd);
+                        var sd = new StockDisplay
+                        {
+                            MainName = item.MainName,
+                            Cost = string.Format("{0:C}", item.SalePrice),
+                            Grouping = item.StockGrouping + " of " + item.MainName + " cost about " + string.Format("{0:C}", item.StockPrice),
+                        };
+                        Items.Add(sd);
+                    }
                 }
             }
             catch (Exception ex)

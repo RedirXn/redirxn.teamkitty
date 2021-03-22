@@ -148,6 +148,7 @@ namespace Redirxn.TeamKitty.Tests
             Db.SaveKittyToDbKitty.Ledger.Summary.Add(new LedgerSummaryLine { Person = new Member { DisplayName = "App User", Email = userEmail } });
             Dialogs.Make_SelectOptionReturn("App User");
             Db.MakeGetKittyReturn(Db.SaveKittyToDbKitty);
+            Locator.Current.GetService<IKittyService>().LoadKitty("anything");
 
             _vmKitty.AssignAdminCommand.Execute(null);
 

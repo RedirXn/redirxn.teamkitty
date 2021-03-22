@@ -43,7 +43,7 @@
                       IsTabStop="False"
                       ContentTemplate="{DataTemplate local:MainPage}"
                       Title="Tick" />
-        <ShellContent Title="Status" Icon="tab_money.png" ContentTemplate="{DataTemplate local:StatusPage}" />
+        <ShellContent Title="Status" Icon="tab_money.png" ContentTemplate="{DataTemplate local:StatusPage}"/>
         <ShellContent Title="Kitty" Icon="tab_money.png" ContentTemplate="{DataTemplate local:KittyPage}" />
 	    <!--ShellContent Title="Session" Icon="tab_money.png" ContentTemplate="{DataTemplate local:SessionPage}" -->
         <ShellContent Title="History" Icon="tab_stock.png" ContentTemplate="{DataTemplate local:HistoryPage}" />

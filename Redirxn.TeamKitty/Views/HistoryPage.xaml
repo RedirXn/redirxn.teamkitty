@@ -15,9 +15,11 @@
     </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout BackgroundColor="{StaticResource MdSurface}">
-            <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill"/>
 
-            <RefreshView x:DataType="local:HistoryViewModel" Command="{Binding LoadTransactionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+            <BoxView BackgroundColor="{StaticResource MdBackground}" HeightRequest="5" HorizontalOptions="Fill" />
+
+            <RefreshView x:DataType="local:HistoryViewModel" Command="{Binding LoadTransactionsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}"
+                         IsVisible="{Binding HasKitty}" >
                 <CollectionView x:Name="TransactionsListView"
                                 ItemsSource="{Binding Transactions}"
                                 IsGrouped="True"
@@ -41,7 +43,7 @@
                                             FontSize="Small" 
                                             HorizontalOptions="Start"
                                            WidthRequest="100"/>
-                                
+
                                     <StackLayout Orientation="Vertical" Padding="3">
                                         <Label Text="{Binding Summary}" 
                                             LineBreakMode="WordWrap"
@@ -49,7 +51,7 @@
                                             FontSize="Small"
                                             HorizontalOptions="StartAndExpand"
                                                VerticalOptions="CenterAndExpand"/>
-                                    </StackLayout>                                    
+                                    </StackLayout>
                                     <Label Text="{Binding DayTotal}" 
                                             LineBreakMode="NoWrap"
                                             Style="{DynamicResource ListItemDetailTextStyle}"

@@ -64,46 +64,21 @@
                             FontSize="20"
                             HorizontalTextAlignment="Center"
                             Style="{StaticResource LabelStyle}"
-                            Text="TeamKitty" />
+                            Text="TeamKitty" 
+                            Grid.Row="3"/>
 
                         <!--  Label to display the description of this page  -->
-                        <Label
-                            Grid.Row="1"
-                            Margin="0,8"
-                            FontFamily="{StaticResource Montserrat-Medium}"
-                            HorizontalTextAlignment="Center"
-                            Style="{StaticResource LabelStyle}"
-                            Text="Log In" />
-                        <Button Text="Login" Clicked="Button_Clicked" />
-                        <!--  Login through facebook account  -->
-                        <buttons:SfButton
-                            IsVisible="{Binding CanClick}"
-                            Grid.Row="7"
-                            Margin="0,16,0,16"
-                            BackgroundColor="{DynamicResource FacebookBlue}"
-                            Command="{Binding OnLoginWithFacebookCommand}"                            
-                            CornerRadius="20"
-                            HeightRequest="40">
-                            <buttons:SfButton.Content>
-                                <StackLayout
-                                    HorizontalOptions="CenterAndExpand"
-                                    Orientation="Horizontal"
-                                    VerticalOptions="Center">
-                                    <Label
-                                        FontFamily="{StaticResource FontIcons}"
-                                        FontSize="18"
-                                        Text="&#xe735;"
-                                        FontAttributes="Bold"
-                                        TextColor="{DynamicResource Gray-White}"
-                                        VerticalTextAlignment="Center" />
-                                    <Label
-                                        FontFamily="{StaticResource Montserrat-Medium}"
-                                        FontSize="16"
-                                        Text="Login with Facebook"
-                                        TextColor="{DynamicResource Gray-White}" />
-                                </StackLayout>
-                            </buttons:SfButton.Content>
-                        </buttons:SfButton>
+
+                        <buttons:SfButton Text="Login" 
+                                          IsVisible="{Binding CanClick}"
+                                          Command="{Binding OnLoginCommand}"                                   
+                                          BackgroundColor="{StaticResource Gray-800}"
+                                          TextColor="{StaticResource Gray-100}"
+                                          Margin="8,16,8,16"
+                                          CornerRadius="20"
+                                          HeightRequest="40"
+                                          Grid.Row="5"/>
+
                         <ActivityIndicator Color="{StaticResource MdPrimary}"
                                IsRunning="True"
                                IsVisible="{Binding IsLoading}" />

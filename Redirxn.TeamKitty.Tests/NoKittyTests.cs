@@ -58,6 +58,15 @@ namespace Redirxn.TeamKitty.Tests
             _vm.OnAppearing();
             _vm.LoadItemsCommand.Execute(null);
         }
+        [Test]
+        public async Task HistoryPageLoadsWithoutError()
+        {
+            await PrepareMinimum();
+
+            var _vm = new HistoryViewModel();
+            _vm.OnAppearing();
+            _vm.LoadTransactionsCommand.Execute(null);
+        }
 
     }
 

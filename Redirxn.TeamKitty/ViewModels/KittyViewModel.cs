@@ -52,6 +52,16 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
         }
+        private bool _noKitty;
+        public bool NoKitty
+        {
+            get { return _noKitty; }
+            set { SetProperty(ref _noKitty, value); }
+        }
+        public bool HasKitty
+        {
+            get { return !_noKitty; }
+        }
         private string _kittyBalanceText = string.Empty;
         public string KittyBalanceText
         {
@@ -99,6 +109,7 @@ namespace Redirxn.TeamKitty.ViewModels
             CarryoverKittyCommand = new Command(async () => await CarryoverKitty());
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
+            NoKitty = _kittyService.Kitty == null;
         }
         async Task ExecuteLoadItemsCommand()
         {
@@ -137,6 +148,7 @@ namespace Redirxn.TeamKitty.ViewModels
             
             KittyBalanceText = "When all money collected: $" + balance;
             KittyOnHandText = " Collected so far: $" + onHand;
+            NoKitty = _kittyService.Kitty == null;
         }
         async void OnItemSelected(LedgerSummaryLine item)
         {
@@ -180,7 +192,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 var displayKitties = kitties.Select(k => k.Split('|')[1]).ToArray();
                 string nextKittyDisplay = await _dialogService.SelectOption("Choose Kitty", "Cancel", displayKitties);
 
-                if (!string.IsNullOrWhiteSpace(nextKittyDisplay))
+                if (!string.IsNullOrWhiteSpace(nextKittyDisplay) && nextKittyDisplay != "Cancel")
                 {
                     var nextKitty = kitties.First(k => k.EndsWith("|" + nextKittyDisplay));
                     await _kittyService.LoadKitty(nextKitty);
@@ -202,8 +214,10 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 if (!string.IsNullOrWhiteSpace(newKittyName))
                 {
-                    await CreateNewKittyWithName(newKittyName);
-                    await _routingService.NavigateTo($"///main");
+                    string kittyId = await CreateNewKittyWithName(newKittyName);
+                    await _kittyService.LoadKitty(kittyId);
+                    await _identityService.SetDefaultKitty(kittyId);
+                    OnAppearing();
                 }
             }
             catch (Exception ex)
@@ -230,6 +244,9 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 await _kittyService.AddRegisteredUser(_identityService.LoginData.Email, _identityService.UserDetail.Name, kittyId);
                 await _identityService.AddMeToKitty(kittyId);
+                await _kittyService.LoadKitty(kittyId);
+                await _identityService.SetDefaultKitty(kittyId);
+                OnAppearing();
             }
         }
         internal async Task JoinKitty()
@@ -240,8 +257,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 if (!string.IsNullOrWhiteSpace(joinCode))
                 {
-                    await JoinKittyWithCode(joinCode);
-                    await _routingService.NavigateTo($"///main");
+                    await JoinKittyWithCode(joinCode);                    
                 }
             }
             catch (Exception ex)

@@ -26,10 +26,5 @@ namespace Redirxn.TeamKitty.Views
             return true;
         }
 
-        private void Button_Clicked(object sender, EventArgs e)
-        {
-            
-            ViewModel.OnLoginWithFacebookCommand.Execute(null);
-        }
     }
 }

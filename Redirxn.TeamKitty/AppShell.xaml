@@ -29,10 +29,6 @@
         </ResourceDictionary>
     </Shell.Resources>
 
-    <ShellItem Route="loading">
-        <ShellContent ContentTemplate="{DataTemplate local:LoadingPage}" />
-    </ShellItem>
-
     <ShellContent Route="login"
                   ContentTemplate="{DataTemplate local:LoginPage}">
     </ShellContent>

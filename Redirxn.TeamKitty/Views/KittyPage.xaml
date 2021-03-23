@@ -9,6 +9,7 @@
              Shell.TabBarIsVisible="{Binding HasKitty}"
              Title="{Binding CurrentKitty}">
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Sign Out" Command="{Binding SignOutCommand}" Order="Secondary"/>
         <ToolbarItem Text="Change Kitty" Command="{Binding ChangeKittyCommand}" Order="Secondary"/>
         <ToolbarItem Text="Create a New Kitty" Command="{Binding CreateKittyCommand}" Order="Secondary"/>
         <ToolbarItem Text="Join a Kitty" Command="{Binding JoinKittyCommand}" Order="Secondary"/>

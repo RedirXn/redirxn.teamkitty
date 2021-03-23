@@ -26,6 +26,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
         public ICommand LoadItemsCommand { get; }
         public ICommand AdjustCommand { get; set; }
+        public ICommand SignOutCommand { get; set; }
         public ICommand ChangeKittyCommand { get; set; }
         public ICommand CreateKittyCommand { get; set; }
         public ICommand JoinKittyCommand { get; set; }
@@ -107,10 +108,18 @@ namespace Redirxn.TeamKitty.ViewModels
             ChangeKittyNameCommand = new Command(async () => await ChangeKittyName());
             RecalculateKittyCommand = new Command(async () => await RecalculateKitty());
             CarryoverKittyCommand = new Command(async () => await CarryoverKitty());
+            SignOutCommand = new Command(() => SignOut());
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
             NoKitty = _kittyService.Kitty == null;
         }
+
+        private async void SignOut()
+        {
+            Application.Current.Properties["IsLoggedIn"] = Boolean.FalseString;
+            await _routingService.NavigateTo("main/login");
+        }    
+
         async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;

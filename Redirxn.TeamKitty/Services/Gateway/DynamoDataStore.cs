@@ -46,10 +46,17 @@ namespace Redirxn.TeamKitty.Services.Gateway
 
         public async Task<UserInfo> GetUserDetail(string email)
         {
-            var u = await _context.LoadAsync<DynamoUser>(email.ToLower());
-            if (u == null || u.Info == "{}") return new UserInfo();
-            var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
-            return myInfo;
+            try
+            {
+                var u = await _context.LoadAsync<DynamoUser>(email.ToLower());
+                if (u == null || u.Info == "{}") return new UserInfo();
+                var myInfo = JsonConvert.DeserializeObject<UserInfo>(u.Info);
+                return myInfo;
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
         }
         public async Task SaveUserDetailToDb(UserInfo userDetail)
         {

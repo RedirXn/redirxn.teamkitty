@@ -9,6 +9,7 @@ namespace Redirxn.TeamKitty.Services.Logic
     public interface IIdentityService
     {
         bool IsUserLoggedIn { get; } // TODO: CHange this to use App property
+        bool HasDataCredentials { get; }
         NetworkAuthData LoginData { get; set; }
         UserInfo UserDetail { get; set; }
         Task Init(string activeToken, NetworkAuthData socialLoginData);        
@@ -16,5 +17,6 @@ namespace Redirxn.TeamKitty.Services.Logic
         Task AddMeToKitty(string kittyId);
         Task Rename(string newName);
         Task SetDefaultKitty(string nextKitty);
+        void LogOut();
     }
 }

@@ -598,5 +598,10 @@ namespace Redirxn.TeamKitty.Services.Logic
             Kitty = kitty;
 
         }
+
+        public void Clear()
+        {
+            Kitty = null;
+        }
     }
 }

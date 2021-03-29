@@ -11,6 +11,7 @@ namespace Redirxn.TeamKitty.Services.Logic
     {
         IUserDataStore _dataStore;
         public bool IsUserLoggedIn { get { return LoginData != null && LoginData.Email != string.Empty; } }
+        public bool HasDataCredentials { get { return UserDetail != null; } }
         public NetworkAuthData LoginData { get; set; }
         public UserInfo UserDetail { get; set; }        
 
@@ -67,6 +68,12 @@ namespace Redirxn.TeamKitty.Services.Logic
         {
             UserDetail.DefaultKitty = nextKitty;
             await _dataStore.SaveUserDetailToDb(UserDetail);
+        }
+
+        public void LogOut()
+        {
+            UserDetail = null;
+            LoginData = null;
         }
     }
 }

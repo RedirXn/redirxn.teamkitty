@@ -116,7 +116,12 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private async void SignOut()
         {
-            Application.Current.Properties["IsLoggedIn"] = Boolean.FalseString;
+            Application.Current.Properties["LoginData"] = string.Empty;
+            Application.Current.Properties["AccessToken"] = string.Empty;
+            //Application.Current.Properties["RefreshToken"] = string.Empty;
+
+            _identityService.LogOut();
+            _kittyService.Clear();
             await _routingService.NavigateTo("main/login");
         }    
 
@@ -198,15 +203,18 @@ namespace Redirxn.TeamKitty.ViewModels
             try
             {
                 var kitties = _identityService.UserDetail.KittyNames;
-                var displayKitties = kitties.Select(k => k.Split('|')[1]).ToArray();
-                string nextKittyDisplay = await _dialogService.SelectOption("Choose Kitty", "Cancel", displayKitties);
-
-                if (!string.IsNullOrWhiteSpace(nextKittyDisplay) && nextKittyDisplay != "Cancel")
+                if (kitties.Count() > 1)
                 {
-                    var nextKitty = kitties.First(k => k.EndsWith("|" + nextKittyDisplay));
-                    await _kittyService.LoadKitty(nextKitty);
-                    await _identityService.SetDefaultKitty(nextKitty);
-                    OnAppearing();
+                    var displayKitties = kitties.Select(k => k.Split('|')[1]).ToArray();
+                    string nextKittyDisplay = await _dialogService.SelectOption("Choose Kitty", "Cancel", displayKitties);
+
+                    if (!string.IsNullOrWhiteSpace(nextKittyDisplay) && nextKittyDisplay != "Cancel")
+                    {
+                        var nextKitty = kitties.First(k => k.EndsWith("|" + nextKittyDisplay));
+                        await _kittyService.LoadKitty(nextKitty);
+                        await _identityService.SetDefaultKitty(nextKitty);
+                        OnAppearing();
+                    }
                 }
             }
             catch (Exception ex)

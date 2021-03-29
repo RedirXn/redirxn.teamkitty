@@ -26,7 +26,7 @@ namespace Redirxn.TeamKitty.Droid
                     new Uri($"https://{domain}/login?client_id={clientId}&response_type={responseType}&scope={scope}&redirect_uri={callbackUri}"),
                     new Uri(callbackUri)
                     );
-            }
+            }            
             catch(Exception ex)
             {
                 Console.WriteLine(ex.ToString());

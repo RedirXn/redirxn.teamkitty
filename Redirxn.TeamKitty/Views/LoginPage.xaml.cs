@@ -30,5 +30,6 @@ namespace Redirxn.TeamKitty.Views
             base.OnAppearing();
             ViewModel.OnAppearing();
         }
+                
     }
 }

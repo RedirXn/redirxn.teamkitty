@@ -11,6 +11,7 @@
                                                                   iOSPhoneLandscape=LoginBackground-Landscape.png,
                                                                   iOSTabletLandscape=LoginBackground-Landscape.png}"
     Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False"
     Style="{StaticResource ContentPageStyle}">
 
     <ContentPage.Resources>
@@ -70,7 +71,17 @@
                         <!--  Label to display the description of this page  -->
 
                         <ActivityIndicator Color="{StaticResource MdPrimary}"
-                               IsRunning="True" />
+                                           IsRunning="True" 
+                                           IsVisible="{Binding IsLoading}"/>
+                        <buttons:SfButton Text="Login" 
+                                          IsVisible="{Binding CanClick}"
+                                          Command="{Binding OnLoginCommand}"                                   
+                                          BackgroundColor="{StaticResource Gray-800}"
+                                          TextColor="{StaticResource Gray-100}"
+                                          Margin="8,16,8,16"
+                                          CornerRadius="20"
+                                          HeightRequest="40"
+                                          Grid.Row="5"/>
                     </Grid>
 
                 </StackLayout>

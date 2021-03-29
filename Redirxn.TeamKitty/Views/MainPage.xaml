@@ -20,7 +20,7 @@
     
     <ContentPage.Content>
         <StackLayout BackgroundColor="{StaticResource MainBackgroundColor}">
-            <Label Text="Tick up a:" Style="{StaticResource LabelPrimaryStyle}" FontSize="Large" LineBreakMode="NoWrap" HorizontalOptions="CenterAndExpand" />
+            <Label Text="{Binding TickText}" Style="{StaticResource LabelPrimaryStyle}" FontSize="Large" LineBreakMode="NoWrap" HorizontalOptions="CenterAndExpand" />
             <BoxView BackgroundColor="{StaticResource Primary}" HeightRequest="5"/>
             <RefreshView x:DataType="local:MainViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
                 <CollectionView x:Name="ItemsListView"
@@ -31,11 +31,11 @@
                             <StackLayout Padding="10" x:DataType="local:StockItemCount">
                                 <StackLayout Orientation="Horizontal">
                                     <StackLayout Orientation="Vertical">
-                                    <Label Text="{Binding MainName}" 
-                                           LineBreakMode="NoWrap" 
-                                           Style="{StaticResource ListItemTextStyle}" 
-                                           FontSize="Large"
-                                           HorizontalOptions="StartAndExpand"/>
+                                        <Label Text="{Binding MainName}" 
+                                               LineBreakMode="NoWrap" 
+                                               Style="{StaticResource ListItemTextStyle}" 
+                                               FontSize="Large"
+                                               HorizontalOptions="StartAndExpand"/>
                                         <StackLayout Orientation="Horizontal">
                                             <Label Text="You've already had: "                                        
                                                    Style="{StaticResource LabelBackgroundStyle}" 

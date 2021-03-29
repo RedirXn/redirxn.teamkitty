@@ -116,13 +116,13 @@ namespace Redirxn.TeamKitty.ViewModels
 
         private async void SignOut()
         {
-            Application.Current.Properties["LoginData"] = string.Empty;
-            Application.Current.Properties["AccessToken"] = string.Empty;
+            await Xamarin.Essentials.SecureStorage.SetAsync("LoginData", string.Empty);
+            await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", string.Empty);
             //Application.Current.Properties["RefreshToken"] = string.Empty;
 
             _identityService.LogOut();
             _kittyService.Clear();
-            await _routingService.NavigateTo("main/login");
+            Application.Current.MainPage = new AppShell();
         }    
 
         async Task ExecuteLoadItemsCommand()
@@ -155,11 +155,10 @@ namespace Redirxn.TeamKitty.ViewModels
             IsBusy = true;
             SelectedItem = null;
 
-            
-                CurrentKitty = _kittyService.Kitty?.DisplayName;
-                var balance = _kittyService.GetKittyBalance();
-                var onHand = _kittyService.GetKittyOnHand();
-            
+            CurrentKitty = _kittyService.Kitty?.DisplayName;
+            var balance = _kittyService.GetKittyBalance();
+            var onHand = _kittyService.GetKittyOnHand();
+
             KittyBalanceText = "When all money collected: $" + balance;
             KittyOnHandText = " Collected so far: $" + onHand;
             NoKitty = _kittyService.Kitty == null;

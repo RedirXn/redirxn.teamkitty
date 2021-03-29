@@ -32,8 +32,7 @@
     <ShellContent Route="login"
                   ContentTemplate="{DataTemplate local:LoginPage}">
     </ShellContent>
-    
-    
+
     <TabBar Route="main">
         <ShellContent Route="home"
                       IsTabStop="False"

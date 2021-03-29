@@ -21,15 +21,21 @@ namespace Redirxn.TeamKitty.ViewModels
         private IRoutingService _routingService;
         
         private StockItemCount _selectedItem;
-        private string _currentKitty = string.Empty;
         public ObservableCollection<StockItemCount> Items { get; }
         public Command LoadItemsCommand { get; }
         public Command<StockItemCount> ItemTapped { get; }
 
+        private string _currentKitty = string.Empty;
         public string CurrentKitty
         {
             get { return _currentKitty; }
             set { SetProperty(ref _currentKitty, value); }
+        }
+        private string _tickText = string.Empty;
+        public string TickText
+        {
+            get { return _tickText; }
+            set { SetProperty(ref _tickText, value); }
         }
 
         public MainViewModel(IIdentityService identityService = null, IKittyService kittyService = null, IDialogService dialogService = null, IInviteService inviteService = null, IRoutingService routingService = null)
@@ -62,15 +68,6 @@ namespace Redirxn.TeamKitty.ViewModels
                 {
                     await _routingService.NavigateTo($"{nameof(KittyPage)}");
                 }
-                else if (string.IsNullOrWhiteSpace(_identityService.UserDetail.Name) || _identityService.UserDetail.Name == _identityService.UserDetail.Id)
-                {
-                    var newName = await _dialogService.GetSingleTextInput("Name Input", "What name would you like to appear in the kitty as?");
-                    if (newName != null)
-                    {
-                        await _kittyService.RenameMember(_identityService.UserDetail.Id, newName);
-                        await _identityService.Rename(newName);
-                    }
-                }
                 else
                 {
                     await ExecuteLoadItemsCommand();
@@ -97,18 +94,26 @@ namespace Redirxn.TeamKitty.ViewModels
 
                 if (_kittyService.Kitty != null)
                 {
-                    foreach (var item in _kittyService.Kitty?.KittyConfig?.StockItems)
+                    if (_kittyService.Kitty.KittyConfig?.StockItems?.Count() > 0)
                     {
-                        var lsl = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(sl => sl.Person.Email == _identityService.LoginData.Email);
-                        var purchased = lsl?.Purchases?.FirstOrDefault(p => p.ProductName == item.MainName)?.ProductCount;
-
-                        Items.Add(new StockItemCount
+                        TickText = "Tick up a:";
+                        foreach (var item in _kittyService.Kitty?.KittyConfig?.StockItems)
                         {
-                            Base = item,
-                            MainName = item.MainName,
-                            SalePrice = item.SalePrice,
-                            Count = purchased ?? 0
-                        });
+                            var lsl = _kittyService.Kitty.Ledger.Summary.FirstOrDefault(sl => sl.Person.Email == _identityService.LoginData.Email);
+                            var purchased = lsl?.Purchases?.FirstOrDefault(p => p.ProductName == item.MainName)?.ProductCount;
+
+                            Items.Add(new StockItemCount
+                            {
+                                Base = item,
+                                MainName = item.MainName,
+                                SalePrice = item.SalePrice,
+                                Count = purchased ?? 0
+                            });
+                        }
+                    }
+                    else
+                    {
+                        TickText = "Add Stock Items on the Stock Tab";
                     }
                 }
             }

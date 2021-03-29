@@ -20,21 +20,24 @@ namespace Redirxn.TeamKitty.ViewModels
 
         public ICommand OnLoginCommand { get; set; }
 
-        public bool _canClick = false;
+        public bool _canClick = true;
         public bool CanClick
         {
             get { return _canClick; }
             set { SetProperty(ref _canClick, value); }
         }
-        public bool _isLoading = true;
+        public bool _isLoading = false;
 
         public bool IsLoading
         {
             get { return _isLoading; }
             set { SetProperty(ref _isLoading, value); }
         }
-        internal async void OnAppearing()
+        internal async Task StartLogin()
         {
+            IsLoading = true;
+            CanClick = false;
+
             string savedLoginData = GetStringAppProperty("LoginData");
             string savedAccessToken = GetStringAppProperty("AccessToken");
             string savedRefreshToken = GetStringAppProperty("RefreshToken");
@@ -59,15 +62,17 @@ namespace Redirxn.TeamKitty.ViewModels
                     return;
                 }
             }
+            else
+            {
+                await LoginAsync();
+            }
             IsLoading = false;
             CanClick = true;
         }
 
         private static string GetStringAppProperty(string propertyName)
         {
-            return Application.Current.Properties.ContainsKey(propertyName) ?
-                Application.Current.Properties[propertyName].ToString() :
-                string.Empty;
+            return Xamarin.Essentials.SecureStorage.GetAsync(propertyName).Result ?? string.Empty;
         }
 
         public LoginViewModel(IRoutingService navigationService = null, IIdentityService identityService = null, IDialogService dialogService = null)
@@ -76,7 +81,7 @@ namespace Redirxn.TeamKitty.ViewModels
             _identityService = identityService ?? Locator.Current.GetService<IIdentityService>();
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
-            OnLoginCommand = new Command(async () => await LoginAsync());
+            OnLoginCommand = new Command(async () => await StartLogin());
         }
 
         async Task LoginAsync()
@@ -100,10 +105,10 @@ namespace Redirxn.TeamKitty.ViewModels
                     Name = loginDetail.Item2.Name,
                     Id = loginDetail.Item2.Id
                 };
-                
-                Application.Current.Properties["AccessToken"] = loginDetail.Item1;
+
+                await Xamarin.Essentials.SecureStorage.SetAsync("LoginData", JsonConvert.SerializeObject(socialLoginData));
+                await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", loginDetail.Item1);
                 //Application.Current.Properties["RefreshToken"] = loginDetail.Item1;
-                Application.Current.Properties["LoginData"] = JsonConvert.SerializeObject(socialLoginData);
 
                 await _identityService.Init(loginDetail.Item1, socialLoginData);
                 if (_identityService.HasDataCredentials)

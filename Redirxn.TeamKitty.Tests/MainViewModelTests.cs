@@ -37,18 +37,6 @@ namespace Redirxn.TeamKitty.Tests
         }
 
         [Test]
-        public async Task NamelessDemandsNameChange()
-        {
-            PrepareKitty();            
-            const string newName = "New Display Name";
-            Dialogs.Make_TextInputReturn(newName);
-            _vmMain = new MainViewModel();
-
-            await _vmMain.Init();
-
-            Db.SaveUserDetailToDbUser.Name.Should().Be(newName);            
-        }
-        [Test]
         public void CanLoadStockItems()
         {
             PrepareKitty();

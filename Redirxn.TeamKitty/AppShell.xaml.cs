@@ -14,6 +14,7 @@ namespace Redirxn.TeamKitty
             InitializeComponent();
                         
             Routing.RegisterRoute("main/login", typeof(LoginPage));
+            Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
             Routing.RegisterRoute(nameof(StockItemPage), typeof(StockItemPage));
             Routing.RegisterRoute(nameof(StockPage), typeof(StockPage));
             Routing.RegisterRoute(nameof(MultiTickPage), typeof(MultiTickPage));
@@ -24,6 +25,5 @@ namespace Redirxn.TeamKitty
             BindingContext = this;
         }
 
-        public ICommand ExecuteLogout => new Command(async () => await GoToAsync("main/login"));
     }
 }

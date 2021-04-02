@@ -35,7 +35,6 @@
 
     <TabBar Route="main">
         <ShellContent Route="home"
-                      IsTabStop="False"
                       ContentTemplate="{DataTemplate local:MainPage}"
                       Title="Tick" />
         <ShellContent Title="Status" Icon="tab_money.png" ContentTemplate="{DataTemplate local:StatusPage}"/>

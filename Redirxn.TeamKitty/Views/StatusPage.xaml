@@ -9,7 +9,7 @@
              x:Class="Redirxn.TeamKitty.Views.StatusPage">
     <ContentPage.ToolbarItems>
         <controls:BindableToolbarItem Text="Sign Out" IsVisible="true" Command="{Binding LogOutCommand}" Order="Secondary"/>
-        <controls:BindableToolbarItem Text="Change My Display Name" IsVisible="{Binding IsChangeable}" Command="{Binding ChangeMyNameCommand}" Order="Secondary"/>
+        <controls:BindableToolbarItem Text="Change My Display Name" IsVisible="{Binding IsNameEditable}" Command="{Binding ChangeMyNameCommand}" Order="Secondary"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Resources>
         <ResourceDictionary>

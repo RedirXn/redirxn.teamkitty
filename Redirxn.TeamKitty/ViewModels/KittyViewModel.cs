@@ -319,15 +319,19 @@ namespace Redirxn.TeamKitty.ViewModels
             {
                 var userlist = _kittyService.Kitty.Ledger.Summary.Select(s => s.Person);
                 if (userlist.Count() < 2) return;
-                var keep = await _dialogService.SelectOption("Select the user that will stay", "Cancel", userlist.Select(u => u.DisplayName).ToArray());
+                var keep = await _dialogService.SelectOption("Select the user that will stay", "Cancel", userlist.Select(u => u.DisplayName + " | " + u.Email).ToArray());
                 if (keep != "Cancel")
                 {
-                    var keepUser = userlist.First(ul => ul.DisplayName == keep);
-                    var absorb = await _dialogService.SelectOption("Select the user that will be removed", "Cancel", userlist.Where(u => u != keepUser).Select(u => u.DisplayName).ToArray());
+                    var keepUser = userlist.First(ul => ul.Email == keep.Split('|')[1].Trim());
+                    var absorb = await _dialogService.SelectOption("Select the user that will be removed", "Cancel", userlist.Where(u => u != keepUser).Select(u => u.DisplayName + " | " + u.Email).ToArray());
                     if (!string.IsNullOrEmpty(absorb))
                     {
-                        var absorbUser = userlist.First(ul => ul.DisplayName == absorb);
-                        await _kittyService.CombineUsers(keepUser.Email, absorbUser.Email);
+                        var absorbUser = userlist.First(ul => ul.Email == absorb.Split('|')[1].Trim());
+                        if (keepUser.Email != absorbUser.Email)
+                        {
+                            await _kittyService.CombineUsers(keepUser.Email, absorbUser.Email);
+                            OnAppearing();
+                        }
                     }
                 }
 

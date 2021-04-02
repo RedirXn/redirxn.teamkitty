@@ -5,6 +5,7 @@ namespace Redirxn.TeamKitty.Models
 {
     public interface ILoginProvider
     {
-        Task<Tuple<string,UserInfo>> GetEmailByLoggingIn();
+        Task<Tuple<Tuple<string,string>,UserInfo>> GetEmailByLoggingIn();
+        Task<String> GetIdFromRefresh(string refreshToken);
     }
 }

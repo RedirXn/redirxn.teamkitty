@@ -19,6 +19,7 @@ namespace Redirxn.TeamKitty.ViewModels
         private IDialogService _dialogService;
 
         public ICommand OnLoginCommand { get; set; }
+        public ICommand OnClearLoginCommand { get; set; }
 
         public bool _canClick = true;
         public bool CanClick
@@ -38,12 +39,13 @@ namespace Redirxn.TeamKitty.ViewModels
             IsLoading = true;
             CanClick = false;
 
+            await Task.Run(() => { });
+            
             string savedLoginData = GetStringAppProperty("LoginData");
             string savedAccessToken = GetStringAppProperty("AccessToken");
             string savedRefreshToken = GetStringAppProperty("RefreshToken");
-
+            
             bool hasSavedCreds = (!string.IsNullOrWhiteSpace(savedLoginData) &&
-                //!string.IsNullOrWhiteSpace(savedRefreshToken) &&
                 !string.IsNullOrWhiteSpace(savedAccessToken));
 
             if (hasSavedCreds)
@@ -51,21 +53,28 @@ namespace Redirxn.TeamKitty.ViewModels
                 var socialLoginData = JsonConvert.DeserializeObject<NetworkAuthData>(savedLoginData);
                 var token = savedAccessToken;
                 await _identityService.Init(token, socialLoginData);
-                if (!_identityService.HasDataCredentials)
-                {
-                    // get new access token from refresh token ????
-                    // update saved credentials
-                }
-                else
+                if (_identityService.HasDataCredentials)
                 {
                     await _navigationService.NavigateTo("///main/home");
                     return;
                 }
+
+                if (!string.IsNullOrEmpty(savedRefreshToken))
+                {
+                    var newIdToken = await DependencyService.Get<ILoginProvider>().GetIdFromRefresh(savedRefreshToken);
+                    await _identityService.Init(newIdToken, socialLoginData);
+                    if (_identityService.HasDataCredentials)
+                    {
+                        await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", newIdToken);
+                        await _navigationService.NavigateTo("///main/home");
+                        return;
+                    }
+                }
+                await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", string.Empty);
             }
-            else
-            {
-                await LoginAsync();
-            }
+
+            await LoginAsync();
+
             IsLoading = false;
             CanClick = true;
         }
@@ -82,6 +91,14 @@ namespace Redirxn.TeamKitty.ViewModels
             _dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
 
             OnLoginCommand = new Command(async () => await StartLogin());
+            OnClearLoginCommand = new Command(async () => await ClearSavedLogin());
+        }
+
+        private async Task ClearSavedLogin()
+        {
+            await Xamarin.Essentials.SecureStorage.SetAsync("LoginData", string.Empty);
+            await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", string.Empty);
+            await Xamarin.Essentials.SecureStorage.SetAsync("RefreshToken", string.Empty);
         }
 
         async Task LoginAsync()
@@ -107,13 +124,15 @@ namespace Redirxn.TeamKitty.ViewModels
                 };
 
                 await Xamarin.Essentials.SecureStorage.SetAsync("LoginData", JsonConvert.SerializeObject(socialLoginData));
-                await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", loginDetail.Item1);
-                //Application.Current.Properties["RefreshToken"] = loginDetail.Item1;
+                await Xamarin.Essentials.SecureStorage.SetAsync("AccessToken", loginDetail.Item1.Item1);
+                await Xamarin.Essentials.SecureStorage.SetAsync("RefreshToken", loginDetail.Item1.Item2 ?? string.Empty);
 
-                await _identityService.Init(loginDetail.Item1, socialLoginData);
+                await _identityService.Init(loginDetail.Item1.Item1, socialLoginData);
                 if (_identityService.HasDataCredentials)
                 {
                     await _navigationService.NavigateTo("///main/home");
+                    await Task.Run(() => { });
+                    return;
                 }
             }
             catch (Exception ex)

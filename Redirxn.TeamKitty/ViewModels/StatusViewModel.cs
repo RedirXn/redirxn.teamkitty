@@ -74,6 +74,12 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _isChangeable; }
             set { SetProperty(ref _isChangeable, value); }
         }
+        private bool _isNameEditable;
+        public bool IsNameEditable
+        {
+            get { return _isNameEditable; }
+            set { SetProperty(ref _isNameEditable, value); }
+        }
 
         public ObservableCollection<GroupedTransaction> Transactions { get; }
 
@@ -98,7 +104,6 @@ namespace Redirxn.TeamKitty.ViewModels
 
             Transactions = new ObservableCollection<GroupedTransaction>();
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
-            IsChangeable = IsAdmin;
         }
 
         private async Task LogOut()
@@ -116,6 +121,8 @@ namespace Redirxn.TeamKitty.ViewModels
                 ReloadSummary(_identityService.LoginData.Email);
             }            
             MyDisplayName = _summary?.Person?.DisplayName ?? _identityService.LoginData.Name;
+            IsNameEditable = MyDisplayName == _identityService.LoginData.Name;
+            IsChangeable = IsNameEditable || IsAdmin;
             UpdateScreenText();
             _loadingFromState = false;
             IsBusy = true;
@@ -271,8 +278,7 @@ namespace Redirxn.TeamKitty.ViewModels
         {
             try
             {
-                string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");
-
+                string newName = await _dialogService.GetSingleTextInput("Change My Name", "Enter the new name:");                
                 if (!string.IsNullOrWhiteSpace(newName) && newName != "Cancel")
                 {
                     await ChangeMyNameTo(newName);

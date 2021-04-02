@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
 using Newtonsoft.Json;
 using Redirxn.TeamKitty.Models;
 using Xamarin.Essentials;
@@ -15,9 +17,11 @@ namespace Redirxn.TeamKitty.Droid
         const string callbackUri = "com.redirxn.teamkitty:/callback";
         const string responseType = "token";
         const string scope = "aws.cognito.signin.user.admin+email+openid+profile";
-        
+        const string userPoolId = "us-east-1_EnMDRXOrG";
+
+
         public AndroidLogin() { }
-        public async Task<Tuple<string, UserInfo>> GetEmailByLoggingIn()
+        public async Task<Tuple<Tuple<string,string>, UserInfo>> GetEmailByLoggingIn()
         {
             WebAuthenticatorResult authResult;
             try
@@ -26,7 +30,8 @@ namespace Redirxn.TeamKitty.Droid
                     new Uri($"https://{domain}/login?client_id={clientId}&response_type={responseType}&scope={scope}&redirect_uri={callbackUri}"),
                     new Uri(callbackUri)
                     );
-            }            
+            }
+            
             catch(Exception ex)
             {
                 Console.WriteLine(ex.ToString());
@@ -37,11 +42,25 @@ namespace Redirxn.TeamKitty.Droid
                 return null;
             var claims = JWT.JsonWebToken.Base64UrlDecode(authResult.IdToken.Split('.')[1]);
             var cString = System.Text.Encoding.UTF8.GetString(claims);
-
+            
             var c = JsonConvert.DeserializeObject<AuthClaims>(cString);
             var u = new UserInfo { Id = c.Email.ToLower(), Name = c.NickName };
+            var tokens = new Tuple<string, string>(authResult.IdToken, authResult.RefreshToken);
+            return new Tuple<Tuple<string, string>, UserInfo>(tokens, u);
+        }
 
-            return new Tuple<string, UserInfo>(authResult.IdToken, u);
+        public async Task<string> GetIdFromRefresh(string refreshToken)
+        {
+            var authReq = new AdminInitiateAuthRequest
+            {
+                UserPoolId = userPoolId,
+                ClientId = clientId,
+                AuthFlow = AuthFlowType.REFRESH_TOKEN_AUTH
+            };
+            
+            AdminInitiateAuthResponse authResp = await new AmazonCognitoIdentityProviderClient().AdminInitiateAuthAsync(authReq);
+
+            return authResp.AuthenticationResult.IdToken;
         }
 
         private class AuthClaims

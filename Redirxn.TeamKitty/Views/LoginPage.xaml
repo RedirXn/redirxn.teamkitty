@@ -83,6 +83,7 @@
                                           HeightRequest="40"
                                           Grid.Row="5"/>
                         <buttons:SfButton Text="Clear Login" 
+                                          IsVisible="false"
                                           Command="{Binding OnClearLoginCommand}"                                   
                                           BackgroundColor="{StaticResource Gray-800}"
                                           TextColor="{StaticResource Gray-100}"
@@ -91,7 +92,6 @@
                                           HeightRequest="40"
                                           Grid.Row="8"/>
                     </Grid>
-
                 </StackLayout>
             </ScrollView>
         </Grid>

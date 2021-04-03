@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Redirxn.TeamKitty.Views;
+using System.Threading.Tasks;
 
 namespace Redirxn.TeamKitty.Services.Application
 {

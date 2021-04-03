@@ -40,6 +40,7 @@ namespace Redirxn.TeamKitty.Services.Gateway
                 _credentials.AddLogin($"cognito-idp.us-east-1.amazonaws.com/{CognitoUserPoolId}", activeToken);
 
                 _client = new AmazonDynamoDBClient(_credentials, RegionEndpoint.USEast1);
+                
                 _context = new DynamoDBContext(_client);
             }
             

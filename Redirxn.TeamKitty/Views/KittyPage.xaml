@@ -6,7 +6,7 @@
              xmlns:model="clr-namespace:Redirxn.TeamKitty.Models"      
              xmlns:controls="clr-namespace:Redirxn.TeamKitty.Controls"
              x:DataType="local:KittyViewModel"
-             Shell.TabBarIsVisible="{Binding HasKitty}"
+             Shell.TabBarIsVisible="{Binding HasKitty, Mode=TwoWay}"
              Title="{Binding CurrentKitty}">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Sign Out" Command="{Binding SignOutCommand}" Order="Secondary"/>

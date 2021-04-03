@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Redirxn.TeamKitty.Views;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Redirxn.TeamKitty.Services.Application
@@ -23,5 +24,6 @@ namespace Redirxn.TeamKitty.Services.Application
         {
             return Shell.Current.Navigation.PopModalAsync();
         }
+
     }
 }

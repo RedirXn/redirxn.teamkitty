@@ -59,9 +59,11 @@ namespace Redirxn.TeamKitty.ViewModels
             get { return _noKitty; }
             set { SetProperty(ref _noKitty, value); }
         }
+        private bool _hasKitty;
         public bool HasKitty
         {
-            get { return !_noKitty; }
+            get { return _hasKitty; }
+            set { SetProperty(ref _hasKitty, value); }
         }
         private string _kittyBalanceText = string.Empty;
         public string KittyBalanceText
@@ -112,6 +114,7 @@ namespace Redirxn.TeamKitty.ViewModels
 
             IsAdmin = _kittyService.AmIAdmin(_identityService.LoginData.Email);
             NoKitty = _kittyService.Kitty == null;
+            HasKitty = !NoKitty;
         }
 
         private async void SignOut()
@@ -162,6 +165,7 @@ namespace Redirxn.TeamKitty.ViewModels
             KittyBalanceText = "When all money collected: $" + balance;
             KittyOnHandText = " Collected so far: $" + onHand;
             NoKitty = _kittyService.Kitty == null;
+            HasKitty = !NoKitty;
         }
         async void OnItemSelected(LedgerSummaryLine item)
         {
@@ -232,7 +236,7 @@ namespace Redirxn.TeamKitty.ViewModels
                 {
                     string kittyId = await CreateNewKittyWithName(newKittyName);
                     await _kittyService.LoadKitty(kittyId);
-                    await _identityService.SetDefaultKitty(kittyId);
+                    await _identityService.SetDefaultKitty(kittyId);                    
                     OnAppearing();
                 }
             }

@@ -11,7 +11,7 @@
     <PackageReference Include="awssdk.cognitoidentity" Version="3.5.2.5" />
     <PackageReference Include="awssdk.core" Version="3.5.2.3" />
     <PackageReference Include="awssdk.dynamodbv2" Version="3.5.4.23" />
-    <PackageReference Include="newtonsoft.json" Version="12.0.3" />
+    <PackageReference Include="newtonsoft.json" Version="13.0.2" />
     <PackageReference Include="plugin.facebookclient" Version="2.2.1" />
     <PackageReference Include="splat" Version="10.0.1" />
     <PackageReference Include="Syncfusion.Xamarin.Buttons" Version="18.4.0.39" />
